@@ -2,586 +2,276 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
 <title>Serpientes y Escaleras Online</title>
 
 <style>
+
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
-    background:
-        radial-gradient(circle at top, #263b58, #101722 70%);
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #20222b;
     color: white;
-    min-height: 100vh;
 }
 
 header {
-    background: rgba(0,0,0,.25);
-    border-bottom: 1px solid rgba(255,255,255,.1);
-    padding: 16px 25px;
-}
-
-.header-content {
-    max-width: 1250px;
-    margin: auto;
-
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-}
-
-.logo {
-    font-size: 25px;
-    font-weight: bold;
-}
-
-.logo span {
-    color: #ffd43b;
-}
-
-.connection {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-}
-
-.connection-dot {
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    background: #ff4d4d;
-}
-
-.connection-dot.online {
-    background: #32d583;
-    box-shadow: 0 0 12px #32d583;
-}
-
-main {
-    max-width: 1250px;
-    margin: auto;
-    padding: 25px;
-}
-
-/* =========================
-   PANTALLA DE INICIO
-========================= */
-
-#pantallaInicio {
-    min-height: calc(100vh - 100px);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.inicio {
-    width: 100%;
-    max-width: 650px;
-
     text-align: center;
-
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.12);
-
-    border-radius: 25px;
-
-    padding: 50px 35px;
-
-    box-shadow: 0 20px 60px rgba(0,0,0,.25);
+    padding: 20px;
+    background: #15161c;
 }
 
-.dados-logo {
-    font-size: 85px;
-    margin-bottom: 15px;
+header h1 {
+    margin: 0;
 }
 
-.inicio h1 {
-    font-size: clamp(38px, 7vw, 65px);
-    margin-bottom: 15px;
-}
-
-.inicio h1 span {
-    color: #ffd43b;
-}
-
-.inicio p {
-    color: #bdc7d5;
-    line-height: 1.6;
-    margin-bottom: 30px;
-}
-
-.nombre-input {
-    width: 100%;
-    max-width: 430px;
-
-    padding: 16px 18px;
-
-    border: 2px solid rgba(255,255,255,.15);
-    border-radius: 12px;
-
-    background: rgba(0,0,0,.25);
-    color: white;
-
-    font-size: 17px;
-
-    outline: none;
-
-    margin-bottom: 15px;
-}
-
-.nombre-input:focus {
-    border-color: #ffd43b;
-}
-
-.btn {
-    border: none;
-    cursor: pointer;
-
-    padding: 15px 28px;
-
-    border-radius: 12px;
-
-    font-size: 17px;
+#estadoConexion {
+    margin-top: 8px;
     font-weight: bold;
-
-    transition: .2s;
 }
 
-.btn:hover {
-    transform: translateY(-2px);
+.conectado {
+    color: #50d878;
 }
 
-.btn-primary {
-    background: #ffd43b;
-    color: #171717;
-
-    box-shadow: 0 10px 25px rgba(255,212,59,.2);
+.desconectado {
+    color: #ff5555;
 }
 
-.btn-primary:hover {
-    background: #ffe16b;
-}
-
-.btn-danger {
-    background: #e5484d;
-    color: white;
-}
-
-.btn-secondary {
-    background: #374151;
-    color: white;
-}
-
-/* =========================
-   JUEGO
-========================= */
-
-#pantallaJuego {
-    display: none;
-}
-
-.game-layout {
-    display: grid;
-
-    grid-template-columns:
-        minmax(500px, 760px)
-        minmax(280px, 350px);
-
-    gap: 25px;
-
+.contenedor {
+    display: flex;
     justify-content: center;
+    gap: 25px;
+    padding: 25px;
+    flex-wrap: wrap;
 }
 
-/* =========================
-   TABLERO
-========================= */
-
-.board-container {
-    width: 100%;
-
-    background: rgba(0,0,0,.2);
-
-    border-radius: 20px;
-
-    padding: 15px;
-
-    box-shadow: 0 20px 50px rgba(0,0,0,.2);
-}
-
-.board {
-    position: relative;
-
-    width: 100%;
-
-    aspect-ratio: 1 / 1;
+#tablero {
+    width: 680px;
+    height: 680px;
 
     display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: repeat(10, 1fr);
 
-    grid-template-columns:
-        repeat(10, 1fr);
-
-    grid-template-rows:
-        repeat(10, 1fr);
-
-    overflow: hidden;
-
-    border-radius: 12px;
-
-    border: 3px solid rgba(255,255,255,.25);
+    border: 4px solid #111;
+    background: white;
 }
 
-.cell {
+.casilla {
     position: relative;
 
-    border: 1px solid rgba(0,0,0,.18);
+    border: 1px solid #777;
 
     display: flex;
-
     align-items: flex-start;
     justify-content: flex-start;
 
-    padding: 5px;
+    padding: 4px;
 
-    font-size: clamp(9px, 1.5vw, 14px);
+    color: #222;
+
+    font-size: 13px;
+
+    overflow: hidden;
+}
+
+.casilla:nth-child(odd) {
+    background: #f5f5f5;
+}
+
+.casilla:nth-child(even) {
+    background: #dfeaf5;
+}
+
+.numero {
+    position: absolute;
+    top: 4px;
+    left: 5px;
 
     font-weight: bold;
-
-    color: rgba(0,0,0,.65);
 }
 
-.cell:nth-child(odd) {
-    background: #f5d58a;
-}
-
-.cell:nth-child(even) {
-    background: #e9b95e;
-}
-
-.cell.start {
-    background: #7bd88f !important;
-}
-
-.cell.finish {
-    background: #ffd43b !important;
-}
-
-.cell-number {
-    position: absolute;
-    top: 3px;
-    left: 5px;
-}
-
-.special {
+.jugadores {
     position: absolute;
 
-    inset: 0;
+    left: 50%;
+    top: 50%;
+
+    transform: translate(-50%, -40%);
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    width: 55px;
+
+    gap: 3px;
+}
+
+.jugador {
+    width: 24px;
+    height: 24px;
+
+    border-radius: 50%;
+
+    border: 2px solid #111;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    font-size: clamp(17px, 3vw, 32px);
+    color: white;
 
-    opacity: .75;
+    font-size: 11px;
 
-    pointer-events: none;
+    font-weight: bold;
 }
-
-.player {
-    position: absolute;
-
-    width: 25px;
-    height: 25px;
-
-    border-radius: 50%;
-
-    border: 3px solid white;
-
-    box-shadow: 0 3px 8px rgba(0,0,0,.5);
-
-    z-index: 10;
-
-    transform: translate(-50%, -50%);
-}
-
-.player.p0 {
-    background: #e63946;
-}
-
-.player.p1 {
-    background: #457b9d;
-}
-
-.player.p2 {
-    background: #2a9d8f;
-}
-
-.player.p3 {
-    background: #9b5de5;
-}
-
-/* =========================
-   PANEL
-========================= */
 
 .panel {
-    background: rgba(255,255,255,.07);
+    width: 320px;
 
-    border:
-        1px solid rgba(255,255,255,.1);
+    background: white;
 
-    border-radius: 20px;
+    color: #222;
 
-    padding: 25px;
+    border-radius: 12px;
 
-    height: fit-content;
+    padding: 20px;
+
+    box-shadow:
+        0 5px 20px rgba(0,0,0,0.4);
 }
 
 .panel h2 {
-    margin-bottom: 20px;
+    margin-top: 0;
 }
 
-.status {
-    background: rgba(0,0,0,.22);
-
-    padding: 15px;
-
-    border-radius: 12px;
-
-    margin-bottom: 15px;
-
-    color: #d6deea;
-
-    line-height: 1.5;
+.info {
+    margin-bottom: 10px;
 }
 
-.turn {
-    background: rgba(255,212,59,.12);
+.turno {
+    padding: 12px;
 
-    border:
-        1px solid rgba(255,212,59,.3);
+    background: #e9f9ee;
 
-    padding: 15px;
+    color: #16813c;
 
-    border-radius: 12px;
+    border-radius: 8px;
 
-    margin-bottom: 20px;
+    font-weight: bold;
 
-    text-align: center;
+    margin: 15px 0;
 }
 
-.turn strong {
-    color: #ffd43b;
-}
-
-.players-list {
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 10px;
-
-    margin-bottom: 20px;
-}
-
-.player-card {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
+.evento {
+    background: #eeeeee;
 
     padding: 12px;
 
-    background: rgba(0,0,0,.2);
+    border-radius: 8px;
 
-    border-radius: 10px;
+    min-height: 60px;
+
+    margin-bottom: 15px;
 }
 
-.player-color {
-    width: 17px;
-    height: 17px;
+button {
 
-    border-radius: 50%;
+    width: 100%;
 
-    border: 2px solid white;
-}
+    padding: 14px;
 
-.dice-area {
-    text-align: center;
+    margin-top: 10px;
 
-    padding: 15px 0;
-}
+    border: none;
 
-.dice {
-    font-size: 75px;
+    border-radius: 8px;
 
-    min-height: 100px;
+    color: white;
 
-    display: flex;
+    font-size: 17px;
 
-    justify-content: center;
-
-    align-items: center;
-}
-
-.dice-number {
-    font-size: 55px;
     font-weight: bold;
+
+    cursor: pointer;
 }
 
-.btn-dice {
-    width: 100%;
-
-    font-size: 19px;
-
-    padding: 17px;
+#btnDado {
+    background: #28b85a;
 }
 
-.btn-dice:disabled {
-    opacity: .45;
+#btnDado:hover {
+    background: #1e9848;
+}
+
+#btnAbandonar {
+    background: #e33d3d;
+}
+
+#btnAbandonar:hover {
+    background: #bd2929;
+}
+
+#btnReiniciar {
+    background: #2675d9;
+}
+
+#btnReiniciar:hover {
+    background: #1d5dad;
+}
+
+button:disabled {
+    background: #999 !important;
     cursor: not-allowed;
-
-    transform: none;
 }
 
-.event {
-    min-height: 70px;
-
-    margin-top: 20px;
-
-    padding: 13px;
-
-    border-radius: 10px;
-
-    background: rgba(0,0,0,.2);
-
-    color: #cbd5e1;
-
-    font-size: 14px;
-
-    line-height: 1.5;
-}
-
-.abandonar {
-    width: 100%;
-
+.listaJugadores {
     margin-top: 15px;
 }
 
-/* =========================
-   GANADOR
-========================= */
+.listaJugador {
+    padding: 8px;
 
-.winner {
-    position: fixed;
+    margin-bottom: 5px;
 
-    inset: 0;
+    border-radius: 5px;
 
-    background: rgba(0,0,0,.75);
-
-    z-index: 100;
-
-    display: none;
-
-    align-items: center;
-
-    justify-content: center;
-
-    padding: 20px;
+    background: #eeeeee;
 }
 
-.winner-box {
-    max-width: 500px;
-    width: 100%;
+#dado {
+    font-size: 55px;
 
     text-align: center;
 
-    background: #182231;
+    font-weight: bold;
 
-    border:
-        1px solid rgba(255,255,255,.15);
-
-    border-radius: 25px;
-
-    padding: 50px 30px;
+    margin: 10px 0;
 }
 
-.winner-icon {
-    font-size: 80px;
+@media(max-width: 750px) {
 
-    margin-bottom: 15px;
-}
-
-.winner-box h2 {
-    font-size: 40px;
-
-    color: #ffd43b;
-
-    margin-bottom: 15px;
-}
-
-.winner-box p {
-    color: #cbd5e1;
-
-    margin-bottom: 25px;
-}
-
-/* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 950px) {
-
-    .game-layout {
-        grid-template-columns: 1fr;
-
-        max-width: 760px;
-
-        margin: auto;
-    }
-
-}
-
-@media (max-width: 600px) {
-
-    main {
-        padding: 12px;
-    }
-
-    header {
-        padding: 13px;
-    }
-
-    .logo {
-        font-size: 19px;
-    }
-
-    .board-container {
-        padding: 7px;
+    #tablero {
+        width: 95vw;
+        height: 95vw;
     }
 
     .panel {
-        padding: 18px;
+        width: 95vw;
     }
-
-    .player {
-        width: 18px;
-        height: 18px;
-        border-width: 2px;
-    }
-
 }
+
 </style>
 </head>
 
@@ -589,210 +279,87 @@ main {
 
 <header>
 
-    <div class="header-content">
+<h1>🎲 Serpientes y Escaleras Online</h1>
 
-        <div class="logo">
-            🎲 Serpientes<span>Escaleras</span>
-        </div>
+<div id="estadoConexion"
+     class="desconectado">
 
-        <div class="connection">
+    Conectando...
 
-            <div
-                id="connectionDot"
-                class="connection-dot">
-            </div>
-
-            <span id="connectionText">
-                Desconectado
-            </span>
-
-        </div>
-
-    </div>
+</div>
 
 </header>
 
 
-<!-- =====================================
-     INICIO
-====================================== -->
+<div class="contenedor">
 
-<section id="pantallaInicio">
+    <div id="tablero"></div>
 
-    <div class="inicio">
 
-        <div class="dados-logo">
-            🐍🎲🪜
+    <div class="panel">
+
+        <h2>🎮 Partida</h2>
+
+        <div class="info">
+            <b>Tu jugador:</b>
+            <span id="miJugador">-</span>
         </div>
 
-        <h1>
-            Serpientes y
-            <span>Escaleras</span>
-        </h1>
+        <div class="info">
+            <b>Jugadores:</b>
+            <span id="cantidadJugadores">0/4</span>
+        </div>
 
-        <p>
-            Juego multijugador online.
-            Conéctate desde tu navegador
-            y juega con hasta 4 personas.
-        </p>
+        <div class="info">
+            <b>Último dado:</b>
+        </div>
 
-        <input
-            id="nombreJugador"
-            class="nombre-input"
-            type="text"
-            maxlength="20"
-            placeholder="Escribe tu nombre">
+        <div id="dado">
+            -
+        </div>
 
-        <br>
+        <div id="turno"
+             class="turno">
 
-        <button
-            id="btnEntrar"
-            class="btn btn-primary"
-            onclick="entrarJuego()">
+            Esperando servidor...
 
-            🎮 Entrar al juego
+        </div>
+
+        <div>
+            <b>Último evento:</b>
+        </div>
+
+        <div id="evento"
+             class="evento">
+
+            Conectando al servidor...
+
+        </div>
+
+        <div class="listaJugadores">
+
+            <b>Jugadores conectados</b>
+
+            <div id="listaJugadores"></div>
+
+        </div>
+
+        <button id="btnDado"
+                disabled>
+
+            🎲 LANZAR DADO
 
         </button>
 
-        <div
-            id="errorInicio"
-            style="
-                color:#ff7777;
-                margin-top:15px;
-            ">
-        </div>
+        <button id="btnReiniciar">
 
-    </div>
+            🔄 REINICIAR PARTIDA
 
-</section>
+        </button>
 
+        <button id="btnAbandonar">
 
-<!-- =====================================
-     JUEGO
-====================================== -->
-
-<main id="pantallaJuego">
-
-    <div class="game-layout">
-
-        <!-- TABLERO -->
-
-        <div class="board-container">
-
-            <div
-                id="board"
-                class="board">
-            </div>
-
-        </div>
-
-
-        <!-- PANEL -->
-
-        <aside class="panel">
-
-            <h2>🎮 Partida</h2>
-
-            <div
-                id="status"
-                class="status">
-
-                Conectando...
-
-            </div>
-
-            <div
-                id="turn"
-                class="turn">
-
-                Esperando jugadores...
-
-            </div>
-
-            <h3 style="margin-bottom:12px;">
-                👥 Jugadores
-            </h3>
-
-            <div
-                id="playersList"
-                class="players-list">
-            </div>
-
-
-            <div class="dice-area">
-
-                <div
-                    id="dice"
-                    class="dice">
-
-                    🎲
-
-                </div>
-
-                <button
-                    id="btnDado"
-                    class="btn btn-primary btn-dice"
-                    onclick="lanzarDado()"
-                    disabled>
-
-                    🎲 Lanzar dado
-
-                </button>
-
-            </div>
-
-
-            <div
-                id="event"
-                class="event">
-
-                Esperando conexión...
-
-            </div>
-
-
-            <button
-                class="btn btn-danger abandonar"
-                onclick="abandonar()">
-
-                🚪 Abandonar partida
-
-            </button>
-
-        </aside>
-
-    </div>
-
-</main>
-
-
-<!-- =====================================
-     GANADOR
-====================================== -->
-
-<div
-    id="winner"
-    class="winner">
-
-    <div class="winner-box">
-
-        <div class="winner-icon">
-            🏆
-        </div>
-
-        <h2>
-            ¡Ganador!
-        </h2>
-
-        <p id="winnerText">
-            ¡Has ganado!
-        </p>
-
-        <button
-            class="btn btn-primary"
-            onclick="cerrarGanador()">
-
-            🎮 Seguir
+            🚪 ABANDONAR PARTIDA
 
         </button>
 
@@ -803,398 +370,399 @@ main {
 
 <script>
 
-/* ============================================================
-   CONFIGURACIÓN
-============================================================ */
+
+// ============================================================
+// CONFIGURACIÓN
+// ============================================================
 
 const SERVER_URL =
     "wss://serpientes-escaleras-phl7.onrender.com";
 
 
-/* ============================================================
-   VARIABLES
-============================================================ */
+const MAX_JUGADORES = 4;
+
+
+// ============================================================
+// ESTADO
+// ============================================================
 
 let socket = null;
 
 let miId = null;
 
-let nombre = "";
+let jugadores = {};
 
-let estadoJuego = {
+let turno = null;
 
-    jugadores: {},
+let ganador = null;
 
-    turno: 0,
+let dado = 0;
 
-    ganador: null,
+let ultimoEvento =
+    "Conectando al servidor...";
 
-    dado: 1,
+let escaleras = {};
 
-    ultimo_dado: 1,
-
-    ultimo_evento: "",
-
-    escaleras: {},
-
-    serpientes: {}
-
-};
-
-let conectado = false;
+let serpientes = {};
 
 
-/* ============================================================
-   TABLERO
-============================================================ */
+// ============================================================
+// COLORES
+// ============================================================
 
-const ESCALERAS_DEFAULT = {
-
-    4: 25,
-    13: 46,
-    33: 49,
-    42: 63,
-    50: 69,
-    62: 81,
-    74: 92
-
-};
-
-const SERPIENTES_DEFAULT = {
-
-    27: 5,
-    40: 3,
-    43: 18,
-    54: 31,
-    66: 45,
-    76: 58,
-    89: 53,
-    99: 41
-
-};
+const colores = [
+    "#ff5050",
+    "#5078ff",
+    "#50c864",
+    "#dc64dc"
+];
 
 
-/* ============================================================
-   CREAR TABLERO
-============================================================ */
+// ============================================================
+// TABLERO
+// ============================================================
+
+const tablero =
+    document.getElementById("tablero");
+
 
 function crearTablero() {
 
-    const board =
-        document.getElementById("board");
+    tablero.innerHTML = "";
 
-    board.innerHTML = "";
 
-    /*
-       Creamos las casillas 100 → 1
-       para producir el patrón clásico
-       de serpientes y escaleras.
-    */
+    for (
+        let fila = 0;
+        fila < 10;
+        fila++
+    ) {
 
-    for (let fila = 9; fila >= 0; fila--) {
+        for (
+            let columna = 0;
+            columna < 10;
+            columna++
+        ) {
 
-        let inicio = fila * 10 + 1;
-        let numeros = [];
+            let numeroFila =
+                9 - fila;
 
-        for (let i = 0; i < 10; i++) {
+            let numero;
 
-            numeros.push(inicio + i);
 
-        }
+            if (
+                numeroFila % 2 === 0
+            ) {
 
-        if ((9 - fila) % 2 === 1) {
-
-            numeros.reverse();
-
-        }
-
-        numeros.forEach(numero => {
-
-            const cell =
-                document.createElement("div");
-
-            cell.className = "cell";
-
-            cell.dataset.numero = numero;
-
-            if (numero === 1) {
-
-                cell.classList.add("start");
-
-            }
-
-            if (numero === 100) {
-
-                cell.classList.add("finish");
-
-            }
-
-            const numeroTexto =
-                document.createElement("span");
-
-            numeroTexto.className =
-                "cell-number";
-
-            numeroTexto.textContent =
-                numero;
-
-            cell.appendChild(numeroTexto);
-
-
-            const escaleras =
-                estadoJuego.escaleras &&
-                Object.keys(estadoJuego.escaleras).length
-                    ? estadoJuego.escaleras
-                    : ESCALERAS_DEFAULT;
-
-            const serpientes =
-                estadoJuego.serpientes &&
-                Object.keys(estadoJuego.serpientes).length
-                    ? estadoJuego.serpientes
-                    : SERPIENTES_DEFAULT;
-
-
-            if (escaleras[numero]) {
-
-                const icon =
-                    document.createElement("div");
-
-                icon.className = "special";
-
-                icon.textContent = "🪜";
-
-                cell.appendChild(icon);
-
-            }
-
-            if (serpientes[numero]) {
-
-                const icon =
-                    document.createElement("div");
-
-                icon.className = "special";
-
-                icon.textContent = "🐍";
-
-                cell.appendChild(icon);
-
-            }
-
-            board.appendChild(cell);
-
-        });
-
-    }
-
-    dibujarJugadores();
-
-}
-
-
-/* ============================================================
-   POSICIÓN DE UNA CASILLA
-============================================================ */
-
-function obtenerPosicion(numero) {
-
-    numero = Math.max(1, Math.min(100, Number(numero)));
-
-    const indice =
-        100 - numero;
-
-    const fila =
-        Math.floor(indice / 10);
-
-    let columna =
-        indice % 10;
-
-    if (fila % 2 === 1) {
-
-        columna = 9 - columna;
-
-    }
-
-    return {
-
-        fila: fila,
-        columna: columna
-
-    };
-
-}
-
-
-/* ============================================================
-   DIBUJAR JUGADORES
-============================================================ */
-
-function dibujarJugadores() {
-
-    const board =
-        document.getElementById("board");
-
-    board.querySelectorAll(".player").forEach(p => {
-
-        p.remove();
-
-    });
-
-
-    const jugadores =
-        estadoJuego.jugadores || {};
-
-
-    Object.entries(jugadores).forEach(
-        ([id, jugador], indice) => {
-
-            let posicion = 1;
-
-            if (typeof jugador === "object") {
-
-                posicion =
-                    jugador.posicion ??
-                    jugador.position ??
-                    jugador.casilla ??
-                    jugador.pos ??
-                    1;
+                numero =
+                    numeroFila * 10 +
+                    columna + 1;
 
             } else {
 
-                posicion =
-                    jugador;
-
+                numero =
+                    numeroFila * 10 +
+                    (9 - columna) + 1;
             }
 
-            const pos =
-                obtenerPosicion(posicion);
 
-
-            const jugadorElemento =
+            const casilla =
                 document.createElement("div");
 
-            jugadorElemento.className =
-                "player p" + (indice % 4);
+            casilla.className =
+                "casilla";
+
+            casilla.dataset.numero =
+                numero;
 
 
-            /*
-               Cada jugador recibe un pequeño
-               desplazamiento para que varios
-               jugadores puedan verse en la
-               misma casilla.
-            */
+            const numeroElemento =
+                document.createElement("div");
 
-            const desplazamientos = [
+            numeroElemento.className =
+                "numero";
 
-                [-18, -18],
-                [18, -18],
-                [-18, 18],
-                [18, 18]
-
-            ];
-
-            const desplazamiento =
-                desplazamientos[indice % 4];
+            numeroElemento.textContent =
+                numero;
 
 
-            jugadorElemento.style.left =
-                `calc(${(pos.columna + .5) * 10}% + ${desplazamiento[0]}px)`;
-
-            jugadorElemento.style.top =
-                `calc(${(pos.fila + .5) * 10}% + ${desplazamiento[1]}px)`;
+            casilla.appendChild(
+                numeroElemento
+            );
 
 
-            jugadorElemento.title =
-                obtenerNombreJugador(jugador);
+            const jugadoresElemento =
+                document.createElement("div");
+
+            jugadoresElemento.className =
+                "jugadores";
 
 
-            board.appendChild(jugadorElemento);
+            casilla.appendChild(
+                jugadoresElemento
+            );
 
+
+            tablero.appendChild(
+                casilla
+            );
         }
-    );
-
+    }
 }
 
 
-/* ============================================================
-   NOMBRE DEL JUGADOR
-============================================================ */
+// ============================================================
+// DIBUJAR JUGADORES
+// ============================================================
 
-function obtenerNombreJugador(jugador) {
+function dibujarJugadores() {
 
-    if (!jugador) {
+    document
+        .querySelectorAll(".jugadores")
+        .forEach(
+            elemento =>
+                elemento.innerHTML = ""
+        );
 
-        return "Jugador";
 
+    for (
+        const [id, jugador]
+        of Object.entries(jugadores)
+    ) {
+
+        const posicion =
+            Number(
+                jugador.posicion ??
+                jugador.casilla ??
+                1
+            );
+
+
+        const casilla =
+            document.querySelector(
+                `.casilla[data-numero="${posicion}"]`
+            );
+
+
+        if (!casilla) {
+            continue;
+        }
+
+
+        const contenedor =
+            casilla.querySelector(
+                ".jugadores"
+            );
+
+
+        const ficha =
+            document.createElement("div");
+
+        ficha.className =
+            "jugador";
+
+
+        let color =
+            jugador.color;
+
+
+        if (
+            Array.isArray(color)
+        ) {
+
+            color =
+                `rgb(${color[0]},${color[1]},${color[2]})`;
+
+        } else {
+
+            color =
+                colores[
+                    (Number(id) - 1)
+                    % colores.length
+                ];
+        }
+
+
+        ficha.style.background =
+            color;
+
+
+        ficha.textContent =
+            id;
+
+
+        ficha.title =
+            jugador.nombre ??
+            `Jugador ${id}`;
+
+
+        contenedor.appendChild(
+            ficha
+        );
     }
-
-    if (typeof jugador === "string") {
-
-        return jugador;
-
-    }
-
-    return jugador.nombre ||
-           jugador.name ||
-           "Jugador";
-
 }
 
 
-/* ============================================================
-   ENTRAR
-============================================================ */
+// ============================================================
+// ACTUALIZAR INTERFAZ
+// ============================================================
 
-function entrarJuego() {
+function actualizarInterfaz() {
 
-    const input =
-        document.getElementById("nombreJugador");
+    document.getElementById(
+        "miJugador"
+    ).textContent =
+        miId ?? "-";
 
-    nombre =
-        input.value.trim();
 
-    if (!nombre) {
+    document.getElementById(
+        "cantidadJugadores"
+    ).textContent =
+        `${Object.keys(jugadores).length}/${MAX_JUGADORES}`;
 
+
+    document.getElementById(
+        "dado"
+    ).textContent =
+        dado || "-";
+
+
+    document.getElementById(
+        "evento"
+    ).textContent =
+        ultimoEvento;
+
+
+    const turnoElemento =
         document.getElementById(
-            "errorInicio"
-        ).textContent =
-            "Escribe tu nombre.";
+            "turno"
+        );
 
-        return;
+
+    if (ganador !== null) {
+
+        turnoElemento.textContent =
+            `🏆 ¡GANÓ EL JUGADOR ${ganador}!`;
 
     }
 
+    else if (
+        miId !== null &&
+        turno !== null &&
+        String(miId) === String(turno)
+    ) {
 
-    document.getElementById(
-        "errorInicio"
-    ).textContent = "";
+        turnoElemento.textContent =
+            "🎯 ¡ES TU TURNO!";
+
+    }
+
+    else if (turno !== null) {
+
+        turnoElemento.textContent =
+            `Turno del jugador ${turno}`;
+
+    }
+
+    else {
+
+        turnoElemento.textContent =
+            "Esperando jugadores...";
+    }
 
 
-    document.getElementById(
-        "btnEntrar"
-    ).disabled = true;
+    const boton =
+        document.getElementById(
+            "btnDado"
+        );
 
 
-    conectarServidor();
+    boton.disabled = !(
+        socket &&
+        socket.readyState === WebSocket.OPEN &&
+        miId !== null &&
+        turno !== null &&
+        String(miId) === String(turno) &&
+        ganador === null
+    );
 
+
+    dibujarJugadores();
+
+    dibujarListaJugadores();
 }
 
 
-/* ============================================================
-   CONECTAR WEBSOCKET
-============================================================ */
+// ============================================================
+// LISTA DE JUGADORES
+// ============================================================
 
-function conectarServidor() {
+function dibujarListaJugadores() {
 
-    actualizarConexion(
-        false,
-        "Conectando..."
-    );
+    const lista =
+        document.getElementById(
+            "listaJugadores"
+        );
+
+
+    lista.innerHTML = "";
+
+
+    for (
+        const [id, jugador]
+        of Object.entries(jugadores)
+    ) {
+
+        const elemento =
+            document.createElement("div");
+
+        elemento.className =
+            "listaJugador";
+
+
+        const posicion =
+            jugador.posicion ??
+            jugador.casilla ??
+            1;
+
+
+        elemento.textContent =
+            `Jugador ${id} — Casilla ${posicion}`;
+
+
+        if (
+            String(id) === String(turno)
+        ) {
+
+            elemento.textContent +=
+                " 🎯";
+        }
+
+
+        lista.appendChild(
+            elemento
+        );
+    }
+}
+
+
+// ============================================================
+// CONECTAR
+// ============================================================
+
+function conectar() {
+
+    ultimoEvento =
+        "Conectando al servidor online...";
+
+    actualizarInterfaz();
 
 
     try {
 
         socket =
-            new WebSocket(SERVER_URL);
+            new WebSocket(
+                SERVER_URL
+            );
 
     }
 
@@ -1205,127 +773,298 @@ function conectarServidor() {
         );
 
         return;
-
     }
 
 
     socket.onopen = function() {
 
-        conectado = true;
-
-        actualizarConexion(
-            true,
-            "Servidor conectado"
-        );
+        const estado =
+            document.getElementById(
+                "estadoConexion"
+            );
 
 
-        /*
-           Enviamos el nombre del jugador.
-           El servidor puede aceptar "nombre"
-           o "conexion".
-        */
+        estado.textContent =
+            "🟢 CONECTADO AL SERVIDOR";
 
-        enviar({
-
-            tipo: "conexion",
-
-            nombre: nombre
-
-        });
+        estado.className =
+            "conectado";
 
 
-        /*
-           También enviamos una variante
-           compatible con servidores que
-           esperan directamente el nombre.
-        */
+        ultimoEvento =
+            "Conectado al servidor online.";
 
-        setTimeout(() => {
 
-            if (
-                socket &&
-                socket.readyState === WebSocket.OPEN &&
-                !miId
-            ) {
+        actualizarInterfaz();
+    };
 
-                enviar({
 
-                    tipo: "nombre",
+    socket.onmessage =
+        function(evento) {
 
-                    nombre: nombre
+            try {
 
-                });
+                const mensaje =
+                    JSON.parse(
+                        evento.data
+                    );
+
+
+                procesarMensaje(
+                    mensaje
+                );
 
             }
 
-        }, 300);
+            catch (error) {
 
-    };
+                console.error(
+                    "Mensaje inválido:",
+                    evento.data
+                );
+            }
+        };
 
 
-    socket.onmessage = function(event) {
+    socket.onclose =
+        function() {
 
-        try {
+            const estado =
+                document.getElementById(
+                    "estadoConexion"
+                );
 
-            const mensaje =
-                JSON.parse(event.data);
 
-            procesarMensaje(mensaje);
+            estado.textContent =
+                "🔴 DESCONECTADO";
 
-        }
+            estado.className =
+                "desconectado";
 
-        catch (error) {
+
+            ultimoEvento =
+                "Se perdió la conexión con el servidor.";
+
+
+            actualizarInterfaz();
+        };
+
+
+    socket.onerror =
+        function(error) {
 
             console.error(
-                "Mensaje inválido:",
-                event.data
+                "WebSocket:",
+                error
             );
 
-        }
 
-    };
-
-
-    socket.onerror = function(error) {
-
-        console.error(
-            "WebSocket:",
-            error
-        );
-
-        actualizarConexion(
-            false,
-            "Error de conexión"
-        );
-
-        mostrarError(
-            "No se pudo conectar al servidor."
-        );
-
-    };
-
-
-    socket.onclose = function() {
-
-        conectado = false;
-
-        actualizarConexion(
-            false,
-            "Desconectado"
-        );
-
-        document.getElementById(
-            "btnDado"
-        ).disabled = true;
-
-    };
-
+            mostrarError(
+                "Error de conexión con Render."
+            );
+        };
 }
 
 
-/* ============================================================
-   ENVIAR
-============================================================ */
+// ============================================================
+// PROCESAR MENSAJE
+// ============================================================
+
+function procesarMensaje(mensaje) {
+
+    const tipo =
+        mensaje.tipo;
+
+
+    console.log(
+        "Servidor:",
+        mensaje
+    );
+
+
+    // --------------------------------------------------------
+    // CONEXIÓN
+    // --------------------------------------------------------
+
+    if (
+        tipo === "conexion" ||
+        tipo === "asignar_id"
+    ) {
+
+        miId =
+            mensaje.id;
+
+
+        if (
+            mensaje.escaleras
+        ) {
+
+            escaleras =
+                mensaje.escaleras;
+        }
+
+
+        if (
+            mensaje.serpientes
+        ) {
+
+            serpientes =
+                mensaje.serpientes;
+        }
+
+
+        ultimoEvento =
+            `Conectado como Jugador ${miId}.`;
+    }
+
+
+    // --------------------------------------------------------
+    // ESTADO
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "estado"
+    ) {
+
+        jugadores =
+            mensaje.jugadores || {};
+
+
+        turno =
+            mensaje.turno;
+
+
+        ganador =
+            mensaje.ganador;
+
+
+        dado =
+            mensaje.dado ??
+            mensaje.ultimo_dado ??
+            0;
+
+
+        ultimoEvento =
+            mensaje.ultimo_evento ??
+            ultimoEvento;
+
+
+        escaleras =
+            mensaje.escaleras ??
+            escaleras;
+
+
+        serpientes =
+            mensaje.serpientes ??
+            serpientes;
+    }
+
+
+    // --------------------------------------------------------
+    // RESULTADO
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "resultado_dado" ||
+        tipo === "resultado"
+    ) {
+
+        if (
+            mensaje.dado !== undefined
+        ) {
+
+            dado =
+                mensaje.dado;
+        }
+
+
+        ultimoEvento =
+            mensaje.mensaje ??
+            "Resultado recibido.";
+    }
+
+
+    // --------------------------------------------------------
+    // MENSAJE
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "mensaje"
+    ) {
+
+        ultimoEvento =
+            mensaje.mensaje ??
+            "";
+    }
+
+
+    // --------------------------------------------------------
+    // ERROR
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "error"
+    ) {
+
+        ultimoEvento =
+            mensaje.mensaje ??
+            "El servidor informó un error.";
+    }
+
+
+    // --------------------------------------------------------
+    // LLENO
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "lleno"
+    ) {
+
+        ultimoEvento =
+            mensaje.mensaje ??
+            "La partida está llena.";
+    }
+
+
+    // --------------------------------------------------------
+    // REINICIO
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "reinicio"
+    ) {
+
+        dado = 0;
+
+        ganador = null;
+
+        ultimoEvento =
+            "Partida reiniciada.";
+    }
+
+
+    // --------------------------------------------------------
+    // SERVIDOR CERRADO
+    // --------------------------------------------------------
+
+    else if (
+        tipo === "servidor_cerrando" ||
+        tipo === "servidor_cerrado"
+    ) {
+
+        ultimoEvento =
+            mensaje.mensaje ??
+            "El servidor se cerró.";
+    }
+
+
+    actualizarInterfaz();
+}
+
+
+// ============================================================
+// ENVIAR
+// ============================================================
 
 function enviar(datos) {
 
@@ -1334,588 +1073,81 @@ function enviar(datos) {
         socket.readyState !== WebSocket.OPEN
     ) {
 
-        return false;
+        ultimoEvento =
+            "No estás conectado al servidor.";
 
+        actualizarInterfaz();
+
+        return false;
     }
+
 
     socket.send(
         JSON.stringify(datos)
     );
 
+
     return true;
-
 }
 
 
-/* ============================================================
-   PROCESAR MENSAJES
-============================================================ */
-
-function procesarMensaje(mensaje) {
-
-    console.log(
-        "Servidor:",
-        mensaje
-    );
-
-
-    switch (mensaje.tipo) {
-
-        case "asignar_id":
-
-            miId =
-                mensaje.id;
-
-            break;
-
-
-        case "conexion":
-
-            if (mensaje.id !== undefined) {
-
-                miId =
-                    mensaje.id;
-
-            }
-
-            actualizarEstado(
-                mensaje
-            );
-
-            break;
-
-
-        case "estado":
-
-            actualizarEstado(
-                mensaje
-            );
-
-            break;
-
-
-        case "resultado_dado":
-
-        case "resultado":
-
-        case "dado":
-
-            if (
-                mensaje.valor !== undefined
-            ) {
-
-                estadoJuego.ultimo_dado =
-                    mensaje.valor;
-
-                estadoJuego.dado =
-                    mensaje.valor;
-
-            }
-
-            if (
-                mensaje.dado !== undefined
-            ) {
-
-                estadoJuego.ultimo_dado =
-                    mensaje.dado;
-
-                estadoJuego.dado =
-                    mensaje.dado;
-
-            }
-
-            actualizarEstado(
-                mensaje
-            );
-
-            break;
-
-
-        case "mensaje":
-
-            mostrarEvento(
-                mensaje.mensaje ||
-                mensaje.texto ||
-                "Mensaje del servidor."
-            );
-
-            break;
-
-
-        case "error":
-
-            mostrarEvento(
-                "❌ " +
-                (
-                    mensaje.mensaje ||
-                    mensaje.error ||
-                    "Error del servidor."
-                )
-            );
-
-            break;
-
-
-        case "lleno":
-
-            mostrarError(
-                "La partida está llena. Máximo 4 jugadores."
-            );
-
-            if (socket) {
-
-                socket.close();
-
-            }
-
-            break;
-
-
-        case "reinicio":
-
-            estadoJuego.ganador =
-                null;
-
-            mostrarEvento(
-                "🔄 La partida fue reiniciada."
-            );
-
-            actualizarInterfaz();
-
-            cerrarGanador();
-
-            break;
-
-
-        case "servidor_cerrando":
-
-        case "servidor_cerrado":
-
-            mostrarEvento(
-                "⚠️ El servidor se está cerrando."
-            );
-
-            break;
-
-
-        default:
-
-            /*
-               Algunos servidores pueden enviar
-               el estado sin especificar tipo.
-            */
-
-            if (
-                mensaje.jugadores !== undefined
-            ) {
-
-                actualizarEstado(
-                    mensaje
-                );
-
-            }
-
-            break;
-
-    }
-
-}
-
-
-/* ============================================================
-   ACTUALIZAR ESTADO
-============================================================ */
-
-function actualizarEstado(mensaje) {
-
-    if (mensaje.jugadores !== undefined) {
-
-        estadoJuego.jugadores =
-            mensaje.jugadores;
-
-    }
-
-    if (mensaje.turno !== undefined) {
-
-        estadoJuego.turno =
-            mensaje.turno;
-
-    }
-
-    if (mensaje.ganador !== undefined) {
-
-        estadoJuego.ganador =
-            mensaje.ganador;
-
-    }
-
-    if (mensaje.dado !== undefined) {
-
-        estadoJuego.dado =
-            mensaje.dado;
-
-        estadoJuego.ultimo_dado =
-            mensaje.dado;
-
-    }
-
-    if (mensaje.ultimo_dado !== undefined) {
-
-        estadoJuego.ultimo_dado =
-            mensaje.ultimo_dado;
-
-    }
-
-    if (mensaje.ultimo_evento !== undefined) {
-
-        estadoJuego.ultimo_evento =
-            mensaje.ultimo_evento;
-
-    }
-
-    if (mensaje.escaleras !== undefined) {
-
-        estadoJuego.escaleras =
-            mensaje.escaleras;
-
-    }
-
-    if (mensaje.serpientes !== undefined) {
-
-        estadoJuego.serpientes =
-            mensaje.serpientes;
-
-    }
-
-    actualizarInterfaz();
-
-}
-
-
-/* ============================================================
-   ACTUALIZAR INTERFAZ
-============================================================ */
-
-function actualizarInterfaz() {
-
-    crearTablero();
-
-    actualizarJugadores();
-
-    actualizarTurno();
-
-    actualizarDado();
-
-    actualizarEvento();
-
-    comprobarGanador();
-
-}
-
-
-/* ============================================================
-   JUGADORES
-============================================================ */
-
-function actualizarJugadores() {
-
-    const lista =
-        document.getElementById(
-            "playersList"
-        );
-
-    lista.innerHTML = "";
-
-
-    const jugadores =
-        estadoJuego.jugadores || {};
-
-
-    Object.entries(jugadores).forEach(
-        ([id, jugador], indice) => {
-
-            const tarjeta =
-                document.createElement("div");
-
-            tarjeta.className =
-                "player-card";
-
-
-            const color =
-                document.createElement("div");
-
-            color.className =
-                "player-color";
-
-
-            const colores = [
-
-                "#e63946",
-                "#457b9d",
-                "#2a9d8f",
-                "#9b5de5"
-
-            ];
-
-            color.style.background =
-                colores[indice % 4];
-
-
-            const texto =
-                document.createElement("div");
-
-
-            const nombreJugador =
-                obtenerNombreJugador(
-                    jugador
-                );
-
-
-            let posicion = 1;
-
-            if (
-                jugador &&
-                typeof jugador === "object"
-            ) {
-
-                posicion =
-                    jugador.posicion ??
-                    jugador.position ??
-                    jugador.casilla ??
-                    jugador.pos ??
-                    1;
-
-            }
-
-
-            texto.innerHTML =
-                `<strong>${escapeHTML(nombreJugador)}</strong>
-                 <br>
-                 <small>Casilla ${posicion}</small>`;
-
-
-            if (
-                String(id) ===
-                String(miId)
-            ) {
-
-                texto.innerHTML +=
-                    ` <small>(Tú)</small>`;
-
-            }
-
-
-            tarjeta.appendChild(color);
-
-            tarjeta.appendChild(texto);
-
-            lista.appendChild(tarjeta);
-
-        }
-    );
-
-}
-
-
-/* ============================================================
-   TURNO
-============================================================ */
-
-function actualizarTurno() {
-
-    const elemento =
-        document.getElementById(
-            "turn"
-        );
-
-
-    const jugadores =
-        estadoJuego.jugadores || {};
-
-
-    let jugadorTurno =
-        jugadores[
-            estadoJuego.turno
-        ];
-
-
-    if (!jugadorTurno) {
-
-        jugadorTurno =
-            jugadores[
-                String(estadoJuego.turno)
-            ];
-
-    }
-
-
-    let nombreTurno =
-        obtenerNombreJugador(
-            jugadorTurno
-        );
-
-
-    if (
-        !jugadorTurno &&
-        Object.keys(jugadores).length
-    ) {
-
-        /*
-           Compatibilidad con servidores
-           que usan índice en lugar de ID.
-        */
-
-        const lista =
-            Object.values(jugadores);
-
-        const indice =
-            Number(estadoJuego.turno);
-
-        if (
-            lista[indice]
-        ) {
-
-            nombreTurno =
-                obtenerNombreJugador(
-                    lista[indice]
-                );
-
-        }
-
-    }
-
-
-    if (nombreTurno === "Jugador") {
-
-        nombreTurno =
-            "Esperando jugador";
-
-    }
-
-
-    const esMiTurno =
-        String(estadoJuego.turno) ===
-        String(miId);
-
-
-    if (esMiTurno) {
-
-        elemento.innerHTML =
-            "🎯 <strong>¡ES TU TURNO!</strong>";
-
-    }
-
-    else {
-
-        elemento.innerHTML =
-            `⏳ Turno de <strong>${escapeHTML(nombreTurno)}</strong>`;
-
-    }
-
-
-    document.getElementById(
-        "btnDado"
-    ).disabled =
-        !conectado ||
-        !esMiTurno ||
-        !!estadoJuego.ganador;
-
-}
-
-
-/* ============================================================
-   DADO
-============================================================ */
-
-function actualizarDado() {
-
-    const dado =
-        Number(
-            estadoJuego.ultimo_dado ||
-            estadoJuego.dado ||
-            1
-        );
-
-
-    const elemento =
-        document.getElementById(
-            "dice"
-        );
-
-
-    const caras = {
-
-        1: "⚀",
-        2: "⚁",
-        3: "⚂",
-        4: "⚃",
-        5: "⚄",
-        6: "⚅"
-
-    };
-
-
-    elemento.textContent =
-        caras[dado] || "🎲";
-
-}
-
-
-/* ============================================================
-   LANZAR DADO
-============================================================ */
+// ============================================================
+// LANZAR DADO
+// ============================================================
 
 function lanzarDado() {
 
-    const boton =
-        document.getElementById(
-            "btnDado"
-        );
-
-
-    if (boton.disabled) {
+    if (
+        miId === null
+    ) {
 
         return;
-
     }
 
 
-    boton.disabled = true;
+    if (
+        turno === null ||
+        String(miId) !== String(turno)
+    ) {
+
+        ultimoEvento =
+            `No es tu turno. Turno del jugador ${turno}.`;
+
+        actualizarInterfaz();
+
+        return;
+    }
 
 
-    /*
-       El servidor acepta "lanzar_dado".
-    */
+    if (
+        ganador !== null
+    ) {
+
+        ultimoEvento =
+            "La partida ya terminó.";
+
+        actualizarInterfaz();
+
+        return;
+    }
+
+
+    ultimoEvento =
+        "Lanzando dado...";
+
+
+    actualizarInterfaz();
+
 
     enviar({
-
         tipo: "lanzar_dado"
-
     });
-
-
-    mostrarEvento(
-        "🎲 Lanzando el dado..."
-    );
-
-
-    /*
-       Reactivar después de unos segundos
-       por seguridad.
-    */
-
-    setTimeout(() => {
-
-        actualizarTurno();
-
-    }, 1500);
-
 }
 
 
-/* ============================================================
-   ABANDONAR
-============================================================ */
+// ============================================================
+// ABANDONAR
+// ============================================================
 
 function abandonar() {
 
@@ -1926,247 +1158,129 @@ function abandonar() {
 
 
     if (!confirmar) {
-
         return;
-
     }
 
 
     enviar({
-
         tipo: "abandonar"
-
     });
 
 
     if (socket) {
 
         socket.close();
-
     }
-
-
-    location.reload();
-
 }
 
 
-/* ============================================================
-   GANADOR
-============================================================ */
+// ============================================================
+// REINICIAR
+// ============================================================
 
-function comprobarGanador() {
+function reiniciar() {
 
-    if (
-        estadoJuego.ganador === null ||
-        estadoJuego.ganador === undefined
-    ) {
+    const confirmar =
+        confirm(
+            "¿Reiniciar la partida para todos?"
+        );
 
+
+    if (!confirmar) {
         return;
-
     }
 
 
-    let ganador =
-        estadoJuego.ganador;
-
-
-    const jugadores =
-        estadoJuego.jugadores || {};
-
-
-    if (
-        jugadores[ganador]
-    ) {
-
-        ganador =
-            obtenerNombreJugador(
-                jugadores[ganador]
-            );
-
-    }
-
-    else if (
-        jugadores[String(ganador)]
-    ) {
-
-        ganador =
-            obtenerNombreJugador(
-                jugadores[String(ganador)]
-            );
-
-    }
-
-    else if (
-        typeof ganador === "object"
-    ) {
-
-        ganador =
-            obtenerNombreJugador(
-                ganador
-            );
-
-    }
-
-
-    document.getElementById(
-        "winnerText"
-    ).textContent =
-        `🏆 ${ganador} ha ganado la partida.`;
-
-
-    document.getElementById(
-        "winner"
-    ).style.display =
-        "flex";
-
+    enviar({
+        tipo: "reiniciar"
+    });
 }
 
 
-function cerrarGanador() {
+// ============================================================
+// ERROR
+// ============================================================
 
-    document.getElementById(
-        "winner"
-    ).style.display =
-        "none";
+function mostrarError(mensaje) {
 
-}
-
-
-/* ============================================================
-   EVENTOS
-============================================================ */
-
-function actualizarEvento() {
-
-    if (
-        estadoJuego.ultimo_evento
-    ) {
-
-        mostrarEvento(
-            estadoJuego.ultimo_evento
-        );
-
-    }
-
-}
+    ultimoEvento =
+        mensaje;
 
 
-function mostrarEvento(texto) {
-
-    document.getElementById(
-        "event"
-    ).textContent =
-        texto || "";
-
-}
-
-
-/* ============================================================
-   CONEXIÓN
-============================================================ */
-
-function actualizarConexion(
-    online,
-    texto
-) {
-
-    const punto =
+    const estado =
         document.getElementById(
-            "connectionDot"
-        );
-
-    const textoElemento =
-        document.getElementById(
-            "connectionText"
+            "estadoConexion"
         );
 
 
-    if (online) {
+    estado.textContent =
+        "🔴 ERROR DE CONEXIÓN";
 
-        punto.classList.add(
-            "online"
-        );
+    estado.className =
+        "desconectado";
 
+
+    actualizarInterfaz();
+}
+
+
+// ============================================================
+// BOTONES
+// ============================================================
+
+document
+    .getElementById("btnDado")
+    .addEventListener(
+        "click",
+        lanzarDado
+    );
+
+
+document
+    .getElementById("btnAbandonar")
+    .addEventListener(
+        "click",
+        abandonar
+    );
+
+
+document
+    .getElementById("btnReiniciar")
+    .addEventListener(
+        "click",
+        reiniciar
+    );
+
+
+// ============================================================
+// TECLADO
+// ============================================================
+
+document.addEventListener(
+    "keydown",
+    function(evento) {
+
+        if (
+            evento.code === "Space"
+        ) {
+
+            evento.preventDefault();
+
+            lanzarDado();
+        }
     }
-
-    else {
-
-        punto.classList.remove(
-            "online"
-        );
-
-    }
+);
 
 
-    textoElemento.textContent =
-        texto;
-
-}
-
-
-/* ============================================================
-   ERROR
-============================================================ */
-
-function mostrarError(texto) {
-
-    document.getElementById(
-        "errorInicio"
-    ).textContent =
-        texto;
-
-    document.getElementById(
-        "btnEntrar"
-    ).disabled =
-        false;
-
-}
-
-
-/* ============================================================
-   SEGURIDAD HTML
-============================================================ */
-
-function escapeHTML(texto) {
-
-    return String(texto)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-
-}
-
-
-/* ============================================================
-   INICIO
-============================================================ */
+// ============================================================
+// INICIO
+// ============================================================
 
 crearTablero();
 
+actualizarInterfaz();
 
-/*
-   Permitir ENTER para entrar.
-*/
-
-document
-    .getElementById("nombreJugador")
-    .addEventListener(
-        "keydown",
-        function(event) {
-
-            if (
-                event.key === "Enter"
-            ) {
-
-                entrarJuego();
-
-            }
-
-        }
-    );
+conectar();
 
 </script>
 
