@@ -1,12 +1,19 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
 
-<meta name="viewport"
-      content="width=device-width, initial-scale=1.0">
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
 
-<title>Serpientes y Escaleras Online</title>
+<title>
+    Serpientes y Escaleras Online
+</title>
+
 
 <style>
 
@@ -14,278 +21,451 @@
     box-sizing: border-box;
 }
 
+
 body {
+
     margin: 0;
-    font-family: Arial, sans-serif;
-    background: #20222b;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        linear-gradient(
+            135deg,
+            #111827,
+            #1e293b
+        );
+
     color: white;
+
+    min-height: 100vh;
+
 }
+
 
 header {
+
     text-align: center;
+
     padding: 20px;
-    background: #15161c;
+
 }
 
-header h1 {
+
+h1 {
+
     margin: 0;
+
+    font-size: 32px;
+
 }
+
 
 #estadoConexion {
-    margin-top: 8px;
+
+    display: inline-block;
+
+    margin-top: 10px;
+
+    padding: 8px 15px;
+
+    border-radius: 20px;
+
+    background: #64748b;
+
     font-weight: bold;
+
 }
+
 
 .conectado {
-    color: #50d878;
+
+    background: #16a34a !important;
+
 }
 
-.desconectado {
-    color: #ff5555;
+
+.error {
+
+    background: #dc2626 !important;
+
 }
+
 
 .contenedor {
+
     display: flex;
-    justify-content: center;
+
     gap: 25px;
-    padding: 25px;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 20px;
+
     flex-wrap: wrap;
+
 }
+
+
+/* ==========================================================
+   TABLERO
+   ========================================================== */
 
 #tablero {
-    width: 680px;
-    height: 680px;
+
+    width: min(
+        90vw,
+        650px
+    );
+
+    height: min(
+        90vw,
+        650px
+    );
 
     display: grid;
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(10, 1fr);
 
-    border: 4px solid #111;
-    background: white;
-}
+    grid-template-columns:
+        repeat(10, 1fr);
 
-.casilla {
-    position: relative;
+    grid-template-rows:
+        repeat(10, 1fr);
 
-    border: 1px solid #777;
+    border:
+        4px solid white;
 
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    background: #f8fafc;
 
-    padding: 4px;
-
-    color: #222;
-
-    font-size: 13px;
+    border-radius: 10px;
 
     overflow: hidden;
+
 }
 
-.casilla:nth-child(odd) {
-    background: #f5f5f5;
-}
 
-.casilla:nth-child(even) {
-    background: #dfeaf5;
-}
+.casilla {
 
-.numero {
-    position: absolute;
-    top: 4px;
-    left: 5px;
-
-    font-weight: bold;
-}
-
-.jugadores {
-    position: absolute;
-
-    left: 50%;
-    top: 50%;
-
-    transform: translate(-50%, -40%);
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    justify-content: center;
-
-    width: 55px;
-
-    gap: 3px;
-}
-
-.jugador {
-    width: 24px;
-    height: 24px;
-
-    border-radius: 50%;
-
-    border: 2px solid #111;
+    position: relative;
 
     display: flex;
 
     align-items: center;
+
+    justify-content: center;
+
+    color: #111827;
+
+    font-weight: bold;
+
+    font-size: clamp(
+        10px,
+        1.8vw,
+        17px
+    );
+
+    border:
+        1px solid #94a3b8;
+
+}
+
+
+.casilla:nth-child(odd) {
+
+    background: #dbeafe;
+
+}
+
+
+.casilla:nth-child(even) {
+
+    background: #fef3c7;
+
+}
+
+
+.numero {
+
+    position: absolute;
+
+    top: 3px;
+
+    left: 5px;
+
+    font-size: 11px;
+
+    opacity: .7;
+
+}
+
+
+/* ==========================================================
+   FICHAS
+   ========================================================== */
+
+.fichas {
+
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 2px;
+
+    justify-content: center;
+
+    align-items: center;
+
+}
+
+
+.ficha {
+
+    width: 25px;
+
+    height: 25px;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
     justify-content: center;
 
     color: white;
 
-    font-size: 11px;
+    font-size: 10px;
 
     font-weight: bold;
+
+    border: 2px solid white;
+
+    box-shadow:
+        0 2px 5px #0008;
+
 }
 
+
+.ficha1 {
+    background: #ef4444;
+}
+
+.ficha2 {
+    background: #3b82f6;
+}
+
+.ficha3 {
+    background: #22c55e;
+}
+
+.ficha4 {
+    background: #a855f7;
+}
+
+
+/* ==========================================================
+   PANEL
+   ========================================================== */
+
 .panel {
-    width: 320px;
 
-    background: white;
+    width: 330px;
 
-    color: #222;
+    max-width: 90vw;
 
-    border-radius: 12px;
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            .95
+        );
+
+    border:
+        1px solid #475569;
+
+    border-radius: 15px;
 
     padding: 20px;
 
     box-shadow:
-        0 5px 20px rgba(0,0,0,0.4);
+        0 10px 30px #0008;
+
 }
+
 
 .panel h2 {
+
     margin-top: 0;
+
 }
 
-.info {
-    margin-bottom: 10px;
-}
 
-.turno {
-    padding: 12px;
+#dado {
 
-    background: #e9f9ee;
+    font-size: 70px;
 
-    color: #16813c;
-
-    border-radius: 8px;
-
-    font-weight: bold;
+    text-align: center;
 
     margin: 15px 0;
+
 }
 
-.evento {
-    background: #eeeeee;
-
-    padding: 12px;
-
-    border-radius: 8px;
-
-    min-height: 60px;
-
-    margin-bottom: 15px;
-}
 
 button {
 
     width: 100%;
 
+    border: none;
+
     padding: 14px;
 
     margin-top: 10px;
 
-    border: none;
-
-    border-radius: 8px;
-
-    color: white;
+    border-radius: 10px;
 
     font-size: 17px;
 
     font-weight: bold;
 
     cursor: pointer;
+
 }
+
 
 #btnDado {
-    background: #28b85a;
+
+    background: #22c55e;
+
+    color: white;
+
 }
+
 
 #btnDado:hover {
-    background: #1e9848;
+
+    background: #16a34a;
+
 }
+
+
+#btnDado:disabled {
+
+    background: #475569;
+
+    cursor: not-allowed;
+
+}
+
 
 #btnAbandonar {
-    background: #e33d3d;
+
+    background: #dc2626;
+
+    color: white;
+
 }
 
-#btnAbandonar:hover {
-    background: #bd2929;
-}
 
 #btnReiniciar {
-    background: #2675d9;
+
+    background: #2563eb;
+
+    color: white;
+
 }
 
-#btnReiniciar:hover {
-    background: #1d5dad;
+
+#nombre {
+
+    width: 100%;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    border: 1px solid #64748b;
+
+    margin-top: 8px;
+
+    font-size: 16px;
+
 }
 
-button:disabled {
-    background: #999 !important;
-    cursor: not-allowed;
-}
 
-.listaJugadores {
+#jugadores {
+
     margin-top: 15px;
+
 }
 
-.listaJugador {
-    padding: 8px;
 
-    margin-bottom: 5px;
+.jugador {
 
-    border-radius: 5px;
+    padding: 10px;
 
-    background: #eeeeee;
+    margin-top: 6px;
+
+    border-radius: 8px;
+
+    background: #1e293b;
+
 }
 
-#dado {
-    font-size: 55px;
 
-    text-align: center;
+.mi-turno {
 
-    font-weight: bold;
+    border:
+        2px solid #22c55e;
 
-    margin: 10px 0;
 }
 
-@media(max-width: 750px) {
 
-    #tablero {
-        width: 95vw;
-        height: 95vw;
-    }
+.evento {
 
-    .panel {
-        width: 95vw;
-    }
+    margin-top: 15px;
+
+    background: #020617;
+
+    padding: 12px;
+
+    border-radius: 8px;
+
+    min-height: 50px;
+
 }
+
+
+.info {
+
+    margin-top: 15px;
+
+    color: #cbd5e1;
+
+    line-height: 1.5;
+
+}
+
 
 </style>
+
 </head>
+
 
 <body>
 
+
 <header>
 
-<h1>🎲 Serpientes y Escaleras Online</h1>
+<h1>
+🎲 Serpientes y Escaleras Online
+</h1>
 
-<div id="estadoConexion"
-     class="desconectado">
-
-    Conectando...
-
+<div id="estadoConexion">
+    CONECTANDO...
 </div>
 
 </header>
@@ -293,77 +473,119 @@ button:disabled {
 
 <div class="contenedor">
 
-    <div id="tablero"></div>
+
+<!-- ======================================================
+     TABLERO
+     ====================================================== -->
+
+<div id="tablero"></div>
 
 
-    <div class="panel">
+<!-- ======================================================
+     PANEL
+     ====================================================== -->
 
-        <h2>🎮 Partida</h2>
+<div class="panel">
 
-        <div class="info">
-            <b>Tu jugador:</b>
-            <span id="miJugador">-</span>
-        </div>
+<h2>
+🎮 Partida
+</h2>
 
-        <div class="info">
-            <b>Jugadores:</b>
-            <span id="cantidadJugadores">0/4</span>
-        </div>
 
-        <div class="info">
-            <b>Último dado:</b>
-        </div>
+<label>
+Tu nombre:
+</label>
 
-        <div id="dado">
-            -
-        </div>
+<input
+    id="nombre"
+    type="text"
+    maxlength="20"
+    placeholder="Escribe tu nombre"
+>
 
-        <div id="turno"
-             class="turno">
 
-            Esperando servidor...
+<button
+    onclick="cambiarNombre()"
+>
+Guardar nombre
+</button>
 
-        </div>
 
-        <div>
-            <b>Último evento:</b>
-        </div>
+<div id="dado">
+    🎲
+</div>
 
-        <div id="evento"
-             class="evento">
 
-            Conectando al servidor...
+<button
+    id="btnDado"
+    onclick="lanzarDado()"
+    disabled
+>
+🎲 Lanzar dado
+</button>
 
-        </div>
 
-        <div class="listaJugadores">
+<button
+    id="btnReiniciar"
+    onclick="reiniciarJuego()"
+>
+🔄 Reiniciar
+</button>
 
-            <b>Jugadores conectados</b>
 
-            <div id="listaJugadores"></div>
+<button
+    id="btnAbandonar"
+    onclick="abandonar()"
+>
+🚪 Abandonar
+</button>
 
-        </div>
 
-        <button id="btnDado"
-                disabled>
+<h2>
+👥 Jugadores
+</h2>
 
-            🎲 LANZAR DADO
+<div id="jugadores">
+    Esperando...
+</div>
 
-        </button>
 
-        <button id="btnReiniciar">
+<div class="evento">
 
-            🔄 REINICIAR PARTIDA
+<b>
+Último evento:
+</b>
 
-        </button>
+<div id="evento">
+    Conectando con el servidor...
+</div>
 
-        <button id="btnAbandonar">
+</div>
 
-            🚪 ABANDONAR PARTIDA
 
-        </button>
+<div class="info">
 
-    </div>
+<b>
+Tu ID:
+</b>
+
+<span id="miId">
+-
+</span>
+
+<br>
+
+<b>
+Turno:
+</b>
+
+<span id="turno">
+-
+</span>
+
+</div>
+
+</div>
 
 </div>
 
@@ -371,60 +593,82 @@ button:disabled {
 <script>
 
 
-// ============================================================
+// ==========================================================
 // CONFIGURACIÓN
-// ============================================================
+// ==========================================================
 
 const SERVER_URL =
     "wss://serpientes-escaleras-phl7.onrender.com";
 
 
-const MAX_JUGADORES = 4;
-
-
-// ============================================================
-// ESTADO
-// ============================================================
-
 let socket = null;
 
 let miId = null;
 
-let jugadores = {};
+let estado = {
 
-let turno = null;
+    jugadores: {},
 
-let ganador = null;
+    turno: null,
 
-let dado = 0;
+    ganador: null,
 
-let ultimoEvento =
-    "Conectando al servidor...";
+    dado: 0,
 
-let escaleras = {};
+    ultimo_evento:
+        "Conectando..."
 
-let serpientes = {};
-
-
-// ============================================================
-// COLORES
-// ============================================================
-
-const colores = [
-    "#ff5050",
-    "#5078ff",
-    "#50c864",
-    "#dc64dc"
-];
+};
 
 
-// ============================================================
-// TABLERO
-// ============================================================
+// ==========================================================
+// ELEMENTOS
+// ==========================================================
 
 const tablero =
-    document.getElementById("tablero");
+    document.getElementById(
+        "tablero"
+    );
 
+const estadoConexion =
+    document.getElementById(
+        "estadoConexion"
+    );
+
+const btnDado =
+    document.getElementById(
+        "btnDado"
+    );
+
+const dado =
+    document.getElementById(
+        "dado"
+    );
+
+const evento =
+    document.getElementById(
+        "evento"
+    );
+
+const jugadores =
+    document.getElementById(
+        "jugadores"
+    );
+
+const miIdElemento =
+    document.getElementById(
+        "miId"
+    );
+
+const turnoElemento =
+    document.getElementById(
+        "turno"
+    );
+
+
+// ==========================================================
+// CREAR TABLERO
+// ==========================================================
 
 function crearTablero() {
 
@@ -437,324 +681,119 @@ function crearTablero() {
         fila++
     ) {
 
-        for (
-            let columna = 0;
-            columna < 10;
-            columna++
+        let numeros = [];
+
+
+        // ----------------------------------------------
+        // FILAS ALTERNADAS
+        // ----------------------------------------------
+
+        if (
+            fila % 2 === 0
         ) {
 
-            let numeroFila =
-                9 - fila;
-
-            let numero;
-
-
-            if (
-                numeroFila % 2 === 0
+            for (
+                let columna = 1;
+                columna <= 10;
+                columna++
             ) {
 
-                numero =
-                    numeroFila * 10 +
-                    columna + 1;
+                numeros.push(
+                    fila * 10 + columna
+                );
 
-            } else {
-
-                numero =
-                    numeroFila * 10 +
-                    (9 - columna) + 1;
             }
 
-
-            const casilla =
-                document.createElement("div");
-
-            casilla.className =
-                "casilla";
-
-            casilla.dataset.numero =
-                numero;
-
-
-            const numeroElemento =
-                document.createElement("div");
-
-            numeroElemento.className =
-                "numero";
-
-            numeroElemento.textContent =
-                numero;
-
-
-            casilla.appendChild(
-                numeroElemento
-            );
-
-
-            const jugadoresElemento =
-                document.createElement("div");
-
-            jugadoresElemento.className =
-                "jugadores";
-
-
-            casilla.appendChild(
-                jugadoresElemento
-            );
-
-
-            tablero.appendChild(
-                casilla
-            );
         }
-    }
-}
 
+        else {
 
-// ============================================================
-// DIBUJAR JUGADORES
-// ============================================================
+            for (
+                let columna = 10;
+                columna >= 1;
+                columna--
+            ) {
 
-function dibujarJugadores() {
+                numeros.push(
+                    fila * 10 + columna
+                );
 
-    document
-        .querySelectorAll(".jugadores")
-        .forEach(
-            elemento =>
-                elemento.innerHTML = ""
-        );
+            }
 
-
-    for (
-        const [id, jugador]
-        of Object.entries(jugadores)
-    ) {
-
-        const posicion =
-            Number(
-                jugador.posicion ??
-                jugador.casilla ??
-                1
-            );
-
-
-        const casilla =
-            document.querySelector(
-                `.casilla[data-numero="${posicion}"]`
-            );
-
-
-        if (!casilla) {
-            continue;
         }
 
 
-        const contenedor =
-            casilla.querySelector(
-                ".jugadores"
-            );
+        numeros.forEach(
+            numero => {
+
+                const casilla =
+                    document.createElement(
+                        "div"
+                    );
+
+                casilla.className =
+                    "casilla";
+
+                casilla.id =
+                    "casilla-" + numero;
 
 
-        const ficha =
-            document.createElement("div");
+                const texto =
+                    document.createElement(
+                        "div"
+                    );
 
-        ficha.className =
-            "jugador";
+                texto.className =
+                    "numero";
 
-
-        let color =
-            jugador.color;
-
-
-        if (
-            Array.isArray(color)
-        ) {
-
-            color =
-                `rgb(${color[0]},${color[1]},${color[2]})`;
-
-        } else {
-
-            color =
-                colores[
-                    (Number(id) - 1)
-                    % colores.length
-                ];
-        }
+                texto.textContent =
+                    numero;
 
 
-        ficha.style.background =
-            color;
+                casilla.appendChild(
+                    texto
+                );
 
 
-        ficha.textContent =
-            id;
+                const fichas =
+                    document.createElement(
+                        "div"
+                    );
+
+                fichas.className =
+                    "fichas";
+
+                fichas.id =
+                    "fichas-" + numero;
 
 
-        ficha.title =
-            jugador.nombre ??
-            `Jugador ${id}`;
+                casilla.appendChild(
+                    fichas
+                );
 
 
-        contenedor.appendChild(
-            ficha
+                tablero.appendChild(
+                    casilla
+                );
+
+            }
         );
+
     }
+
 }
 
 
-// ============================================================
-// ACTUALIZAR INTERFAZ
-// ============================================================
-
-function actualizarInterfaz() {
-
-    document.getElementById(
-        "miJugador"
-    ).textContent =
-        miId ?? "-";
-
-
-    document.getElementById(
-        "cantidadJugadores"
-    ).textContent =
-        `${Object.keys(jugadores).length}/${MAX_JUGADORES}`;
-
-
-    document.getElementById(
-        "dado"
-    ).textContent =
-        dado || "-";
-
-
-    document.getElementById(
-        "evento"
-    ).textContent =
-        ultimoEvento;
-
-
-    const turnoElemento =
-        document.getElementById(
-            "turno"
-        );
-
-
-    if (ganador !== null) {
-
-        turnoElemento.textContent =
-            `🏆 ¡GANÓ EL JUGADOR ${ganador}!`;
-
-    }
-
-    else if (
-        miId !== null &&
-        turno !== null &&
-        String(miId) === String(turno)
-    ) {
-
-        turnoElemento.textContent =
-            "🎯 ¡ES TU TURNO!";
-
-    }
-
-    else if (turno !== null) {
-
-        turnoElemento.textContent =
-            `Turno del jugador ${turno}`;
-
-    }
-
-    else {
-
-        turnoElemento.textContent =
-            "Esperando jugadores...";
-    }
-
-
-    const boton =
-        document.getElementById(
-            "btnDado"
-        );
-
-
-    boton.disabled = !(
-        socket &&
-        socket.readyState === WebSocket.OPEN &&
-        miId !== null &&
-        turno !== null &&
-        String(miId) === String(turno) &&
-        ganador === null
-    );
-
-
-    dibujarJugadores();
-
-    dibujarListaJugadores();
-}
-
-
-// ============================================================
-// LISTA DE JUGADORES
-// ============================================================
-
-function dibujarListaJugadores() {
-
-    const lista =
-        document.getElementById(
-            "listaJugadores"
-        );
-
-
-    lista.innerHTML = "";
-
-
-    for (
-        const [id, jugador]
-        of Object.entries(jugadores)
-    ) {
-
-        const elemento =
-            document.createElement("div");
-
-        elemento.className =
-            "listaJugador";
-
-
-        const posicion =
-            jugador.posicion ??
-            jugador.casilla ??
-            1;
-
-
-        elemento.textContent =
-            `Jugador ${id} — Casilla ${posicion}`;
-
-
-        if (
-            String(id) === String(turno)
-        ) {
-
-            elemento.textContent +=
-                " 🎯";
-        }
-
-
-        lista.appendChild(
-            elemento
-        );
-    }
-}
-
-
-// ============================================================
+// ==========================================================
 // CONECTAR
-// ============================================================
+// ==========================================================
 
 function conectar() {
 
-    ultimoEvento =
-        "Conectando al servidor online...";
-
-    actualizarInterfaz();
+    actualizarConexion(
+        "CONECTANDO...",
+        false
+    );
 
 
     try {
@@ -764,117 +803,140 @@ function conectar() {
                 SERVER_URL
             );
 
-    }
 
-    catch (error) {
+        socket.onopen = function() {
 
-        mostrarError(
-            "No se pudo crear la conexión."
-        );
-
-        return;
-    }
-
-
-    socket.onopen = function() {
-
-        const estado =
-            document.getElementById(
-                "estadoConexion"
+            actualizarConexion(
+                "CONECTADO",
+                true
             );
 
-
-        estado.textContent =
-            "🟢 CONECTADO AL SERVIDOR";
-
-        estado.className =
-            "conectado";
+            evento.textContent =
+                "Conectado al servidor.";
 
 
-        ultimoEvento =
-            "Conectado al servidor online.";
+            console.log(
+                "WebSocket conectado."
+            );
+
+        };
 
 
-        actualizarInterfaz();
-    };
+        socket.onmessage =
+            function(e) {
+
+                try {
+
+                    const mensaje =
+                        JSON.parse(
+                            e.data
+                        );
 
 
-    socket.onmessage =
-        function(evento) {
-
-            try {
-
-                const mensaje =
-                    JSON.parse(
-                        evento.data
+                    procesarMensaje(
+                        mensaje
                     );
 
+                }
 
-                procesarMensaje(
-                    mensaje
-                );
+                catch(error) {
 
-            }
+                    console.error(
+                        "Mensaje inválido:",
+                        error
+                    );
 
-            catch (error) {
+                }
+
+            };
+
+
+        socket.onerror =
+            function(error) {
 
                 console.error(
-                    "Mensaje inválido:",
-                    evento.data
-                );
-            }
-        };
-
-
-    socket.onclose =
-        function() {
-
-            const estado =
-                document.getElementById(
-                    "estadoConexion"
+                    "WebSocket error:",
+                    error
                 );
 
+                actualizarConexion(
+                    "ERROR",
+                    false
+                );
 
-            estado.textContent =
-                "🔴 DESCONECTADO";
-
-            estado.className =
-                "desconectado";
-
-
-            ultimoEvento =
-                "Se perdió la conexión con el servidor.";
+            };
 
 
-            actualizarInterfaz();
-        };
+        socket.onclose =
+            function() {
+
+                actualizarConexion(
+                    "DESCONECTADO",
+                    false
+                );
 
 
-    socket.onerror =
-        function(error) {
-
-            console.error(
-                "WebSocket:",
-                error
-            );
+                btnDado.disabled =
+                    true;
 
 
-            mostrarError(
-                "Error de conexión con Render."
-            );
-        };
+                evento.textContent =
+                    "Conexión cerrada. Intentando reconectar...";
+
+
+                setTimeout(
+                    conectar,
+                    5000
+                );
+
+            };
+
+    }
+
+    catch(error) {
+
+        console.error(
+            error
+        );
+
+        actualizarConexion(
+            "ERROR",
+            false
+        );
+
+    }
+
 }
 
 
-// ============================================================
+// ==========================================================
+// ESTADO DE CONEXIÓN
+// ==========================================================
+
+function actualizarConexion(
+    texto,
+    conectado
+) {
+
+    estadoConexion.textContent =
+        texto;
+
+
+    estadoConexion.className =
+        conectado
+            ? "conectado"
+            : "error";
+
+}
+
+
+// ==========================================================
 // PROCESAR MENSAJE
-// ============================================================
+// ==========================================================
 
-function procesarMensaje(mensaje) {
-
-    const tipo =
-        mensaje.tipo;
-
+function procesarMensaje(
+    mensaje
+) {
 
     console.log(
         "Servidor:",
@@ -882,407 +944,585 @@ function procesarMensaje(mensaje) {
     );
 
 
-    // --------------------------------------------------------
-    // CONEXIÓN
-    // --------------------------------------------------------
-
-    if (
-        tipo === "conexion" ||
-        tipo === "asignar_id"
+    switch(
+        mensaje.tipo
     ) {
 
-        miId =
-            mensaje.id;
+
+        // ==================================================
+        // CONEXIÓN
+        // ==================================================
+
+        case "conexion":
+
+            miId =
+                mensaje.id;
 
 
-        if (
-            mensaje.escaleras
-        ) {
-
-            escaleras =
-                mensaje.escaleras;
-        }
+            miIdElemento.textContent =
+                miId;
 
 
-        if (
-            mensaje.serpientes
-        ) {
-
-            serpientes =
-                mensaje.serpientes;
-        }
+            evento.textContent =
+                "Has entrado a la partida.";
 
 
-        ultimoEvento =
-            `Conectado como Jugador ${miId}.`;
+            break;
+
+
+        // ==================================================
+        // ESTADO
+        // ==================================================
+
+        case "estado":
+
+            estado =
+                mensaje;
+
+
+            renderizar();
+
+
+            break;
+
+
+        // ==================================================
+        // DADO
+        // ==================================================
+
+        case "resultado_dado":
+
+            mostrarDado(
+                mensaje.dado
+            );
+
+
+            break;
+
+
+        // ==================================================
+        // MENSAJE
+        // ==================================================
+
+        case "mensaje":
+
+            evento.textContent =
+                mensaje.mensaje || "";
+
+
+            break;
+
+
+        // ==================================================
+        // ERROR
+        // ==================================================
+
+        case "error":
+
+            evento.textContent =
+                "⚠️ " +
+                mensaje.mensaje;
+
+
+            break;
+
+
+        // ==================================================
+        // LLENO
+        // ==================================================
+
+        case "lleno":
+
+            evento.textContent =
+                "❌ " +
+                mensaje.mensaje;
+
+
+            actualizarConexion(
+                "PARTIDA LLENA",
+                false
+            );
+
+
+            break;
+
+
+        // ==================================================
+        // REINICIO
+        // ==================================================
+
+        case "reinicio":
+
+            evento.textContent =
+                "🔄 " +
+                mensaje.mensaje;
+
+
+            break;
+
+
+        // ==================================================
+        // PONG
+        // ==================================================
+
+        case "pong":
+
+            break;
+
     }
 
-
-    // --------------------------------------------------------
-    // ESTADO
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "estado"
-    ) {
-
-        jugadores =
-            mensaje.jugadores || {};
-
-
-        turno =
-            mensaje.turno;
-
-
-        ganador =
-            mensaje.ganador;
-
-
-        dado =
-            mensaje.dado ??
-            mensaje.ultimo_dado ??
-            0;
-
-
-        ultimoEvento =
-            mensaje.ultimo_evento ??
-            ultimoEvento;
-
-
-        escaleras =
-            mensaje.escaleras ??
-            escaleras;
-
-
-        serpientes =
-            mensaje.serpientes ??
-            serpientes;
-    }
-
-
-    // --------------------------------------------------------
-    // RESULTADO
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "resultado_dado" ||
-        tipo === "resultado"
-    ) {
-
-        if (
-            mensaje.dado !== undefined
-        ) {
-
-            dado =
-                mensaje.dado;
-        }
-
-
-        ultimoEvento =
-            mensaje.mensaje ??
-            "Resultado recibido.";
-    }
-
-
-    // --------------------------------------------------------
-    // MENSAJE
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "mensaje"
-    ) {
-
-        ultimoEvento =
-            mensaje.mensaje ??
-            "";
-    }
-
-
-    // --------------------------------------------------------
-    // ERROR
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "error"
-    ) {
-
-        ultimoEvento =
-            mensaje.mensaje ??
-            "El servidor informó un error.";
-    }
-
-
-    // --------------------------------------------------------
-    // LLENO
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "lleno"
-    ) {
-
-        ultimoEvento =
-            mensaje.mensaje ??
-            "La partida está llena.";
-    }
-
-
-    // --------------------------------------------------------
-    // REINICIO
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "reinicio"
-    ) {
-
-        dado = 0;
-
-        ganador = null;
-
-        ultimoEvento =
-            "Partida reiniciada.";
-    }
-
-
-    // --------------------------------------------------------
-    // SERVIDOR CERRADO
-    // --------------------------------------------------------
-
-    else if (
-        tipo === "servidor_cerrando" ||
-        tipo === "servidor_cerrado"
-    ) {
-
-        ultimoEvento =
-            mensaje.mensaje ??
-            "El servidor se cerró.";
-    }
-
-
-    actualizarInterfaz();
 }
 
 
-// ============================================================
-// ENVIAR
-// ============================================================
+// ==========================================================
+// RENDERIZAR
+// ==========================================================
 
-function enviar(datos) {
+function renderizar() {
+
+    // ----------------------------------------------
+    // LIMPIAR FICHAS
+    // ----------------------------------------------
+
+    document
+        .querySelectorAll(
+            ".fichas"
+        )
+        .forEach(
+            elemento => {
+
+                elemento.innerHTML =
+                    "";
+
+            }
+        );
+
+
+    // ----------------------------------------------
+    // JUGADORES
+    // ----------------------------------------------
+
+    const lista =
+        Object.values(
+            estado.jugadores || {}
+        );
+
+
+    lista.forEach(
+        (jugador, indice) => {
+
+            let posicion =
+                jugador.posicion;
+
+
+            if (
+                posicion < 1
+            ) {
+
+                posicion = 1;
+
+            }
+
+
+            if (
+                posicion > 100
+            ) {
+
+                posicion = 100;
+
+            }
+
+
+            const contenedor =
+                document.getElementById(
+                    "fichas-" +
+                    posicion
+                );
+
+
+            if (!contenedor) {
+
+                return;
+
+            }
+
+
+            const ficha =
+                document.createElement(
+                    "div"
+                );
+
+
+            ficha.className =
+                "ficha ficha" +
+                (
+                    (indice % 4) + 1
+                );
+
+
+            ficha.textContent =
+                jugador.nombre
+                    .substring(
+                        0,
+                        1
+                    )
+                    .toUpperCase();
+
+
+            ficha.title =
+                jugador.nombre +
+                " - casilla " +
+                jugador.posicion;
+
+
+            contenedor.appendChild(
+                ficha
+            );
+
+        }
+    );
+
+
+    // ----------------------------------------------
+    // LISTA DE JUGADORES
+    // ----------------------------------------------
+
+    jugadores.innerHTML =
+        "";
+
+
+    if (
+        lista.length === 0
+    ) {
+
+        jugadores.textContent =
+            "No hay jugadores.";
+
+    }
+
+
+    lista.forEach(
+        jugador => {
+
+            const elemento =
+                document.createElement(
+                    "div"
+                );
+
+
+            elemento.className =
+                "jugador";
+
+
+            if (
+                estado.turno ===
+                jugador.id
+            ) {
+
+                elemento.classList.add(
+                    "mi-turno"
+                );
+
+            }
+
+
+            let texto =
+                "🎮 " +
+                jugador.nombre +
+                " — casilla " +
+                jugador.posicion;
+
+
+            if (
+                jugador.id ===
+                miId
+            ) {
+
+                texto +=
+                    " ⭐ Tú";
+
+            }
+
+
+            if (
+                estado.turno ===
+                jugador.id
+            ) {
+
+                texto +=
+                    " 🎲";
+
+            }
+
+
+            elemento.textContent =
+                texto;
+
+
+            jugadores.appendChild(
+                elemento
+            );
+
+        }
+    );
+
+
+    // ----------------------------------------------
+    // TURNO
+    // ----------------------------------------------
+
+    const jugadorTurno =
+        estado.jugadores[
+            estado.turno
+        ];
+
+
+    if (
+        jugadorTurno
+    ) {
+
+        turnoElemento.textContent =
+            jugadorTurno.nombre;
+
+    }
+
+    else {
+
+        turnoElemento.textContent =
+            "-";
+
+    }
+
+
+    // ----------------------------------------------
+    // BOTÓN DE DADO
+    // ----------------------------------------------
+
+    const esMiTurno =
+        estado.turno ===
+        miId;
+
+
+    const hayGanador =
+        estado.ganador !== null &&
+        estado.ganador !== undefined;
+
+
+    btnDado.disabled =
+        !esMiTurno ||
+        hayGanador ||
+        !socket ||
+        socket.readyState !==
+            WebSocket.OPEN;
+
+
+    // ----------------------------------------------
+    // EVENTO
+    // ----------------------------------------------
+
+    if (
+        estado.ultimo_evento
+    ) {
+
+        evento.textContent =
+            estado.ultimo_evento;
+
+    }
+
+
+    // ----------------------------------------------
+    // GANADOR
+    // ----------------------------------------------
+
+    if (
+        estado.ganador
+    ) {
+
+        const ganador =
+            estado.jugadores[
+                estado.ganador
+            ];
+
+
+        if (ganador) {
+
+            evento.textContent =
+                "🏆 " +
+                ganador.nombre +
+                " ha ganado la partida!";
+
+        }
+
+    }
+
+}
+
+
+// ==========================================================
+// DADO
+// ==========================================================
+
+function mostrarDado(
+    numero
+) {
+
+    const dados = {
+
+        1: "⚀",
+
+        2: "⚁",
+
+        3: "⚂",
+
+        4: "⚃",
+
+        5: "⚄",
+
+        6: "⚅"
+
+    };
+
+
+    dado.textContent =
+        dados[numero] ||
+        "🎲";
+
+}
+
+
+// ==========================================================
+// ENVIAR
+// ==========================================================
+
+function enviar(
+    tipo,
+    datos = {}
+) {
 
     if (
         !socket ||
-        socket.readyState !== WebSocket.OPEN
+        socket.readyState !==
+            WebSocket.OPEN
     ) {
 
-        ultimoEvento =
-            "No estás conectado al servidor.";
+        evento.textContent =
+            "❌ No estás conectado.";
 
-        actualizarInterfaz();
+        return;
 
-        return false;
     }
 
 
     socket.send(
-        JSON.stringify(datos)
+        JSON.stringify({
+
+            tipo:
+                tipo,
+
+            ...datos
+
+        })
     );
 
-
-    return true;
 }
 
 
-// ============================================================
+// ==========================================================
+// CAMBIAR NOMBRE
+// ==========================================================
+
+function cambiarNombre() {
+
+    const input =
+        document.getElementById(
+            "nombre"
+        );
+
+
+    const nombre =
+        input.value.trim();
+
+
+    if (!nombre) {
+
+        evento.textContent =
+            "Escribe un nombre.";
+
+        return;
+
+    }
+
+
+    enviar(
+        "nombre",
+        {
+            nombre:
+                nombre
+        }
+    );
+
+}
+
+
+// ==========================================================
 // LANZAR DADO
-// ============================================================
+// ==========================================================
 
 function lanzarDado() {
 
-    if (
-        miId === null
-    ) {
+    enviar(
+        "lanzar_dado"
+    );
 
-        return;
-    }
-
-
-    if (
-        turno === null ||
-        String(miId) !== String(turno)
-    ) {
-
-        ultimoEvento =
-            `No es tu turno. Turno del jugador ${turno}.`;
-
-        actualizarInterfaz();
-
-        return;
-    }
-
-
-    if (
-        ganador !== null
-    ) {
-
-        ultimoEvento =
-            "La partida ya terminó.";
-
-        actualizarInterfaz();
-
-        return;
-    }
-
-
-    ultimoEvento =
-        "Lanzando dado...";
-
-
-    actualizarInterfaz();
-
-
-    enviar({
-        tipo: "lanzar_dado"
-    });
 }
 
 
-// ============================================================
+// ==========================================================
+// REINICIAR
+// ==========================================================
+
+function reiniciarJuego() {
+
+    enviar(
+        "reiniciar"
+    );
+
+}
+
+
+// ==========================================================
 // ABANDONAR
-// ============================================================
+// ==========================================================
 
 function abandonar() {
 
-    const confirmar =
+    if (
         confirm(
             "¿Quieres abandonar la partida?"
+        )
+    ) {
+
+        enviar(
+            "abandonar"
         );
 
-
-    if (!confirmar) {
-        return;
     }
 
-
-    enviar({
-        tipo: "abandonar"
-    });
-
-
-    if (socket) {
-
-        socket.close();
-    }
 }
 
 
-// ============================================================
-// REINICIAR
-// ============================================================
-
-function reiniciar() {
-
-    const confirmar =
-        confirm(
-            "¿Reiniciar la partida para todos?"
-        );
-
-
-    if (!confirmar) {
-        return;
-    }
-
-
-    enviar({
-        tipo: "reiniciar"
-    });
-}
-
-
-// ============================================================
-// ERROR
-// ============================================================
-
-function mostrarError(mensaje) {
-
-    ultimoEvento =
-        mensaje;
-
-
-    const estado =
-        document.getElementById(
-            "estadoConexion"
-        );
-
-
-    estado.textContent =
-        "🔴 ERROR DE CONEXIÓN";
-
-    estado.className =
-        "desconectado";
-
-
-    actualizarInterfaz();
-}
-
-
-// ============================================================
-// BOTONES
-// ============================================================
-
-document
-    .getElementById("btnDado")
-    .addEventListener(
-        "click",
-        lanzarDado
-    );
-
-
-document
-    .getElementById("btnAbandonar")
-    .addEventListener(
-        "click",
-        abandonar
-    );
-
-
-document
-    .getElementById("btnReiniciar")
-    .addEventListener(
-        "click",
-        reiniciar
-    );
-
-
-// ============================================================
-// TECLADO
-// ============================================================
-
-document.addEventListener(
-    "keydown",
-    function(evento) {
-
-        if (
-            evento.code === "Space"
-        ) {
-
-            evento.preventDefault();
-
-            lanzarDado();
-        }
-    }
-);
-
-
-// ============================================================
-// INICIO
-// ============================================================
+// ==========================================================
+// INICIAR
+// ==========================================================
 
 crearTablero();
 
-actualizarInterfaz();
-
 conectar();
+
 
 </script>
 
+
 </body>
+
 </html>
