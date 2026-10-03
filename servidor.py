@@ -11,14 +11,14 @@ import websockets
 
 HOST = "0.0.0.0"
 
-# Render proporciona PORT automáticamente.
+# Render proporciona automáticamente PORT
 PORT = int(os.environ.get("PORT", 10000))
 
 MAX_JUGADORES = 4
 
 
 # ============================================================
-# TABLERO
+# ESCALERAS Y SERPIENTES
 # ============================================================
 
 ESCALERAS = {
@@ -44,118 +44,186 @@ SERPIENTES = {
 
 
 # ============================================================
-# SERVIDOR
+# JUEGO
 # ============================================================
 
-class ServidorJuego:
+class Juego:
 
     def __init__(self):
 
-        self.clientes = {}
         self.jugadores = {}
 
-        self.siguiente_id = 1
+        self.conexiones = {}
 
-        self.turno_actual = None
+        self.turno = None
+
         self.ganador = None
 
         self.ultimo_dado = 0
+
         self.ultimo_evento = "Esperando jugadores..."
+
+        self.siguiente_id = 1
 
         self.lock = asyncio.Lock()
 
-        print("=" * 60)
-        print("     SERPIENTES Y ESCALERAS - SERVIDOR ONLINE")
-        print("=" * 60)
-        print(f"Puerto: {PORT}")
-        print("Esperando jugadores...")
-        print()
+
+    # ========================================================
+    # GENERAR ID
+    # ========================================================
+
+    def generar_id(self):
+
+        while True:
+
+            jugador_id = str(self.siguiente_id)
+
+            self.siguiente_id += 1
+
+            if jugador_id not in self.jugadores:
+                return jugador_id
 
 
     # ========================================================
-    # CONEXIÓN
+    # ESTADO
+    # ========================================================
+
+    def obtener_estado(self):
+
+        jugadores = {}
+
+        for jugador_id, jugador in self.jugadores.items():
+
+            jugadores[jugador_id] = {
+                "id": jugador["id"],
+                "nombre": jugador["nombre"],
+                "posicion": jugador["posicion"]
+            }
+
+        return {
+            "tipo": "estado",
+
+            "jugadores": jugadores,
+
+            "turno": self.turno,
+
+            "ganador": self.ganador,
+
+            "dado": self.ultimo_dado,
+
+            "ultimo_dado": self.ultimo_dado,
+
+            "ultimo_evento": self.ultimo_evento,
+
+            "escaleras": ESCALERAS,
+
+            "serpientes": SERPIENTES
+        }
+
+
+    # ========================================================
+    # ENVIAR A TODOS
+    # ========================================================
+
+    async def enviar_todos(self, mensaje):
+
+        datos = json.dumps(mensaje)
+
+        conexiones = list(self.conexiones.items())
+
+        for jugador_id, websocket in conexiones:
+
+            try:
+
+                await websocket.send(datos)
+
+            except Exception:
+
+                pass
+
+
+    # ========================================================
+    # ENVIAR ESTADO
+    # ========================================================
+
+    async def enviar_estado(self):
+
+        await self.enviar_todos(
+            self.obtener_estado()
+        )
+
+
+    # ========================================================
+    # CONECTAR JUGADOR
     # ========================================================
 
     async def conectar(self, websocket):
 
         jugador_id = None
 
-        async with self.lock:
-
-            if len(self.clientes) >= MAX_JUGADORES:
-
-                await websocket.send(
-                    json.dumps({
-                        "tipo": "lleno",
-                        "mensaje": "La partida está llena."
-                    })
-                )
-
-                return
-
-            # Buscar ID disponible
-            for posible_id in range(1, MAX_JUGADORES + 1):
-
-                if posible_id not in self.clientes:
-
-                    jugador_id = posible_id
-                    break
-
-            if jugador_id is None:
-
-                await websocket.send(
-                    json.dumps({
-                        "tipo": "lleno",
-                        "mensaje": "La partida está llena."
-                    })
-                )
-
-                return
-
-            self.clientes[jugador_id] = websocket
-
-            self.jugadores[jugador_id] = {
-
-                "id": jugador_id,
-
-                "nombre":
-                    f"Jugador {jugador_id}",
-
-                "casilla": 1,
-
-                "color":
-                    self.obtener_color(jugador_id)
-            }
-
-            if self.turno_actual is None:
-
-                self.turno_actual = jugador_id
-
-        print(
-            f"[CONEXIÓN] Jugador {jugador_id} conectado."
-        )
-
-        await self.enviar(
-            jugador_id,
-            {
-                "tipo": "conexion",
-
-                "id": jugador_id,
-
-                "mensaje":
-                    "Conectado al servidor.",
-
-                "escaleras":
-                    ESCALERAS,
-
-                "serpientes":
-                    SERPIENTES
-            }
-        )
-
-        await self.enviar_estado()
-
         try:
+
+            async with self.lock:
+
+                if len(self.jugadores) >= MAX_JUGADORES:
+
+                    await websocket.send(
+                        json.dumps({
+                            "tipo": "lleno",
+                            "mensaje": "La partida está llena."
+                        })
+                    )
+
+                    await websocket.close()
+
+                    return
+
+
+                jugador_id = self.generar_id()
+
+                self.jugadores[jugador_id] = {
+
+                    "id": jugador_id,
+
+                    "nombre": f"Jugador {jugador_id}",
+
+                    "posicion": 0
+                }
+
+                self.conexiones[jugador_id] = websocket
+
+                if self.turno is None:
+
+                    self.turno = jugador_id
+
+                self.ultimo_evento = (
+                    f"Jugador {jugador_id} se ha conectado."
+                )
+
+
+            # ----------------------------------------------
+            # INFORMACIÓN DEL JUGADOR
+            # ----------------------------------------------
+
+            await websocket.send(
+                json.dumps({
+                    "tipo": "conexion",
+                    "id": jugador_id,
+                    "nombre": self.jugadores[jugador_id]["nombre"]
+                })
+            )
+
+
+            # ----------------------------------------------
+            # ESTADO INICIAL
+            # ----------------------------------------------
+
+            await self.enviar_estado()
+
+
+            # ----------------------------------------------
+            # RECIBIR MENSAJES
+            # ----------------------------------------------
 
             async for mensaje in websocket:
 
@@ -170,24 +238,22 @@ class ServidorJuego:
 
                 except json.JSONDecodeError:
 
-                    await self.enviar(
-                        jugador_id,
-                        {
+                    await websocket.send(
+                        json.dumps({
                             "tipo": "error",
-                            "mensaje":
-                                "Mensaje inválido."
-                        }
+                            "mensaje": "Mensaje inválido."
+                        })
                     )
+
 
         except websockets.exceptions.ConnectionClosed:
 
             pass
 
-        except Exception as error:
+        except Exception as e:
 
             print(
-                f"[ERROR JUGADOR {jugador_id}] "
-                f"{type(error).__name__}: {error}"
+                f"Error con jugador {jugador_id}: {e}"
             )
 
         finally:
@@ -196,109 +262,7 @@ class ServidorJuego:
 
 
     # ========================================================
-    # COLORES
-    # ========================================================
-
-    def obtener_color(self, jugador_id):
-
-        colores = [
-
-            (255, 80, 80),
-
-            (80, 120, 255),
-
-            (80, 200, 100),
-
-            (220, 100, 220)
-        ]
-
-        return colores[
-            (jugador_id - 1) %
-            len(colores)
-        ]
-
-
-    # ========================================================
-    # ENVIAR
-    # ========================================================
-
-    async def enviar(
-        self,
-        jugador_id,
-        datos
-    ):
-
-        async with self.lock:
-
-            websocket = self.clientes.get(
-                jugador_id
-            )
-
-        if websocket is None:
-
-            return False
-
-        try:
-
-            await websocket.send(
-                json.dumps(
-                    datos,
-                    ensure_ascii=False
-                )
-            )
-
-            return True
-
-        except Exception:
-
-            return False
-
-
-    # ========================================================
-    # BROADCAST
-    # ========================================================
-
-    async def broadcast(
-        self,
-        datos
-    ):
-
-        async with self.lock:
-
-            conexiones = list(
-                self.clientes.items()
-            )
-
-        mensaje = json.dumps(
-            datos,
-            ensure_ascii=False
-        )
-
-        desconectados = []
-
-        for jugador_id, websocket in conexiones:
-
-            try:
-
-                await websocket.send(
-                    mensaje
-                )
-
-            except Exception:
-
-                desconectados.append(
-                    jugador_id
-                )
-
-        for jugador_id in desconectados:
-
-            await self.desconectar(
-                jugador_id
-            )
-
-
-    # ========================================================
-    # PROCESAR MENSAJE
+    # PROCESAR MENSAJES
     # ========================================================
 
     async def procesar_mensaje(
@@ -309,77 +273,116 @@ class ServidorJuego:
 
         tipo = datos.get("tipo")
 
-        # ----------------------------------------------------
-        # DADO
-        # ----------------------------------------------------
 
-        if tipo in (
-            "dado",
-            "lanzar_dado"
-        ):
+        # ====================================================
+        # CAMBIAR NOMBRE
+        # ====================================================
 
-            await self.lanzar_dado(
-                jugador_id
-            )
-
-        # ----------------------------------------------------
-        # REINICIAR
-        # ----------------------------------------------------
-
-        elif tipo == "reiniciar":
-
-            await self.reiniciar_partida()
-
-        # ----------------------------------------------------
-        # ABANDONAR
-        # ----------------------------------------------------
-
-        elif tipo == "abandonar":
-
-            print(
-                f"[JUGADOR {jugador_id}] "
-                "Abandonó la partida."
-            )
-
-            await self.desconectar(
-                jugador_id
-            )
-
-        # ----------------------------------------------------
-        # NOMBRE
-        # ----------------------------------------------------
-
-        elif tipo == "nombre":
+        if tipo == "nombre":
 
             nombre = datos.get(
                 "nombre",
                 f"Jugador {jugador_id}"
             )
 
-            async with self.lock:
+            nombre = str(nombre).strip()
 
-                if jugador_id in self.jugadores:
+            if not nombre:
 
-                    self.jugadores[
-                        jugador_id
-                    ]["nombre"] = str(
-                        nombre
-                    )[:20]
+                nombre = f"Jugador {jugador_id}"
 
-            await self.enviar_estado()
+            nombre = nombre[:20]
 
-        # ----------------------------------------------------
+            if jugador_id in self.jugadores:
+
+                self.jugadores[jugador_id]["nombre"] = nombre
+
+                self.ultimo_evento = (
+                    f"{nombre} se ha unido a la partida."
+                )
+
+                await self.enviar_estado()
+
+            return
+
+
+        # ====================================================
         # PING
-        # ----------------------------------------------------
+        # ====================================================
 
-        elif tipo == "ping":
+        if tipo == "ping":
 
-            await self.enviar(
+            websocket = self.conexiones.get(jugador_id)
+
+            if websocket:
+
+                await websocket.send(
+                    json.dumps({
+                        "tipo": "pong"
+                    })
+                )
+
+            return
+
+
+        # ====================================================
+        # ABANDONAR
+        # ====================================================
+
+        if tipo == "abandonar":
+
+            await self.desconectar(
                 jugador_id,
-                {
-                    "tipo": "pong"
-                }
+                cerrar=False
             )
+
+            return
+
+
+        # ====================================================
+        # REINICIAR
+        # ====================================================
+
+        if tipo == "reiniciar":
+
+            if self.ganador is not None:
+
+                self.reiniciar()
+
+                await self.enviar_todos({
+                    "tipo": "reinicio",
+                    "mensaje": "La partida ha sido reiniciada."
+                })
+
+                await self.enviar_estado()
+
+            return
+
+
+        # ====================================================
+        # LANZAR DADO
+        # ====================================================
+
+        if tipo == "lanzar_dado":
+
+            await self.lanzar_dado(
+                jugador_id
+            )
+
+            return
+
+
+        # ====================================================
+        # COMPATIBILIDAD
+        # ====================================================
+
+        if tipo == "dado":
+
+            await self.lanzar_dado(
+                jugador_id
+            )
+
+            return
 
 
     # ========================================================
@@ -397,311 +400,243 @@ class ServidorJuego:
 
                 return
 
+
+            # ----------------------------------------------
+            # PARTIDA TERMINADA
+            # ----------------------------------------------
+
             if self.ganador is not None:
 
-                mensaje_error = {
-                    "tipo": "mensaje",
-                    "mensaje":
-                        "La partida ya terminó."
-                }
-
-                websocket = self.clientes.get(
-                    jugador_id
+                await self.enviar_error(
+                    jugador_id,
+                    "La partida ya terminó."
                 )
-
-                if websocket:
-
-                    await websocket.send(
-                        json.dumps(
-                            mensaje_error
-                        )
-                    )
 
                 return
 
-            if self.turno_actual != jugador_id:
 
-                websocket = self.clientes.get(
-                    jugador_id
+            # ----------------------------------------------
+            # TURNO
+            # ----------------------------------------------
+
+            if self.turno != jugador_id:
+
+                await self.enviar_error(
+                    jugador_id,
+                    "No es tu turno."
                 )
-
-                if websocket:
-
-                    await websocket.send(
-                        json.dumps({
-                            "tipo": "mensaje",
-                            "mensaje":
-                                "No es tu turno."
-                        })
-                    )
 
                 return
 
-            jugador = self.jugadores[
-                jugador_id
-            ]
 
-            casilla_actual = jugador[
-                "casilla"
-            ]
+            # ----------------------------------------------
+            # DADO
+            # ----------------------------------------------
 
-            dado = random.randint(
-                1,
-                6
-            )
+            dado = random.randint(1, 6)
 
             self.ultimo_dado = dado
 
-            nueva_casilla = (
-                casilla_actual +
-                dado
-            )
 
-            # ------------------------------------------------
+            jugador = self.jugadores[jugador_id]
+
+            posicion_anterior = jugador["posicion"]
+
+            nueva_posicion = posicion_anterior + dado
+
+
+            # ----------------------------------------------
             # NO PASAR DE 100
-            # ------------------------------------------------
+            # ----------------------------------------------
 
-            if nueva_casilla > 100:
+            if nueva_posicion > 100:
 
-                nueva_casilla = casilla_actual
+                nueva_posicion = posicion_anterior
+
+
+            jugador["posicion"] = nueva_posicion
+
+
+            # ----------------------------------------------
+            # ESCALERA
+            # ----------------------------------------------
+
+            if nueva_posicion in ESCALERAS:
+
+                destino = ESCALERAS[nueva_posicion]
+
+                jugador["posicion"] = destino
 
                 self.ultimo_evento = (
-                    f"Jugador {jugador_id} "
-                    f"sacó {dado}. "
-                    f"No puede avanzar."
+                    f"{jugador['nombre']} sacó {dado}, "
+                    f"subió por una escalera "
+                    f"hasta {destino}."
                 )
+
+
+            # ----------------------------------------------
+            # SERPIENTE
+            # ----------------------------------------------
+
+            elif nueva_posicion in SERPIENTES:
+
+                destino = SERPIENTES[nueva_posicion]
+
+                jugador["posicion"] = destino
+
+                self.ultimo_evento = (
+                    f"{jugador['nombre']} sacó {dado}, "
+                    f"cayó por una serpiente "
+                    f"hasta {destino}."
+                )
+
 
             else:
 
-                jugador["casilla"] = (
-                    nueva_casilla
-                )
-
                 self.ultimo_evento = (
-                    f"Jugador {jugador_id} "
-                    f"sacó {dado}."
+                    f"{jugador['nombre']} sacó {dado}."
                 )
 
-                # --------------------------------------------
-                # ESCALERA
-                # --------------------------------------------
 
-                if nueva_casilla in ESCALERAS:
-
-                    destino = ESCALERAS[
-                        nueva_casilla
-                    ]
-
-                    jugador["casilla"] = destino
-
-                    self.ultimo_evento = (
-                        f"Jugador {jugador_id} "
-                        f"subió por una escalera: "
-                        f"{nueva_casilla} → {destino}"
-                    )
-
-                # --------------------------------------------
-                # SERPIENTE
-                # --------------------------------------------
-
-                elif nueva_casilla in SERPIENTES:
-
-                    destino = SERPIENTES[
-                        nueva_casilla
-                    ]
-
-                    jugador["casilla"] = destino
-
-                    self.ultimo_evento = (
-                        f"Jugador {jugador_id} "
-                        f"cayó por una serpiente: "
-                        f"{nueva_casilla} → {destino}"
-                    )
-
-            # ------------------------------------------------
+            # ----------------------------------------------
             # GANADOR
-            # ------------------------------------------------
+            # ----------------------------------------------
 
-            if jugador["casilla"] == 100:
+            if jugador["posicion"] >= 100:
+
+                jugador["posicion"] = 100
 
                 self.ganador = jugador_id
 
                 self.ultimo_evento = (
-                    f"Jugador {jugador_id} "
-                    f"ha ganado!"
+                    f"🎉 {jugador['nombre']} ha ganado!"
                 )
+
+
+            # ----------------------------------------------
+            # SIGUIENTE TURNO
+            # ----------------------------------------------
 
             else:
 
-                ids = sorted(
-                    self.jugadores.keys()
-                )
+                self.siguiente_turno()
 
-                if ids:
 
-                    try:
+        # ====================================================
+        # RESULTADO DEL DADO
+        # ====================================================
 
-                        posicion = ids.index(
-                            jugador_id
-                        )
+        await self.enviar_todos({
 
-                        siguiente = (
-                            posicion + 1
-                        ) % len(ids)
+            "tipo": "resultado_dado",
 
-                        self.turno_actual = (
-                            ids[siguiente]
-                        )
+            "jugador": jugador_id,
 
-                    except ValueError:
+            "dado": dado
+        })
 
-                        self.turno_actual = ids[0]
 
-        # ----------------------------------------------------
-        # RESULTADO
-        # ----------------------------------------------------
-
-        await self.broadcast(
-            {
-                "tipo":
-                    "resultado_dado",
-
-                "jugador":
-                    jugador_id,
-
-                "dado":
-                    dado,
-
-                "ok":
-                    True,
-
-                "mensaje":
-                    self.ultimo_evento
-            }
-        )
+        # ====================================================
+        # ESTADO
+        # ====================================================
 
         await self.enviar_estado()
+
+
+    # ========================================================
+    # SIGUIENTE TURNO
+    # ========================================================
+
+    def siguiente_turno(self):
+
+        ids = list(self.jugadores.keys())
+
+        if not ids:
+
+            self.turno = None
+
+            return
+
+
+        try:
+
+            indice = ids.index(
+                self.turno
+            )
+
+        except ValueError:
+
+            indice = -1
+
+
+        siguiente = (
+            indice + 1
+        ) % len(ids)
+
+
+        self.turno = ids[siguiente]
 
 
     # ========================================================
     # REINICIAR
     # ========================================================
 
-    async def reiniciar_partida(
-        self
-    ):
+    def reiniciar(self):
 
-        async with self.lock:
+        for jugador in self.jugadores.values():
 
-            for jugador in (
-                self.jugadores.values()
-            ):
+            jugador["posicion"] = 0
 
-                jugador["casilla"] = 1
+        self.ganador = None
 
-            self.ganador = None
+        self.ultimo_dado = 0
 
-            self.ultimo_dado = 0
-
-            self.ultimo_evento = (
-                "Partida reiniciada."
-            )
-
-            ids = sorted(
-                self.jugadores.keys()
-            )
-
-            if ids:
-
-                self.turno_actual = ids[0]
-
-            else:
-
-                self.turno_actual = None
-
-        print(
-            "[PARTIDA] Partida reiniciada."
+        self.ultimo_evento = (
+            "Nueva partida iniciada."
         )
 
-        await self.broadcast(
-            {
-                "tipo":
-                    "reinicio"
-            }
+
+        ids = list(
+            self.jugadores.keys()
         )
 
-        await self.enviar_estado()
+        if ids:
+
+            self.turno = ids[0]
+
+        else:
+
+            self.turno = None
 
 
     # ========================================================
-    # ESTADO
+    # ERROR
     # ========================================================
 
-    async def enviar_estado(
-        self
+    async def enviar_error(
+        self,
+        jugador_id,
+        mensaje
     ):
 
-        async with self.lock:
-
-            jugadores = {}
-
-            for jugador_id, jugador in (
-                self.jugadores.items()
-            ):
-
-                jugadores[
-                    str(jugador_id)
-                ] = {
-
-                    "id":
-                        jugador["id"],
-
-                    "nombre":
-                        jugador["nombre"],
-
-                    "casilla":
-                        jugador["casilla"],
-
-                    "posicion":
-                        jugador["casilla"],
-
-                    "color":
-                        jugador["color"]
-                }
-
-            estado = {
-
-                "tipo":
-                    "estado",
-
-                "jugadores":
-                    jugadores,
-
-                "turno":
-                    self.turno_actual,
-
-                "ganador":
-                    self.ganador,
-
-                "dado":
-                    self.ultimo_dado,
-
-                "ultimo_dado":
-                    self.ultimo_dado,
-
-                "ultimo_evento":
-                    self.ultimo_evento,
-
-                "escaleras":
-                    ESCALERAS,
-
-                "serpientes":
-                    SERPIENTES
-            }
-
-        await self.broadcast(
-            estado
+        websocket = self.conexiones.get(
+            jugador_id
         )
+
+        if websocket:
+
+            try:
+
+                await websocket.send(
+                    json.dumps({
+                        "tipo": "error",
+                        "mensaje": mensaje
+                    })
+                )
+
+            except Exception:
+
+                pass
 
 
     # ========================================================
@@ -710,50 +645,35 @@ class ServidorJuego:
 
     async def desconectar(
         self,
-        jugador_id
+        jugador_id,
+        cerrar=True
     ):
 
-        async with self.lock:
+        if jugador_id is None:
 
-            websocket = self.clientes.pop(
-                jugador_id,
-                None
-            )
+            return
 
-            jugador = self.jugadores.pop(
-                jugador_id,
-                None
-            )
 
-            if jugador is None:
-
-                return
-
-            ids = sorted(
-                self.jugadores.keys()
-            )
-
-            era_turno = (
-                self.turno_actual ==
-                jugador_id
-            )
-
-            if era_turno:
-
-                if ids:
-
-                    self.turno_actual = ids[0]
-
-                else:
-
-                    self.turno_actual = None
-
-        print(
-            f"[JUGADOR {jugador_id}] "
-            "Desconectado."
+        websocket = self.conexiones.pop(
+            jugador_id,
+            None
         )
 
-        if websocket:
+        jugador = self.jugadores.pop(
+            jugador_id,
+            None
+        )
+
+
+        if jugador is None:
+
+            return
+
+
+        nombre = jugador["nombre"]
+
+
+        if websocket and cerrar:
 
             try:
 
@@ -763,72 +683,89 @@ class ServidorJuego:
 
                 pass
 
-        if ids:
 
-            self.ultimo_evento = (
-                f"Jugador {jugador_id} "
-                "se desconectó."
+        # ----------------------------------------------
+        # CAMBIAR TURNO
+        # ----------------------------------------------
+
+        if self.turno == jugador_id:
+
+            ids = list(
+                self.jugadores.keys()
             )
 
-        else:
+            if ids:
 
-            self.ultimo_evento = (
-                "Esperando jugadores..."
-            )
+                self.turno = ids[0]
+
+            else:
+
+                self.turno = None
+
+
+        self.ultimo_evento = (
+            f"{nombre} abandonó la partida."
+        )
+
 
         await self.enviar_estado()
 
 
 # ============================================================
-# CREAR SERVIDOR
+# SERVIDOR
 # ============================================================
 
-juego = ServidorJuego()
+juego = Juego()
 
 
 async def main():
 
     print(
-        f"[SERVIDOR] Escuchando en "
-        f"0.0.0.0:{PORT}"
+        "=========================================="
     )
 
+    print(
+        " SERPIENTES Y ESCALERAS - SERVIDOR"
+    )
+
+    print(
+        "=========================================="
+    )
+
+    print(
+        f"Escuchando en {HOST}:{PORT}"
+    )
+
+
     async with websockets.serve(
+
         juego.conectar,
+
         HOST,
+
         PORT,
+
         ping_interval=20,
+
         ping_timeout=20
+
     ):
 
         print(
-            "[SERVIDOR] Servidor online."
+            "Servidor WebSocket iniciado."
         )
 
         print(
-            "Presiona CTRL+C para detener."
+            "Esperando jugadores..."
         )
-
-        print()
 
         await asyncio.Future()
 
 
 # ============================================================
-# EJECUTAR
+# INICIAR
 # ============================================================
 
 if __name__ == "__main__":
 
-    try:
-
-        asyncio.run(
-            main()
-        )
-
-    except KeyboardInterrupt:
-
-        print()
-        print(
-            "[SERVIDOR] Servidor detenido."
-        )
+    asyncio.run(main())
