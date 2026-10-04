@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -8,306 +9,200 @@
 
 <style>
 
-* {
-    box-sizing: border-box;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
 }
 
-body {
-    margin: 0;
-    min-height: 100vh;
-    font-family: Arial, Helvetica, sans-serif;
-
+body{
+    min-height:100vh;
+    font-family:Arial, Helvetica, sans-serif;
     background:
-        radial-gradient(circle at top left, #dff6ff, transparent 35%),
-        radial-gradient(circle at bottom right, #e8dcff, transparent 35%),
-        #eef2f7;
-
-    color: #222;
+        radial-gradient(circle at top left,#dff4ff,transparent 35%),
+        radial-gradient(circle at bottom right,#ffe5e5,transparent 35%),
+        linear-gradient(135deg,#eef7ff,#f7f7f7);
+    color:#202020;
+    overflow-x:hidden;
 }
 
-/* ============================================================
-   APP
-   ============================================================ */
-
-.app {
-    width: min(1450px, 96%);
-    margin: auto;
-    padding: 20px;
+.app{
+    width:min(1450px,96%);
+    margin:auto;
+    padding:25px 0 40px;
 }
 
-.titulo {
-    text-align: center;
-    font-size: clamp(26px, 4vw, 44px);
-    font-weight: 900;
-    margin-bottom: 20px;
-
-    color: #222;
-
-    text-shadow:
-        2px 2px 0 #fff,
-        4px 4px 0 rgba(0,0,0,.08);
+.titulo{
+    text-align:center;
+    font-size:38px;
+    font-weight:900;
+    margin-bottom:22px;
+    text-shadow:0 4px 10px rgba(0,0,0,.15);
 }
 
-/* ============================================================
-   CONTENEDOR PRINCIPAL
-   ============================================================ */
-
-.juego {
-    display: grid;
-    grid-template-columns: minmax(500px, 1fr) 340px;
-    gap: 20px;
-    align-items: start;
+.juego{
+    display:grid;
+    grid-template-columns:minmax(600px,1fr) 340px;
+    gap:25px;
+    align-items:start;
 }
 
 /* ============================================================
    TABLERO
    ============================================================ */
 
-.tablero-contenedor {
-    position: relative;
-
-    background: white;
-
-    border-radius: 24px;
-
-    padding: 20px;
-
+.tablero-contenedor{
+    background:white;
+    border-radius:25px;
+    padding:20px;
     box-shadow:
-        0 20px 50px rgba(0,0,0,.12);
-
-    overflow: hidden;
+        0 20px 50px rgba(0,0,0,.15),
+        inset 0 0 0 1px rgba(0,0,0,.05);
 }
 
-#tablero {
-    position: relative;
+#tablero{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    display:grid;
+    grid-template-columns:repeat(10,1fr);
+    grid-template-rows:repeat(10,1fr);
+    border:5px solid #171717;
+    border-radius:18px;
+    overflow:hidden;
+    background:#fff;
+}
 
-    width: 100%;
-    max-width: 760px;
+.casilla{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    border:1px solid rgba(0,0,0,.18);
+    font-size:15px;
+    font-weight:800;
+    user-select:none;
+}
 
-    aspect-ratio: 1 / 1;
+.casilla:nth-child(odd){
+    background:#f4f8ff;
+}
 
-    margin: auto;
+.casilla:nth-child(even){
+    background:#fff;
+}
 
-    display: grid;
+.numero{
+    position:absolute;
+    top:5px;
+    left:7px;
+    font-size:13px;
+    opacity:.7;
+}
 
-    grid-template-columns: repeat(10, 1fr);
-    grid-template-rows: repeat(10, 1fr);
+.svg-elementos{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    pointer-events:none;
+    z-index:4;
+}
 
-    border: 5px solid #222;
-
-    border-radius: 18px;
-
-    overflow: hidden;
-
-    background: white;
+.capa-fichas{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:10;
 }
 
 /* ============================================================
-   CASILLAS
+   FICHAS
    ============================================================ */
 
-.casilla {
-    position: relative;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    border: 1px solid rgba(0,0,0,.13);
-
-    font-size: clamp(11px, 1.3vw, 18px);
-
-    font-weight: 900;
-
-    user-select: none;
-
+.pieza{
+    position:absolute;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    border:4px solid white;
+    box-shadow:
+        0 5px 12px rgba(0,0,0,.35),
+        inset 0 2px 4px rgba(255,255,255,.6);
     transition:
-        transform .15s ease,
-        filter .15s ease;
+        box-shadow .25s,
+        transform .25s;
+    z-index:20;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:white;
+    font-size:13px;
+    font-weight:900;
 }
 
-.casilla:nth-child(odd) {
-    background: #fffdf5;
-}
-
-.casilla:nth-child(even) {
-    background: #eaf5ff;
-}
-
-.numero {
-    position: absolute;
-
-    top: 5px;
-    left: 6px;
-
-    font-size: clamp(10px, 1.2vw, 16px);
-
-    color: #333;
-
-    z-index: 2;
-}
-
-.meta {
-    background:
-        radial-gradient(circle, #fff8c9, #ffe66d);
-
+.pieza.mia{
+    width:40px;
+    height:40px;
+    border:4px solid #ffd600;
     box-shadow:
-        inset 0 0 0 4px #f4c430;
+        0 0 0 3px rgba(255,214,0,.25),
+        0 7px 16px rgba(0,0,0,.4);
 }
 
-/* ============================================================
-   SVG
-   ============================================================ */
-
-#svgElementos {
-    position: absolute;
-
-    inset: 0;
-
-    width: 100%;
-    height: 100%;
-
-    pointer-events: none;
-
-    z-index: 5;
+.pieza.moviendo{
+    z-index:50;
+    transform:translate(-50%,-50%) scale(1.12);
 }
 
-/* ============================================================
-   CAPA DE FICHAS
-   ============================================================ */
-
-#capaFichas {
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    z-index: 20;
+.pieza.rebote{
+    animation:reboteFicha .45s ease;
 }
 
-.pieza {
-    position: absolute;
-
-    width: 34px;
-    height: 34px;
-
-    border-radius: 50%;
-
-    transform:
-        translate(-50%, -50%);
-
-    border: 3px solid white;
-
-    box-shadow:
-        0 5px 10px rgba(0,0,0,.35);
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    color: white;
-
-    font-size: 13px;
-
-    font-weight: 900;
-
-    transition:
-        filter .2s ease,
-        box-shadow .2s ease;
-
-    z-index: 30;
-}
-
-.pieza.mia {
-    border-color: #ffd740;
-
-    box-shadow:
-        0 0 0 4px rgba(255,215,64,.35),
-        0 5px 12px rgba(0,0,0,.4);
-}
-
-.pieza.moviendo {
-    z-index: 50;
-
-    transform:
-        translate(-50%, -50%)
-        scale(1.15);
-
-    box-shadow:
-        0 0 20px rgba(255,215,64,.8),
-        0 7px 15px rgba(0,0,0,.35);
-}
-
-.pieza.rebote {
-    animation: reboteFicha .45s ease;
-}
-
-@keyframes reboteFicha {
-
-    0% {
-        transform:
-            translate(-50%, -50%)
-            scale(1);
+@keyframes reboteFicha{
+    0%{
+        transform:translate(-50%,-50%) scale(1);
     }
 
-    50% {
-        transform:
-            translate(-50%, -50%)
-            scale(1.35);
+    40%{
+        transform:translate(-50%,-65%) scale(1.18);
     }
 
-    100% {
-        transform:
-            translate(-50%, -50%)
-            scale(1);
+    70%{
+        transform:translate(-50%,-45%) scale(.96);
+    }
+
+    100%{
+        transform:translate(-50%,-50%) scale(1);
     }
 }
 
 /* ============================================================
-   RESALTADO
+   RESALTADO DE CASILLA
    ============================================================ */
 
-.resaltado-casilla {
-    position: absolute;
-
-    width: 8%;
-    height: 8%;
-
-    transform:
-        translate(-50%, -50%);
-
-    border-radius: 50%;
-
-    pointer-events: none;
-
-    z-index: 15;
-
-    border: 5px solid #ffd740;
-
-    box-shadow:
-        0 0 15px #ffd740,
-        0 0 35px rgba(255,215,64,.7);
-
-    animation:
-        resaltarCasilla 1s ease infinite;
+.resaltado-casilla{
+    position:absolute;
+    width:58px;
+    height:58px;
+    border-radius:50%;
+    border:5px solid #ffd600;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:7;
+    animation:resaltarCasilla 1s ease-in-out infinite;
 }
 
-@keyframes resaltarCasilla {
-
-    0%,
-    100% {
-        opacity: .4;
-        transform:
-            translate(-50%, -50%)
-            scale(.8);
+@keyframes resaltarCasilla{
+    0%,100%{
+        opacity:.35;
+        transform:translate(-50%,-50%) scale(.9);
     }
 
-    50% {
-        opacity: 1;
-        transform:
-            translate(-50%, -50%)
-            scale(1.15);
+    50%{
+        opacity:1;
+        transform:translate(-50%,-50%) scale(1.12);
     }
 }
 
@@ -315,55 +210,66 @@ body {
    ESCALERAS Y SERPIENTES
    ============================================================ */
 
-.escalera-activa {
+.escalera-activa{
     filter:
-        drop-shadow(0 0 8px #00ff66)
-        drop-shadow(0 0 15px #00ff66);
+        drop-shadow(0 0 6px #00ff66)
+        drop-shadow(0 0 12px #00ff66);
+    animation:brilloEscalera .7s ease-in-out infinite alternate;
 }
 
-.serpiente-activa {
+@keyframes brilloEscalera{
+    from{
+        opacity:.7;
+    }
+
+    to{
+        opacity:1;
+    }
+}
+
+.serpiente-activa{
     filter:
-        drop-shadow(0 0 8px #ff3333)
-        drop-shadow(0 0 15px #ff3333);
+        drop-shadow(0 0 6px #ff1744)
+        drop-shadow(0 0 12px #ff1744);
+    animation:brilloSerpiente .7s ease-in-out infinite alternate;
+}
+
+@keyframes brilloSerpiente{
+    from{
+        opacity:.7;
+    }
+
+    to{
+        opacity:1;
+    }
 }
 
 /* ============================================================
    PARTICULAS
    ============================================================ */
 
-.particula {
-    position: absolute;
-
-    width: 8px;
-    height: 8px;
-
-    border-radius: 50%;
-
-    pointer-events: none;
-
-    z-index: 60;
-
-    animation:
-        particulaVuelo .9s ease-out forwards;
+.particula{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    pointer-events:none;
+    z-index:100;
+    animation:particulaVuelo 1s ease-out forwards;
 }
 
-@keyframes particulaVuelo {
-
-    0% {
-        opacity: 1;
-
-        transform:
-            translate(0,0)
-            scale(1);
+@keyframes particulaVuelo{
+    0%{
+        opacity:1;
+        transform:translate(0,0) scale(1);
     }
 
-    100% {
-        opacity: 0;
-
+    100%{
+        opacity:0;
         transform:
             translate(
-                var(--dx),
-                var(--dy)
+                calc((var(--x) - .5) * 150px),
+                calc((var(--y) - .5) * 150px)
             )
             scale(.2);
     }
@@ -373,306 +279,200 @@ body {
    PANEL
    ============================================================ */
 
-.panel {
-
-    background: white;
-
-    border-radius: 24px;
-
-    padding: 22px;
-
+.panel{
+    background:white;
+    border-radius:25px;
+    padding:25px;
     box-shadow:
-        0 20px 50px rgba(0,0,0,.12);
-
-    min-height: 600px;
+        0 20px 50px rgba(0,0,0,.15),
+        inset 0 0 0 1px rgba(0,0,0,.05);
 }
 
-.panel h2 {
-    margin-top: 0;
-
-    text-align: center;
-
-    font-size: 26px;
+.panel h2{
+    text-align:center;
+    margin-bottom:20px;
+    font-size:27px;
 }
 
-/* ============================================================
-   ESTADO
-   ============================================================ */
-
-.estado-box {
-
-    padding: 12px;
-
-    border-radius: 14px;
-
-    background: #f1f5f9;
-
-    text-align: center;
-
-    margin-bottom: 14px;
-
-    font-weight: bold;
-
-    min-height: 44px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.estado{
+    padding:14px;
+    border-radius:13px;
+    background:#edf6ff;
+    border:1px solid #c9e5ff;
+    text-align:center;
+    font-weight:700;
+    margin-bottom:15px;
 }
 
-/* ============================================================
-   NOMBRE
-   ============================================================ */
-
-.nombre-box {
-
-    display: flex;
-
-    gap: 8px;
-
-    margin-bottom: 15px;
+.nombre-box{
+    display:flex;
+    gap:8px;
+    margin-bottom:20px;
 }
 
-.nombre-box input {
-
-    flex: 1;
-
-    min-width: 0;
-
-    border:
-        2px solid #ddd;
-
-    border-radius: 10px;
-
-    padding: 11px;
-
-    font-size: 15px;
-
-    outline: none;
+.nombre-box input{
+    flex:1;
+    min-width:0;
+    border:2px solid #ddd;
+    border-radius:10px;
+    padding:11px;
+    outline:none;
+    font-size:15px;
 }
 
-.nombre-box input:focus {
-
-    border-color: #1976d2;
+.nombre-box input:focus{
+    border-color:#1976d2;
 }
 
-.nombre-box button {
-
-    border: 0;
-
-    border-radius: 10px;
-
-    padding: 0 15px;
-
-    background: #1976d2;
-
-    color: white;
-
-    font-weight: bold;
-
-    cursor: pointer;
+.nombre-box button{
+    border:0;
+    border-radius:10px;
+    padding:0 15px;
+    background:#1976d2;
+    color:white;
+    font-weight:800;
+    cursor:pointer;
 }
 
 /* ============================================================
    DADO 3D
    ============================================================ */
 
-.dado-contenedor {
-
-    width: 130px;
-    height: 130px;
-
-    margin: 10px auto 5px;
-
-    perspective: 700px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
+.zona-dado{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    margin:15px 0 20px;
 }
 
-.dado-3d {
-
-    width: 75px;
-    height: 75px;
-
-    position: relative;
-
-    transform-style: preserve-3d;
-
-    transition:
-        transform .8s cubic-bezier(.2,.8,.2,1);
+.dado-escena{
+    width:110px;
+    height:110px;
+    perspective:700px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
-.cara {
+.dado-3d{
+    width:80px;
+    height:80px;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+}
 
-    position: absolute;
-
-    width: 75px;
-    height: 75px;
-
-    background:
-        linear-gradient(
-            145deg,
-            #ffffff,
-            #eeeeee
-        );
-
-    border:
-        3px solid #222;
-
-    border-radius: 12px;
-
-    display: grid;
-
-    grid-template-columns:
-        repeat(3, 1fr);
-
-    grid-template-rows:
-        repeat(3, 1fr);
-
-    padding: 10px;
-
+.cara{
+    position:absolute;
+    width:80px;
+    height:80px;
+    border-radius:15px;
+    background:linear-gradient(145deg,#ffffff,#e9e9e9);
+    border:3px solid #333;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     box-shadow:
-        inset 0 0 10px rgba(0,0,0,.12);
+        inset 0 0 15px rgba(0,0,0,.1);
 }
 
-.cara.c1 {
-    transform:
-        rotateY(0deg)
-        translateZ(37.5px);
+.cara1{
+    transform:translateZ(40px);
 }
 
-.cara.c2 {
-    transform:
-        rotateY(90deg)
-        translateZ(37.5px);
+.cara2{
+    transform:rotateY(90deg) translateZ(40px);
 }
 
-.cara.c3 {
-    transform:
-        rotateY(180deg)
-        translateZ(37.5px);
+.cara3{
+    transform:rotateY(180deg) translateZ(40px);
 }
 
-.cara.c4 {
-    transform:
-        rotateY(-90deg)
-        translateZ(37.5px);
+.cara4{
+    transform:rotateY(-90deg) translateZ(40px);
 }
 
-.cara.c5 {
-    transform:
-        rotateX(90deg)
-        translateZ(37.5px);
+.cara5{
+    transform:rotateX(90deg) translateZ(40px);
 }
 
-.cara.c6 {
-    transform:
-        rotateX(-90deg)
-        translateZ(37.5px);
+.cara6{
+    transform:rotateX(-90deg) translateZ(40px);
 }
 
-.punto {
-
-    width: 13px;
-    height: 13px;
-
-    background: #222;
-
-    border-radius: 50%;
-
-    align-self: center;
-    justify-self: center;
+.puntos{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    grid-template-rows:repeat(3,1fr);
+    width:55px;
+    height:55px;
+    gap:5px;
 }
 
-.dado-3d.lanzando {
-
-    animation:
-        dadoSacudida .22s infinite;
+.punto{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:#222;
+    align-self:center;
+    justify-self:center;
 }
 
-@keyframes dadoSacudida {
+.dado-3d.lanzando{
+    animation:dadoSacudida .15s infinite;
+}
 
-    0% {
-        transform:
-            rotateX(0deg)
-            rotateY(0deg)
-            rotateZ(0deg)
-            translateY(0);
+@keyframes dadoSacudida{
+    0%{
+        transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg)
+                   translate(0,0);
     }
 
-    25% {
-        transform:
-            rotateX(90deg)
-            rotateY(100deg)
-            rotateZ(35deg)
-            translateY(-7px);
+    25%{
+        transform:rotateX(25deg) rotateY(35deg) rotateZ(10deg)
+                   translate(-4px,3px);
     }
 
-    50% {
-        transform:
-            rotateX(180deg)
-            rotateY(220deg)
-            rotateZ(90deg)
-            translateY(0);
+    50%{
+        transform:rotateX(-35deg) rotateY(-50deg) rotateZ(-15deg)
+                   translate(4px,-3px);
     }
 
-    75% {
-        transform:
-            rotateX(270deg)
-            rotateY(310deg)
-            rotateZ(150deg)
-            translateY(-7px);
+    75%{
+        transform:rotateX(45deg) rotateY(30deg) rotateZ(15deg)
+                   translate(-3px,-2px);
     }
 
-    100% {
-        transform:
-            rotateX(360deg)
-            rotateY(400deg)
-            rotateZ(180deg)
-            translateY(0);
+    100%{
+        transform:rotateX(-20deg) rotateY(-30deg) rotateZ(-5deg)
+                   translate(2px,3px);
     }
 }
 
-/* ============================================================
-   RESULTADO
-   ============================================================ */
-
-#resultadoDado {
-
-    text-align: center;
-
-    min-height: 28px;
-
-    font-size: 20px;
-
-    font-weight: 900;
-
-    margin-bottom: 12px;
+.resultado-dado{
+    min-height:30px;
+    text-align:center;
+    font-size:19px;
+    font-weight:900;
 }
 
-.mensaje-efecto {
-
-    animation:
-        efectoTexto .7s ease;
+.mensaje-efecto{
+    animation:efectoTexto .65s ease;
 }
 
-@keyframes efectoTexto {
-
-    0% {
-        transform: scale(.8);
-        opacity: 0;
+@keyframes efectoTexto{
+    0%{
+        transform:scale(.5);
+        opacity:0;
     }
 
-    60% {
-        transform: scale(1.15);
-        opacity: 1;
+    60%{
+        transform:scale(1.25);
+        opacity:1;
     }
 
-    100% {
-        transform: scale(1);
+    100%{
+        transform:scale(1);
     }
 }
 
@@ -680,340 +480,228 @@ body {
    BOTONES
    ============================================================ */
 
-.boton {
-
-    width: 100%;
-
-    border: 0;
-
-    border-radius: 13px;
-
-    padding: 15px;
-
-    font-size: 17px;
-
-    font-weight: 900;
-
-    cursor: pointer;
-
+.btn{
+    width:100%;
+    border:0;
+    border-radius:13px;
+    padding:15px;
+    font-size:16px;
+    font-weight:900;
+    cursor:pointer;
     transition:
-        transform .15s ease,
-        filter .15s ease,
-        opacity .15s ease;
-
-    margin-top: 9px;
+        transform .2s,
+        filter .2s,
+        opacity .2s;
+    margin-top:10px;
 }
 
-.boton:hover:not(:disabled) {
-
-    transform:
-        translateY(-2px);
-
-    filter:
-        brightness(1.05);
+.btn:hover:not(:disabled){
+    transform:translateY(-2px);
+    filter:brightness(1.05);
 }
 
-.boton:active:not(:disabled) {
-
-    transform:
-        translateY(1px);
+.btn:active:not(:disabled){
+    transform:translateY(1px);
 }
 
-.boton:disabled {
-
-    cursor: not-allowed;
-
-    opacity: .45;
+.btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
 }
 
-#btnDado {
-
-    background:
-        linear-gradient(
-            135deg,
-            #ffca28,
-            #ff8f00
-        );
-
-    color: #222;
-
-    box-shadow:
-        0 6px 15px rgba(255,143,0,.25);
+.btn-dado{
+    background:linear-gradient(135deg,#1976d2,#42a5f5);
+    color:white;
+    box-shadow:0 8px 18px rgba(25,118,210,.25);
 }
 
-#btnReiniciar {
-
-    background:
-        linear-gradient(
-            135deg,
-            #42a5f5,
-            #1565c0
-        );
-
-    color: white;
+.btn-reiniciar{
+    background:linear-gradient(135deg,#43a047,#66bb6a);
+    color:white;
 }
 
-#btnAbandonar {
-
-    background:
-        linear-gradient(
-            135deg,
-            #ef5350,
-            #c62828
-        );
-
-    color: white;
+.btn-abandonar{
+    background:linear-gradient(135deg,#e53935,#ef5350);
+    color:white;
 }
 
 /* ============================================================
    JUGADORES
    ============================================================ */
 
-.jugadores {
-
-    margin-top: 18px;
+.jugadores{
+    margin-top:22px;
 }
 
-.jugadores h3 {
-
-    margin:
-        0 0 8px;
-
-    font-size: 18px;
+.jugadores h3{
+    margin-bottom:10px;
 }
 
-.jugador-item {
-
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    padding: 9px;
-
-    margin-bottom: 7px;
-
-    border-radius: 10px;
-
-    background: #f5f5f5;
-
-    font-size: 14px;
+.jugador-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    border-radius:10px;
+    background:#f5f5f5;
+    margin-bottom:7px;
+    transition:.25s;
 }
 
-.jugador-color {
-
-    width: 18px;
-    height: 18px;
-
-    border-radius: 50%;
-
-    border: 2px solid white;
-
-    box-shadow:
-        0 1px 4px rgba(0,0,0,.25);
+.jugador-item.turno{
+    background:#fff8d6;
+    box-shadow:inset 0 0 0 2px #ffd600;
 }
 
-.jugador-item.actual {
-
-    outline:
-        2px solid #ffd740;
-
-    background: #fff8d8;
+.color-jugador{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    border:2px solid white;
+    box-shadow:0 2px 5px rgba(0,0,0,.3);
 }
 
-.jugador-item.turno {
+.info-jugador{
+    flex:1;
+}
 
-    box-shadow:
-        inset 4px 0 0 #43a047;
+.nombre-jugador{
+    font-weight:900;
+}
+
+.posicion-jugador{
+    font-size:12px;
+    color:#666;
 }
 
 /* ============================================================
    VICTORIA
    ============================================================ */
 
-.overlay-victoria {
-
-    position: fixed;
-
-    inset: 0;
-
-    background:
-        rgba(0,0,0,.72);
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    z-index: 999;
-
-    opacity: 0;
-
-    pointer-events: none;
-
-    transition:
-        opacity .3s ease;
+.victoria{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .4s;
 }
 
-.overlay-victoria.visible {
-
-    opacity: 1;
-
-    pointer-events: auto;
+.victoria.visible{
+    opacity:1;
+    pointer-events:auto;
 }
 
-.ventana-victoria {
-
-    width: min(450px, 90%);
-
-    background: white;
-
-    border-radius: 25px;
-
-    padding: 35px;
-
-    text-align: center;
-
-    box-shadow:
-        0 25px 80px rgba(0,0,0,.4);
-
-    animation:
-        victoriaEntrada .6s ease;
+.victoria-card{
+    background:white;
+    border-radius:30px;
+    padding:40px;
+    width:min(450px,90%);
+    text-align:center;
+    box-shadow:0 30px 80px rgba(0,0,0,.4);
+    animation:entradaVictoria .7s cubic-bezier(.2,.8,.2,1);
 }
 
-@keyframes victoriaEntrada {
-
-    0% {
-        opacity: 0;
-
-        transform:
-            scale(.5)
-            rotate(-5deg);
+@keyframes entradaVictoria{
+    0%{
+        transform:scale(.4) rotate(-10deg);
+        opacity:0;
     }
 
-    70% {
-        transform:
-            scale(1.05)
-            rotate(2deg);
+    70%{
+        transform:scale(1.08) rotate(2deg);
     }
 
-    100% {
-        opacity: 1;
-
-        transform:
-            scale(1)
-            rotate(0);
+    100%{
+        transform:scale(1) rotate(0);
+        opacity:1;
     }
 }
 
-.trofeo {
-
-    font-size: 80px;
-
-    animation:
-        trofeoAnim 1.3s ease infinite;
+.trofeo{
+    font-size:85px;
+    animation:trofeo .9s infinite alternate ease-in-out;
 }
 
-@keyframes trofeoAnim {
-
-    0%,
-    100% {
-        transform:
-            translateY(0)
-            rotate(-4deg);
+@keyframes trofeo{
+    from{
+        transform:translateY(0) rotate(-5deg);
     }
 
-    50% {
-        transform:
-            translateY(-12px)
-            rotate(4deg);
+    to{
+        transform:translateY(-12px) rotate(5deg);
     }
 }
 
-.ventana-victoria h2 {
-
-    font-size: 32px;
-
-    margin:
-        10px 0;
+.victoria-card h2{
+    font-size:34px;
+    margin:10px 0;
 }
 
-.ventana-victoria p {
-
-    font-size: 18px;
-
-    color: #555;
-}
-
-#btnVictoria {
-
-    background:
-        linear-gradient(
-            135deg,
-            #43a047,
-            #1b5e20
-        );
-
-    color: white;
+.victoria-card p{
+    font-size:18px;
+    color:#555;
 }
 
 /* ============================================================
    RESPONSIVE
    ============================================================ */
 
-@media (max-width: 1000px) {
+@media(max-width:1000px){
 
-    .juego {
-
-        grid-template-columns: 1fr;
+    .juego{
+        grid-template-columns:1fr;
     }
 
-    .panel {
-
-        max-width: 760px;
-
-        width: 100%;
-
-        margin: auto;
+    .panel{
+        max-width:700px;
+        width:100%;
+        margin:auto;
     }
+
 }
 
-@media (max-width: 600px) {
+@media(max-width:700px){
 
-    .app {
-
-        width: 100%;
-
-        padding: 10px;
+    .app{
+        width:98%;
+        padding-top:12px;
     }
 
-    .tablero-contenedor {
-
-        padding: 8px;
-
-        border-radius: 16px;
+    .titulo{
+        font-size:27px;
     }
 
-    .panel {
-
-        border-radius: 16px;
-
-        padding: 15px;
+    .tablero-contenedor{
+        padding:10px;
     }
 
-    .pieza {
-
-        width: 27px;
-        height: 27px;
-
-        font-size: 10px;
+    .casilla{
+        font-size:11px;
     }
 
-    .juego {
-
-        gap: 12px;
+    .numero{
+        top:2px;
+        left:3px;
+        font-size:9px;
     }
+
+    .pieza{
+        width:25px;
+        height:25px;
+        font-size:10px;
+        border-width:3px;
+    }
+
+    .pieza.mia{
+        width:29px;
+        height:29px;
+    }
+
 }
 
 </style>
@@ -1029,9 +717,9 @@ body {
 
     <div class="juego">
 
-        <!-- =====================================================
+        <!-- ====================================================
              TABLERO
-             ===================================================== -->
+             ==================================================== -->
 
         <div class="tablero-contenedor">
 
@@ -1039,30 +727,27 @@ body {
 
                 <svg
                     id="svgElementos"
+                    class="svg-elementos"
                     viewBox="0 0 100 100"
                     preserveAspectRatio="none">
                 </svg>
 
-                <div id="capaFichas"></div>
+                <div id="capaFichas" class="capa-fichas"></div>
 
             </div>
 
         </div>
 
-        <!-- =====================================================
+        <!-- ====================================================
              PANEL
-             ===================================================== -->
+             ==================================================== -->
 
         <div class="panel">
 
             <h2>🎮 Partida</h2>
 
-            <div
-                id="estadoConexion"
-                class="estado-box">
-
+            <div id="estadoConexion" class="estado">
                 🔄 Conectando al servidor...
-
             </div>
 
             <div class="nombre-box">
@@ -1081,162 +766,132 @@ body {
 
             <!-- DADO -->
 
-            <div class="dado-contenedor">
+            <div class="zona-dado">
 
-                <div
-                    id="dado3d"
-                    class="dado-3d">
+                <div class="dado-escena">
 
-                    <!-- CARA 1 -->
+                    <div id="dado3d" class="dado-3d">
 
-                    <div class="cara c1">
+                        <div class="cara cara1">
+                            <div class="puntos">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
 
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <div class="cara cara2">
+                            <div class="puntos">
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
 
-                        <span></span>
-                        <span class="punto"></span>
-                        <span></span>
+                        <div class="cara cara3">
+                            <div class="puntos">
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                            </div>
+                        </div>
 
-                        <span></span>
-                        <span></span>
-                        <span></span>
+                        <div class="cara cara4">
+                            <div class="puntos">
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                                <span class="punto"></span>
+                            </div>
+                        </div>
 
-                    </div>
+                        <div class="cara cara5">
+                            <div class="puntos">
+                                <span class="punto"></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span></span>
+                                <span class="punto"></span>
+                            </div>
+                        </div>
 
-                    <!-- CARA 2 -->
-
-                    <div class="cara c2">
-
-                        <span class="punto"></span>
-                        <span></span>
-                        <span></span>
-
-                        <span></span>
-                        <span></span>
-                        <span></span>
-
-                        <span></span>
-                        <span></span>
-                        <span class="punto"></span>
-
-                    </div>
-
-                    <!-- CARA 3 -->
-
-                    <div class="cara c3">
-
-                        <span class="punto"></span>
-                        <span></span>
-                        <span></span>
-
-                        <span></span>
-                        <span class="punto"></span>
-                        <span></span>
-
-                        <span></span>
-                        <span></span>
-                        <span class="punto"></span>
-
-                    </div>
-
-                    <!-- CARA 4 -->
-
-                    <div class="cara c4">
-
-                        <span class="punto"></span>
-                        <span></span>
-                        <span class="punto"></span>
-
-                        <span></span>
-                        <span></span>
-                        <span></span>
-
-                        <span class="punto"></span>
-                        <span></span>
-                        <span class="punto"></span>
-
-                    </div>
-
-                    <!-- CARA 5 -->
-
-                    <div class="cara c5">
-
-                        <span class="punto"></span>
-                        <span></span>
-                        <span class="punto"></span>
-
-                        <span></span>
-                        <span class="punto"></span>
-                        <span></span>
-
-                        <span class="punto"></span>
-                        <span></span>
-                        <span class="punto"></span>
-
-                    </div>
-
-                    <!-- CARA 6 -->
-
-                    <div class="cara c6">
-
-                        <span class="punto"></span>
-                        <span class="punto"></span>
-                        <span class="punto"></span>
-
-                        <span></span>
-                        <span></span>
-                        <span></span>
-
-                        <span class="punto"></span>
-                        <span class="punto"></span>
-                        <span class="punto"></span>
+                        <div class="cara cara6">
+                            <div class="puntos">
+                                <span class="punto"></span>
+                                <span></span>
+                                <span class="punto"></span>
+                                <span class="punto"></span>
+                                <span class="punto"></span>
+                                <span class="punto"></span>
+                                <span class="span"></span>
+                                <span></span>
+                                <span class="punto"></span>
+                            </div>
+                        </div>
 
                     </div>
 
                 </div>
 
-            </div>
+                <div
+                    id="resultadoDado"
+                    class="resultado-dado">
+                    🎲
+                </div>
 
-            <div id="resultadoDado">
-                🎲 Esperando...
             </div>
 
             <button
                 id="btnDado"
-                class="boton"
+                class="btn btn-dado"
                 disabled>
-
                 🎲 LANZAR DADO
-
             </button>
 
             <button
                 id="btnReiniciar"
-                class="boton">
-
+                class="btn btn-reiniciar">
                 🔄 REINICIAR PARTIDA
-
             </button>
 
             <button
                 id="btnAbandonar"
-                class="boton">
-
+                class="btn btn-abandonar">
                 🚪 ABANDONAR
-
             </button>
 
             <div class="jugadores">
 
-                <h3>
-                    👥 Jugadores
-                </h3>
+                <h3>👥 Jugadores</h3>
 
-                <div id="listaJugadores">
-                    Esperando jugadores...
-                </div>
+                <div id="listaJugadores"></div>
 
             </div>
 
@@ -1250,30 +905,26 @@ body {
      VICTORIA
      ============================================================ -->
 
-<div
-    id="overlayVictoria"
-    class="overlay-victoria">
+<div id="victoria" class="victoria">
 
-    <div class="ventana-victoria">
+    <div class="victoria-card">
 
         <div class="trofeo">
             🏆
         </div>
 
-        <h2>
-            ¡Tenemos un ganador!
+        <h2 id="textoVictoria">
+            ¡Ganaste!
         </h2>
 
-        <p id="textoVictoria">
-            ¡Felicidades!
+        <p>
+            Has llegado a la casilla 100.
         </p>
 
         <button
-            id="btnVictoria"
-            class="boton">
-
+            id="btnVictoriaReiniciar"
+            class="btn btn-reiniciar">
             🔄 JUGAR DE NUEVO
-
         </button>
 
     </div>
@@ -1289,30 +940,33 @@ body {
 const SERVER_URL =
     "wss://serpientes-escaleras-phl7.onrender.com";
 
+
 const ESCALERAS = {
 
-    4: 25,
-    13: 46,
-    33: 49,
-    42: 63,
-    50: 69,
-    62: 81,
-    74: 92
+    4:25,
+    13:46,
+    33:49,
+    42:63,
+    50:69,
+    62:81,
+    74:92
 
 };
+
 
 const SERPIENTES = {
 
-    27: 5,
-    40: 3,
-    43: 18,
-    54: 31,
-    66: 45,
-    76: 58,
-    89: 53,
-    99: 41
+    27:5,
+    40:3,
+    43:18,
+    54:31,
+    66:45,
+    76:58,
+    89:53,
+    99:41
 
 };
+
 
 const COLORES = [
 
@@ -1323,6 +977,7 @@ const COLORES = [
 
 ];
 
+
 /* ============================================================
    VARIABLES
    ============================================================ */
@@ -1331,15 +986,15 @@ let socket = null;
 
 let estado = {
 
-    mi_id: null,
+    mi_id:null,
 
-    jugadores: {},
+    jugadores:{},
 
-    turno: null,
+    turno:null,
 
-    ganador: null,
+    ganador:null,
 
-    ultimo_dado: null,
+    ultimo_dado:null,
 
     ultimo_evento:
         "Conectando al servidor..."
@@ -1354,24 +1009,42 @@ let abandonando = false;
 
 let ultimaPosicionGanador = null;
 
+
+/*
+    IMPORTANTE:
+
+    dadoTerminado indica si el dado ya terminó completamente.
+
+    resultadoDadoPendiente guarda el movimiento de la ficha
+    mientras el dado todavía está girando.
+*/
+
+let dadoTerminado = true;
+
+let resultadoDadoPendiente = null;
+
+
 /* ============================================================
-   ELEMENTOS
+   ELEMENTOS HTML
    ============================================================ */
 
 const tablero =
     document.getElementById("tablero");
 
-const svgElementos =
-    document.getElementById("svgElementos");
-
 const capaFichas =
     document.getElementById("capaFichas");
+
+const svgElementos =
+    document.getElementById("svgElementos");
 
 const estadoConexion =
     document.getElementById("estadoConexion");
 
-const resultadoDado =
-    document.getElementById("resultadoDado");
+const nombreInput =
+    document.getElementById("nombreInput");
+
+const btnNombre =
+    document.getElementById("btnNombre");
 
 const btnDado =
     document.getElementById("btnDado");
@@ -1382,112 +1055,101 @@ const btnReiniciar =
 const btnAbandonar =
     document.getElementById("btnAbandonar");
 
-const btnNombre =
-    document.getElementById("btnNombre");
-
-const nombreInput =
-    document.getElementById("nombreInput");
-
-const dado3d =
-    document.getElementById("dado3d");
+const btnVictoriaReiniciar =
+    document.getElementById("btnVictoriaReiniciar");
 
 const listaJugadores =
     document.getElementById("listaJugadores");
 
-const overlayVictoria =
-    document.getElementById("overlayVictoria");
+const dado3d =
+    document.getElementById("dado3d");
+
+const resultadoDado =
+    document.getElementById("resultadoDado");
+
+const victoria =
+    document.getElementById("victoria");
 
 const textoVictoria =
     document.getElementById("textoVictoria");
 
-const btnVictoria =
-    document.getElementById("btnVictoria");
 
 /* ============================================================
-   CREAR TABLERO
+   UTILIDADES
    ============================================================ */
 
-function crearTablero() {
+function dormir(ms){
 
-    const existentes =
-        tablero.querySelectorAll(".casilla");
-
-    existentes.forEach(
-        elemento => elemento.remove()
+    return new Promise(resolve =>
+        setTimeout(resolve,ms)
     );
 
-    for (
-        let fila = 0;
-        fila < 10;
-        fila++
-    ) {
-
-        for (
-            let columna = 0;
-            columna < 10;
-            columna++
-        ) {
-
-            const casilla =
-                document.createElement("div");
-
-            casilla.className =
-                "casilla";
-
-            let numero;
-
-            const filaDesdeAbajo =
-                9 - fila;
-
-            if (
-                filaDesdeAbajo % 2 === 0
-            ) {
-
-                numero =
-                    filaDesdeAbajo * 10 +
-                    columna +
-                    1;
-
-            } else {
-
-                numero =
-                    filaDesdeAbajo * 10 +
-                    (9 - columna) +
-                    1;
-            }
-
-            if (numero === 100) {
-
-                casilla.classList.add(
-                    "meta"
-                );
-
-            }
-
-            const texto =
-                document.createElement("span");
-
-            texto.className =
-                "numero";
-
-            texto.textContent =
-                numero;
-
-            casilla.appendChild(texto);
-
-            tablero.insertBefore(
-                casilla,
-                svgElementos
-            );
-        }
-    }
 }
 
+
 /* ============================================================
-   POSICIÓN DE CASILLA
+   TABLERO
    ============================================================ */
 
-function posicionCasilla(numero) {
+function crearTablero(){
+
+    tablero
+        .querySelectorAll(".casilla")
+        .forEach(elemento =>
+            elemento.remove()
+        );
+
+
+    for(
+        let numero = 1;
+        numero <= 100;
+        numero++
+    ){
+
+        const casilla =
+            document.createElement("div");
+
+        casilla.className =
+            "casilla";
+
+        casilla.dataset.numero =
+            numero;
+
+        const numeroTexto =
+            document.createElement("span");
+
+        numeroTexto.className =
+            "numero";
+
+        numeroTexto.textContent =
+            numero;
+
+        casilla.appendChild(
+            numeroTexto
+        );
+
+        tablero.insertBefore(
+            casilla,
+            svgElementos
+        );
+
+    }
+
+}
+
+
+/*
+    Convierte número de casilla
+    a coordenadas porcentuales.
+
+    El tablero usa zigzag:
+    1 -> izquierda abajo
+    10 -> derecha abajo
+    11 -> derecha segunda fila
+    etc.
+*/
+
+function posicionCasilla(numero){
 
     numero =
         Math.max(
@@ -1502,9 +1164,7 @@ function posicionCasilla(numero) {
         numero - 1;
 
     const fila =
-        Math.floor(
-            indice / 10
-        );
+        Math.floor(indice / 10);
 
     const columna =
         indice % 10;
@@ -1514,14 +1174,12 @@ function posicionCasilla(numero) {
 
     let columnaVisual;
 
-    if (
-        fila % 2 === 0
-    ) {
+    if(fila % 2 === 0){
 
         columnaVisual =
             columna;
 
-    } else {
+    }else{
 
         columnaVisual =
             9 - columna;
@@ -1537,17 +1195,9 @@ function posicionCasilla(numero) {
             filaVisual * 10 + 5
 
     };
-}
-
-/* ============================================================
-   CENTRO
-   ============================================================ */
-
-function centroCasilla(numero) {
-
-    return posicionCasilla(numero);
 
 }
+
 
 /* ============================================================
    SVG
@@ -1558,8 +1208,9 @@ function crearLinea(
     y1,
     x2,
     y2,
-    clase
-) {
+    color,
+    grosor=1
+){
 
     const linea =
         document.createElementNS(
@@ -1589,16 +1240,12 @@ function crearLinea(
 
     linea.setAttribute(
         "stroke",
-        clase === "escalera"
-            ? "#1eaa46"
-            : "#d23232"
+        color
     );
 
     linea.setAttribute(
         "stroke-width",
-        clase === "escalera"
-            ? "1.2"
-            : "1.7"
+        grosor
     );
 
     linea.setAttribute(
@@ -1606,75 +1253,25 @@ function crearLinea(
         "round"
     );
 
-    linea.classList.add(
-        clase
-    );
-
     return linea;
+
 }
 
+
 /* ============================================================
-   DIBUJAR ESCALERAS
+   ESCALERAS
    ============================================================ */
 
 function dibujarEscalera(
     desde,
     hasta
-) {
+){
 
     const inicio =
-        centroCasilla(desde);
+        posicionCasilla(desde);
 
-    const fin =
-        centroCasilla(hasta);
-
-    const dx =
-        fin.x - inicio.x;
-
-    const dy =
-        fin.y - inicio.y;
-
-    const distancia =
-        Math.sqrt(
-            dx * dx +
-            dy * dy
-        );
-
-    if (!distancia) {
-        return;
-    }
-
-    const nx =
-        -dy / distancia;
-
-    const ny =
-        dx / distancia;
-
-    const separacion = 1.1;
-
-    const x1a =
-        inicio.x + nx * separacion;
-
-    const y1a =
-        inicio.y + ny * separacion;
-
-    const x2a =
-        fin.x + nx * separacion;
-
-    const y2a =
-        fin.y + ny * separacion;
-
-    const x1b =
-        inicio.x - nx * separacion;
-
-    const y1b =
-        inicio.y - ny * separacion;
-
-    const x2b =
-        fin.x - nx * separacion;
-
-    const y2b =
-        fin.y - ny * separacion;
+    const final =
+        posicionCasilla(hasta);
 
     const grupo =
         document.createElementNS(
@@ -1682,9 +1279,8 @@ function dibujarEscalera(
             "g"
         );
 
-    grupo.classList.add(
-        "grupo-escalera"
-    );
+    grupo.dataset.tipo =
+        "escalera";
 
     grupo.dataset.desde =
         desde;
@@ -1692,142 +1288,130 @@ function dibujarEscalera(
     grupo.dataset.hasta =
         hasta;
 
-    grupo.appendChild(
+    grupo.classList.add(
+        "escalera-svg"
+    );
+
+
+    const dx =
+        final.x - inicio.x;
+
+    const dy =
+        final.y - inicio.y;
+
+    const distancia =
+        Math.sqrt(
+            dx*dx +
+            dy*dy
+        );
+
+    if(distancia === 0){
+        return grupo;
+    }
+
+
+    const nx =
+        -dy / distancia;
+
+    const ny =
+        dx / distancia;
+
+
+    const separacion =
+        1.4;
+
+
+    const rail1 =
         crearLinea(
-            x1a,
-            y1a,
-            x2a,
-            y2a,
-            "escalera"
-        )
+            inicio.x + nx*separacion,
+            inicio.y + ny*separacion,
+            final.x + nx*separacion,
+            final.y + ny*separacion,
+            "#1eaa45",
+            1.2
+        );
+
+
+    const rail2 =
+        crearLinea(
+            inicio.x - nx*separacion,
+            inicio.y - ny*separacion,
+            final.x - nx*separacion,
+            final.y - ny*separacion,
+            "#1eaa45",
+            1.2
+        );
+
+
+    grupo.appendChild(
+        rail1
     );
 
     grupo.appendChild(
-        crearLinea(
-            x1b,
-            y1b,
-            x2b,
-            y2b,
-            "escalera"
-        )
+        rail2
     );
+
 
     const peldaños = 7;
 
-    for (
-        let i = 1;
-        i < peldaños;
+
+    for(
+        let i=1;
+        i<peldaños;
         i++
-    ) {
+    ){
 
         const t =
             i / peldaños;
 
-        const x =
+        const cx =
             inicio.x +
-            dx * t;
+            dx*t;
 
-        const y =
+        const cy =
             inicio.y +
-            dy * t;
+            dy*t;
 
-        const px =
-            x + nx * separacion;
 
-        const py =
-            y + ny * separacion;
+        const peldaño =
+            crearLinea(
+                cx + nx*separacion,
+                cy + ny*separacion,
+                cx - nx*separacion,
+                cy - ny*separacion,
+                "#26c65b",
+                1
+            );
 
-        const qx =
-            x - nx * separacion;
-
-        const qy =
-            y - ny * separacion;
 
         grupo.appendChild(
-            crearLinea(
-                px,
-                py,
-                qx,
-                qy,
-                "escalera"
-            )
+            peldaño
         );
+
     }
+
 
     svgElementos.appendChild(
         grupo
     );
+
 }
 
+
 /* ============================================================
-   DIBUJAR SERPIENTE
+   SERPIENTES
    ============================================================ */
 
 function dibujarSerpiente(
     desde,
     hasta
-) {
+){
 
     const inicio =
-        centroCasilla(desde);
+        posicionCasilla(desde);
 
-    const fin =
-        centroCasilla(hasta);
-
-    const dx =
-        fin.x - inicio.x;
-
-    const dy =
-        fin.y - inicio.y;
-
-    const distancia =
-        Math.sqrt(
-            dx * dx +
-            dy * dy
-        );
-
-    if (!distancia) {
-        return;
-    }
-
-    const nx =
-        -dy / distancia;
-
-    const ny =
-        dx / distancia;
-
-    const puntos = [];
-
-    const segmentos = 18;
-
-    for (
-        let i = 0;
-        i <= segmentos;
-        i++
-    ) {
-
-        const t =
-            i / segmentos;
-
-        const amplitud =
-            Math.sin(
-                t * Math.PI * 4
-            ) * 2;
-
-        const x =
-            inicio.x +
-            dx * t +
-            nx * amplitud;
-
-        const y =
-            inicio.y +
-            dy * t +
-            ny * amplitud;
-
-        puntos.push(
-            `${x},${y}`
-        );
-    }
+    const final =
+        posicionCasilla(hasta);
 
     const grupo =
         document.createElementNS(
@@ -1835,9 +1419,8 @@ function dibujarSerpiente(
             "g"
         );
 
-    grupo.classList.add(
-        "grupo-serpiente"
-    );
+    grupo.dataset.tipo =
+        "serpiente";
 
     grupo.dataset.desde =
         desde;
@@ -1845,42 +1428,148 @@ function dibujarSerpiente(
     grupo.dataset.hasta =
         hasta;
 
-    const polyline =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "polyline"
-        );
-
-    polyline.setAttribute(
-        "points",
-        puntos.join(" ")
+    grupo.classList.add(
+        "serpiente-svg"
     );
 
-    polyline.setAttribute(
+
+    const path =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "path"
+        );
+
+
+    const dx =
+        final.x - inicio.x;
+
+    const dy =
+        final.y - inicio.y;
+
+
+    const longitud =
+        Math.sqrt(
+            dx*dx +
+            dy*dy
+        );
+
+
+    const nx =
+        -dy / Math.max(
+            longitud,
+            1
+        );
+
+    const ny =
+        dx / Math.max(
+            longitud,
+            1
+        );
+
+
+    const amplitud =
+        Math.min(
+            6,
+            longitud * .25
+        );
+
+
+    const puntos = [];
+
+    const segmentos = 20;
+
+
+    for(
+        let i=0;
+        i<=segmentos;
+        i++
+    ){
+
+        const t =
+            i / segmentos;
+
+        const baseX =
+            inicio.x +
+            dx*t;
+
+        const baseY =
+            inicio.y +
+            dy*t;
+
+        const onda =
+            Math.sin(
+                t * Math.PI * 4
+            ) *
+            amplitud *
+            (1 - Math.abs(
+                t-.5
+            )*.5);
+
+        puntos.push({
+
+            x:
+                baseX +
+                nx*onda,
+
+            y:
+                baseY +
+                ny*onda
+
+        });
+
+    }
+
+
+    let d =
+        `M ${puntos[0].x} ${puntos[0].y}`;
+
+
+    for(
+        let i=1;
+        i<puntos.length;
+        i++
+    ){
+
+        d +=
+            ` L ${puntos[i].x} ${puntos[i].y}`;
+
+    }
+
+
+    path.setAttribute(
+        "d",
+        d
+    );
+
+    path.setAttribute(
         "fill",
         "none"
     );
 
-    polyline.setAttribute(
+    path.setAttribute(
         "stroke",
         "#d23232"
     );
 
-    polyline.setAttribute(
+    path.setAttribute(
         "stroke-width",
-        "2.8"
+        "1.7"
     );
 
-    polyline.setAttribute(
+    path.setAttribute(
         "stroke-linecap",
         "round"
     );
 
+
     grupo.appendChild(
-        polyline
+        path
     );
 
-    /* Cabeza */
+
+    /*
+        Cabeza
+    */
 
     const cabeza =
         document.createElementNS(
@@ -1890,17 +1579,17 @@ function dibujarSerpiente(
 
     cabeza.setAttribute(
         "cx",
-        fin.x
+        inicio.x
     );
 
     cabeza.setAttribute(
         "cy",
-        fin.y
+        inicio.y
     );
 
     cabeza.setAttribute(
         "r",
-        "2.2"
+        "2"
     );
 
     cabeza.setAttribute(
@@ -1908,27 +1597,32 @@ function dibujarSerpiente(
         "#c62828"
     );
 
+
     grupo.appendChild(
         cabeza
     );
 
+
     svgElementos.appendChild(
         grupo
     );
+
 }
 
+
 /* ============================================================
-   DIBUJAR ELEMENTOS
+   DIBUJAR TODOS LOS ELEMENTOS
    ============================================================ */
 
-function dibujarElementos() {
+function dibujarElementos(){
 
     svgElementos.innerHTML = "";
+
 
     Object.entries(
         ESCALERAS
     ).forEach(
-        ([desde, hasta]) => {
+        ([desde,hasta]) => {
 
             dibujarEscalera(
                 Number(desde),
@@ -1938,10 +1632,11 @@ function dibujarElementos() {
         }
     );
 
+
     Object.entries(
         SERPIENTES
     ).forEach(
-        ([desde, hasta]) => {
+        ([desde,hasta]) => {
 
             dibujarSerpiente(
                 Number(desde),
@@ -1950,90 +1645,101 @@ function dibujarElementos() {
 
         }
     );
+
 }
 
+
 /* ============================================================
-   POSICIÓN JUGADOR
+   DATOS DE JUGADOR
    ============================================================ */
 
 function obtenerPosicionJugador(
     jugador
-) {
+){
 
-    if (!jugador) {
+    if(!jugador){
         return 1;
     }
 
-    return Number(
-        jugador.posicion ??
-        jugador.casilla ??
-        1
-    );
+    if(
+        jugador.posicion !== undefined
+    ){
+
+        return Number(
+            jugador.posicion
+        );
+
+    }
+
+    if(
+        jugador.casilla !== undefined
+    ){
+
+        return Number(
+            jugador.casilla
+        );
+
+    }
+
+    return 1;
+
 }
 
-/* ============================================================
-   NOMBRE
-   ============================================================ */
 
 function obtenerNombreJugador(
     jugador,
     id
-) {
+){
 
-    if (!jugador) {
+    if(
+        jugador &&
+        jugador.nombre
+    ){
 
-        return `Jugador ${id}`;
+        return jugador.nombre;
 
     }
 
-    return (
-        jugador.nombre ??
-        jugador.nick ??
-        `Jugador ${id}`
-    );
+    return `Jugador ${id}`;
+
 }
 
-/* ============================================================
-   COLOR
-   ============================================================ */
 
 function obtenerColorJugador(
     jugador,
     id
-) {
+){
 
-    if (
+    if(
         jugador &&
         jugador.color
-    ) {
+    ){
 
         return jugador.color;
 
     }
 
     const indice =
-        (
-            Number(id) - 1
-        ) %
+        (Number(id)-1) %
         COLORES.length;
 
     return COLORES[
-        indice >= 0
-            ? indice
-            : 0
+        indice
     ];
+
 }
 
+
 /* ============================================================
-   OBTENER JUGADOR
+   POSICIÓN VISUAL
    ============================================================ */
 
 function obtenerJugador(
     jugadores,
     id
-) {
+){
 
-    if (!jugadores) {
+    if(!jugadores){
         return null;
     }
 
@@ -2042,274 +1748,359 @@ function obtenerJugador(
         jugadores[String(id)] ??
         null
     );
+
 }
+
 
 /* ============================================================
    RENDERIZAR FICHAS
    ============================================================ */
 
-function renderizarFichas() {
+function renderizarFichas(){
 
     const jugadores =
         estado.jugadores || {};
 
+
     const ids =
         Object.keys(jugadores);
 
-    ids.forEach(
-        id => {
 
-            const jugador =
-                jugadores[id];
+    ids.forEach(id => {
 
-            const posicion =
-                posicionesVisuales[id] ??
-                obtenerPosicionJugador(
-                    jugador
-                );
+        const jugador =
+            jugadores[id];
+
+        const posicion =
+            obtenerPosicionJugador(
+                jugador
+            );
+
+
+        if(
+            posicionesVisuales[id] ===
+            undefined
+        ){
 
             posicionesVisuales[id] =
                 posicion;
 
         }
-    );
 
-    Object.keys(
-        posicionesVisuales
-    ).forEach(
-        id => {
 
-            if (
-                !jugadores[id]
-            ) {
+        let ficha =
+            document.getElementById(
+                `pieza-${id}`
+            );
 
-                delete posicionesVisuales[id];
 
-            }
+        if(!ficha){
 
-        }
-    );
-
-    capaFichas.innerHTML = "";
-
-    ids.forEach(
-        id => {
-
-            const jugador =
-                jugadores[id];
-
-            const ficha =
+            ficha =
                 document.createElement(
                     "div"
                 );
 
-            ficha.className =
-                "pieza";
-
-            if (
-                Number(id) ===
-                Number(estado.mi_id)
-            ) {
-
-                ficha.classList.add(
-                    "mia"
-                );
-
-            }
-
             ficha.id =
                 `pieza-${id}`;
 
-            ficha.textContent =
-                id;
-
-            ficha.style.background =
-                obtenerColorJugador(
-                    jugador,
-                    id
-                );
-
-            const posicion =
-                posicionesVisuales[id] ??
-                obtenerPosicionJugador(
-                    jugador
-                );
-
-            const coordenadas =
-                posicionCasilla(
-                    posicion
-                );
-
-            ficha.style.left =
-                `${coordenadas.x}%`;
-
-            ficha.style.top =
-                `${coordenadas.y}%`;
+            ficha.className =
+                "pieza";
 
             capaFichas.appendChild(
                 ficha
             );
+
         }
-    );
+
+
+        if(
+            Number(id) ===
+            Number(estado.mi_id)
+        ){
+
+            ficha.classList.add(
+                "mia"
+            );
+
+        }else{
+
+            ficha.classList.remove(
+                "mia"
+            );
+
+        }
+
+
+        ficha.textContent =
+            id;
+
+
+        ficha.style.background =
+            obtenerColorJugador(
+                jugador,
+                id
+            );
+
+
+        const pos =
+            posicionCasilla(
+                posicionesVisuales[id]
+            );
+
+
+        ficha.style.left =
+            `${pos.x}%`;
+
+        ficha.style.top =
+            `${pos.y}%`;
+
+    });
+
+
+    /*
+        Elimina fichas que ya no existen.
+    */
+
+    Array.from(
+        capaFichas.children
+    ).forEach(ficha => {
+
+        const id =
+            ficha.id.replace(
+                "pieza-",
+                ""
+            );
+
+        if(
+            !jugadores[id]
+        ){
+
+            ficha.remove();
+
+            delete posicionesVisuales[
+                id
+            ];
+
+        }
+
+    });
+
 }
 
-/* ============================================================
-   DORMIR
-   ============================================================ */
-
-function dormir(ms) {
-
-    return new Promise(
-        resolve =>
-            setTimeout(
-                resolve,
-                ms
-            )
-    );
-}
 
 /* ============================================================
-   EASING
+   MOVIMIENTO SUAVE
    ============================================================ */
 
-function easeInOutCubic(t) {
+function easeInOutCubic(t){
 
     return t < .5
-        ? 4 * t * t * t
+
+        ? 4*t*t*t
+
         : 1 -
           Math.pow(
-              -2 * t + 2,
+              -2*t+2,
               3
           ) / 2;
+
 }
 
-/* ============================================================
-   MOVER ELEMENTO SUAVE
-   ============================================================ */
 
 function moverElementoSuave(
     id,
     desde,
     hasta,
-    duracion = 450
-) {
+    duracion=450
+){
 
-    return new Promise(
-        resolve => {
+    return new Promise(resolve => {
 
-            const ficha =
-                document.getElementById(
-                    `pieza-${id}`
+        const ficha =
+            document.getElementById(
+                `pieza-${id}`
+            );
+
+
+        if(!ficha){
+
+            resolve();
+
+            return;
+
+        }
+
+
+        const inicio =
+            posicionCasilla(
+                desde
+            );
+
+        const final =
+            posicionCasilla(
+                hasta
+            );
+
+
+        ficha.classList.add(
+            "moviendo"
+        );
+
+
+        const tiempoInicio =
+            performance.now();
+
+
+        function animar(
+            tiempoActual
+        ){
+
+            const progreso =
+                Math.min(
+                    1,
+                    (
+                        tiempoActual -
+                        tiempoInicio
+                    ) / duracion
                 );
 
-            if (!ficha) {
+
+            const suavizado =
+                easeInOutCubic(
+                    progreso
+                );
+
+
+            const x =
+                inicio.x +
+                (
+                    final.x -
+                    inicio.x
+                ) *
+                suavizado;
+
+
+            const y =
+                inicio.y +
+                (
+                    final.y -
+                    inicio.y
+                ) *
+                suavizado;
+
+
+            ficha.style.left =
+                `${x}%`;
+
+            ficha.style.top =
+                `${y}%`;
+
+
+            if(
+                progreso < 1
+            ){
+
+                requestAnimationFrame(
+                    animar
+                );
+
+            }else{
+
+                ficha.classList.remove(
+                    "moviendo"
+                );
 
                 posicionesVisuales[id] =
                     hasta;
 
                 resolve();
 
-                return;
             }
 
-            const inicio =
-                posicionCasilla(
-                    desde
-                );
-
-            const fin =
-                posicionCasilla(
-                    hasta
-                );
-
-            ficha.classList.add(
-                "moviendo"
-            );
-
-            const inicioTiempo =
-                performance.now();
-
-            function animar(
-                tiempo
-            ) {
-
-                const progreso =
-                    Math.min(
-                        1,
-                        (
-                            tiempo -
-                            inicioTiempo
-                        ) /
-                        duracion
-                    );
-
-                const t =
-                    easeInOutCubic(
-                        progreso
-                    );
-
-                const x =
-                    inicio.x +
-                    (
-                        fin.x -
-                        inicio.x
-                    ) * t;
-
-                const y =
-                    inicio.y +
-                    (
-                        fin.y -
-                        inicio.y
-                    ) * t;
-
-                ficha.style.left =
-                    `${x}%`;
-
-                ficha.style.top =
-                    `${y}%`;
-
-                if (
-                    progreso < 1
-                ) {
-
-                    requestAnimationFrame(
-                        animar
-                    );
-
-                } else {
-
-                    ficha.classList.remove(
-                        "moviendo"
-                    );
-
-                    posicionesVisuales[id] =
-                        hasta;
-
-                    resolve();
-                }
-            }
-
-            requestAnimationFrame(
-                animar
-            );
         }
-    );
+
+
+        requestAnimationFrame(
+            animar
+        );
+
+    });
+
 }
+
+
+/* ============================================================
+   MOVER CASILLA POR CASILLA
+   ============================================================ */
+
+async function moverFichaPorCasillas(
+    id,
+    inicio,
+    final,
+    velocidad=360
+){
+
+    if(
+        inicio === final
+    ){
+
+        await dormir(200);
+
+        return;
+
+    }
+
+
+    const paso =
+        final > inicio
+            ? 1
+            : -1;
+
+
+    let actual =
+        inicio;
+
+
+    while(
+        actual !== final
+    ){
+
+        const siguiente =
+            actual + paso;
+
+
+        await moverElementoSuave(
+            id,
+            actual,
+            siguiente,
+            velocidad
+        );
+
+
+        actual =
+            siguiente;
+
+
+        await dormir(80);
+
+    }
+
+}
+
 
 /* ============================================================
    REBOTE
    ============================================================ */
 
-async function reboteFicha(
-    id
-) {
+async function reboteFicha(id){
 
     const ficha =
         document.getElementById(
             `pieza-${id}`
         );
 
-    if (!ficha) {
+    if(!ficha){
         return;
     }
 
@@ -2325,69 +2116,16 @@ async function reboteFicha(
 
     await dormir(450);
 
-    ficha.classList.remove(
-        "rebote"
-    );
 }
 
-/* ============================================================
-   MOVER POR CASILLAS
-   ============================================================ */
-
-async function moverFichaPorCasillas(
-    id,
-    inicio,
-    final,
-    velocidad = 360
-) {
-
-    if (
-        inicio === final
-    ) {
-
-        await reboteFicha(id);
-
-        return;
-    }
-
-    const paso =
-        final > inicio
-            ? 1
-            : -1;
-
-    let actual =
-        inicio;
-
-    while (
-        actual !== final
-    ) {
-
-        const siguiente =
-            actual + paso;
-
-        await moverElementoSuave(
-            id,
-            actual,
-            siguiente,
-            velocidad
-        );
-
-        await dormir(70);
-
-        actual =
-            siguiente;
-    }
-
-    await reboteFicha(id);
-}
 
 /* ============================================================
-   MENSAJE
+   MENSAJES
    ============================================================ */
 
-function mostrarMensaje(
+async function mostrarMensaje(
     texto
-) {
+){
 
     resultadoDado.textContent =
         texto;
@@ -2401,7 +2139,67 @@ function mostrarMensaje(
     resultadoDado.classList.add(
         "mensaje-efecto"
     );
+
 }
+
+
+/* ============================================================
+   RESALTAR CASILLA
+   ============================================================ */
+
+async function resaltarCasilla(
+    numero,
+    duracion=1200
+){
+
+    const existente =
+        document.getElementById(
+            "resaltadoTemporal"
+        );
+
+    if(existente){
+        existente.remove();
+    }
+
+
+    const pos =
+        posicionCasilla(
+            numero
+        );
+
+
+    const elemento =
+        document.createElement(
+            "div"
+        );
+
+    elemento.id =
+        "resaltadoTemporal";
+
+    elemento.className =
+        "resaltado-casilla";
+
+    elemento.style.left =
+        `${pos.x}%`;
+
+    elemento.style.top =
+        `${pos.y}%`;
+
+
+    tablero.appendChild(
+        elemento
+    );
+
+
+    await dormir(
+        duracion
+    );
+
+
+    elemento.remove();
+
+}
+
 
 /* ============================================================
    PARTICULAS
@@ -2409,22 +2207,20 @@ function mostrarMensaje(
 
 function crearParticulas(
     numeroCasilla,
-    cantidad = 25
-) {
+    cantidad=25
+){
 
-    const posicion =
+    const pos =
         posicionCasilla(
             numeroCasilla
         );
 
-    const rect =
-        tablero.getBoundingClientRect();
 
-    for (
-        let i = 0;
-        i < cantidad;
+    for(
+        let i=0;
+        i<cantidad;
         i++
-    ) {
+    ){
 
         const particula =
             document.createElement(
@@ -2434,33 +2230,24 @@ function crearParticulas(
         particula.className =
             "particula";
 
-        const dx =
-            (
-                Math.random() -
-                .5
-            ) * 180;
-
-        const dy =
-            (
-                Math.random() -
-                .5
-            ) * 180;
 
         particula.style.left =
-            `${posicion.x}%`;
+            `${pos.x}%`;
 
         particula.style.top =
-            `${posicion.y}%`;
+            `${pos.y}%`;
+
 
         particula.style.setProperty(
-            "--dx",
-            `${dx}px`
+            "--x",
+            Math.random()
         );
 
         particula.style.setProperty(
-            "--dy",
-            `${dy}px`
+            "--y",
+            Math.random()
         );
+
 
         particula.style.background =
             COLORES[
@@ -2470,68 +2257,22 @@ function crearParticulas(
                 )
             ];
 
+
         tablero.appendChild(
             particula
         );
 
-        setTimeout(
-            () => {
 
-                particula.remove();
+        setTimeout(() => {
 
-            },
-            1000
-        );
-    }
-}
+            particula.remove();
 
-/* ============================================================
-   RESALTAR CASILLA
-   ============================================================ */
+        },1000);
 
-async function resaltarCasilla(
-    numero,
-    duracion = 1000
-) {
-
-    const anterior =
-        tablero.querySelector(
-            ".resaltado-casilla"
-        );
-
-    if (anterior) {
-        anterior.remove();
     }
 
-    const posicion =
-        posicionCasilla(
-            numero
-        );
-
-    const elemento =
-        document.createElement(
-            "div"
-        );
-
-    elemento.className =
-        "resaltado-casilla";
-
-    elemento.style.left =
-        `${posicion.x}%`;
-
-    elemento.style.top =
-        `${posicion.y}%`;
-
-    tablero.appendChild(
-        elemento
-    );
-
-    await dormir(
-        duracion
-    );
-
-    elemento.remove();
 }
+
 
 /* ============================================================
    ACTIVAR ESCALERA
@@ -2540,43 +2281,58 @@ async function resaltarCasilla(
 async function activarEscalera(
     desde,
     hasta
-) {
+){
 
     const grupos =
         svgElementos.querySelectorAll(
-            ".grupo-escalera"
+            ".escalera-svg"
         );
 
-    grupos.forEach(
-        grupo => {
 
-            if (
-                Number(
-                    grupo.dataset.desde
-                ) === Number(desde) &&
-                Number(
-                    grupo.dataset.hasta
-                ) === Number(hasta)
-            ) {
+    grupos.forEach(grupo => {
 
-                grupo.classList.add(
-                    "escalera-activa"
-                );
+        if(
+            Number(
+                grupo.dataset.desde
+            ) === Number(desde) &&
+            Number(
+                grupo.dataset.hasta
+            ) === Number(hasta)
+        ){
 
-                setTimeout(
-                    () => {
+            grupo.classList.add(
+                "escalera-activa"
+            );
 
-                        grupo.classList.remove(
-                            "escalera-activa"
-                        );
-
-                    },
-                    1800
-                );
-            }
         }
+
+    });
+
+
+    await mostrarMensaje(
+        `🪜 ¡Escalera! ${desde} → ${hasta}`
     );
+
+
+    crearParticulas(
+        hasta,
+        35
+    );
+
+
+    await dormir(700);
+
+
+    grupos.forEach(grupo => {
+
+        grupo.classList.remove(
+            "escalera-activa"
+        );
+
+    });
+
 }
+
 
 /* ============================================================
    ACTIVAR SERPIENTE
@@ -2585,46 +2341,61 @@ async function activarEscalera(
 async function activarSerpiente(
     desde,
     hasta
-) {
+){
 
     const grupos =
         svgElementos.querySelectorAll(
-            ".grupo-serpiente"
+            ".serpiente-svg"
         );
 
-    grupos.forEach(
-        grupo => {
 
-            if (
-                Number(
-                    grupo.dataset.desde
-                ) === Number(desde) &&
-                Number(
-                    grupo.dataset.hasta
-                ) === Number(hasta)
-            ) {
+    grupos.forEach(grupo => {
 
-                grupo.classList.add(
-                    "serpiente-activa"
-                );
+        if(
+            Number(
+                grupo.dataset.desde
+            ) === Number(desde) &&
+            Number(
+                grupo.dataset.hasta
+            ) === Number(hasta)
+        ){
 
-                setTimeout(
-                    () => {
+            grupo.classList.add(
+                "serpiente-activa"
+            );
 
-                        grupo.classList.remove(
-                            "serpiente-activa"
-                        );
-
-                    },
-                    1900
-                );
-            }
         }
+
+    });
+
+
+    await mostrarMensaje(
+        `🐍 ¡Serpiente! ${desde} → ${hasta}`
     );
+
+
+    crearParticulas(
+        desde,
+        30
+    );
+
+
+    await dormir(700);
+
+
+    grupos.forEach(grupo => {
+
+        grupo.classList.remove(
+            "serpiente-activa"
+        );
+
+    });
+
 }
 
+
 /* ============================================================
-   ANIMACIÓN MOVIMIENTO
+   ANIMACIÓN COMPLETA DEL MOVIMIENTO
    ============================================================ */
 
 async function animarMovimientoJugador(
@@ -2632,178 +2403,227 @@ async function animarMovimientoJugador(
     posicionAnterior,
     posicionFinal,
     dado
-) {
+){
 
-    if (animando) {
+    if(animando){
         return;
     }
+
 
     animando = true;
 
     actualizarBotonDado();
 
-    const inicio =
-        Number(posicionAnterior);
 
-    const final =
-        Number(posicionFinal);
-
-    let intermedia =
-        inicio +
-        Number(dado || 0);
-
-    if (
-        intermedia > 100
-    ) {
-
-        intermedia =
-            inicio;
-
-    }
-
-    /* Movimiento normal */
-
-    if (
-        intermedia !== inicio
-    ) {
-
-        await moverFichaPorCasillas(
-            id,
-            inicio,
-            intermedia,
-            300
+    let inicio =
+        Number(
+            posicionAnterior
         );
 
-    } else {
 
-        await reboteFicha(id);
+    let final =
+        Number(
+            posicionFinal
+        );
+
+
+    dado =
+        Number(dado) || 0;
+
+
+    /*
+        El movimiento normal que produjo el dado.
+    */
+
+    let posicionIntermedia =
+        inicio + dado;
+
+
+    if(
+        posicionIntermedia > 100
+    ){
+
+        posicionIntermedia =
+            100;
 
     }
 
-    /* ESCALERA */
 
-    if (
-        ESCALERAS[intermedia]
-    ) {
+    /*
+        Si por alguna razón el servidor
+        informa una posición diferente,
+        siempre respetamos el servidor
+        al final.
+    */
 
-        const destino =
-            ESCALERAS[
-                intermedia
-            ];
+
+    await moverFichaPorCasillas(
+        id,
+        inicio,
+        posicionIntermedia,
+        360
+    );
+
+
+    await reboteFicha(
+        id
+    );
+
+
+    /*
+        ESCALERA
+    */
+
+    if(
+        ESCALERAS[
+            posicionIntermedia
+        ] !== undefined
+    ){
+
+        const destinoEscalera =
+            Number(
+                ESCALERAS[
+                    posicionIntermedia
+                ]
+            );
+
 
         await resaltarCasilla(
-            intermedia,
-            800
+            posicionIntermedia,
+            900
         );
 
-        activarEscalera(
-            intermedia,
-            destino
+
+        await activarEscalera(
+            posicionIntermedia,
+            destinoEscalera
         );
 
-        mostrarMensaje(
-            `🪜 ¡Escalera! ${intermedia} → ${destino}`
-        );
 
-        crearParticulas(
-            intermedia,
-            30
-        );
+        await dormir(300);
 
-        await dormir(700);
 
         await moverElementoSuave(
             id,
-            intermedia,
-            destino,
+            posicionIntermedia,
+            destinoEscalera,
             1500
         );
 
+
         crearParticulas(
-            destino,
-            35
+            destinoEscalera,
+            40
         );
 
-        await dormir(300);
+
+        await reboteFicha(
+            id
+        );
+
+
+        posicionIntermedia =
+            destinoEscalera;
+
     }
 
-    /* SERPIENTE */
 
-    else if (
-        SERPIENTES[intermedia]
-    ) {
+    /*
+        SERPIENTE
+    */
 
-        const destino =
-            SERPIENTES[
-                intermedia
-            ];
+    else if(
+        SERPIENTES[
+            posicionIntermedia
+        ] !== undefined
+    ){
+
+        const destinoSerpiente =
+            Number(
+                SERPIENTES[
+                    posicionIntermedia
+                ]
+            );
+
 
         await resaltarCasilla(
-            intermedia,
-            800
+            posicionIntermedia,
+            900
         );
 
-        activarSerpiente(
-            intermedia,
-            destino
+
+        await activarSerpiente(
+            posicionIntermedia,
+            destinoSerpiente
         );
 
-        mostrarMensaje(
-            `🐍 ¡Serpiente! ${intermedia} → ${destino}`
-        );
 
-        crearParticulas(
-            intermedia,
-            30
-        );
+        await dormir(300);
 
-        await dormir(700);
 
         await moverElementoSuave(
             id,
-            intermedia,
-            destino,
+            posicionIntermedia,
+            destinoSerpiente,
             1700
         );
 
+
         crearParticulas(
-            destino,
+            destinoSerpiente,
             35
         );
 
-        await dormir(300);
+
+        await reboteFicha(
+            id
+        );
+
+
+        posicionIntermedia =
+            destinoSerpiente;
+
     }
 
-    /* CORRECCIÓN FINAL */
 
-    if (
-        posicionesVisuales[id] !==
-        final
-    ) {
+    /*
+        Corrección final usando
+        la posición real del servidor.
+    */
+
+    if(
+        posicionIntermedia !== final
+    ){
 
         await moverElementoSuave(
             id,
-            posicionesVisuales[id] ??
-            intermedia,
+            posicionIntermedia,
             final,
-            400
+            500
         );
+
     }
+
 
     posicionesVisuales[id] =
         final;
 
+
+    await reboteFicha(
+        id
+    );
+
+
     animando = false;
 
-    actualizarEstadoTexto();
-
-    actualizarListaJugadores();
 
     actualizarBotonDado();
+
 }
 
+
 /* ============================================================
-   ROTACIONES DADO
+   DADO
    ============================================================ */
 
 const ROTACIONES_DADO = {
@@ -2828,20 +2648,29 @@ const ROTACIONES_DADO = {
 
 };
 
-/* ============================================================
-   MOSTRAR CARA
-   ============================================================ */
 
 function mostrarCaraDado(
     numero
-) {
+){
+
+    numero =
+        Number(numero);
+
+
+    if(
+        !ROTACIONES_DADO[numero]
+    ){
+
+        return;
+
+    }
+
 
     dado3d.style.transform =
-        ROTACIONES_DADO[
-            numero
-        ] ||
-        ROTACIONES_DADO[1];
+        ROTACIONES_DADO[numero];
+
 }
+
 
 /* ============================================================
    ANIMAR DADO
@@ -2849,374 +2678,904 @@ function mostrarCaraDado(
 
 async function animarDado(
     resultado
-) {
+){
 
-    btnDado.disabled =
-        true;
+    /*
+        MUY IMPORTANTE:
+
+        Mientras el dado está girando,
+        la ficha NO puede moverse.
+    */
+
+    dadoTerminado = false;
+
+
+    btnDado.disabled = true;
+
 
     dado3d.classList.add(
         "lanzando"
     );
 
-    const rondas = 15;
-
-    for (
-        let i = 0;
-        i < rondas;
-        i++
-    ) {
-
-        const cara =
-            1 +
-            Math.floor(
-                Math.random() * 6
-            );
-
-        mostrarCaraDado(
-            cara
-        );
-
-        await dormir(
-            90
-        );
-    }
-
-    dado3d.classList.remove(
-        "lanzando"
-    );
-
-    mostrarCaraDado(
-        Number(resultado)
-    );
 
     resultadoDado.textContent =
-        `🎲 Salió ${resultado}`;
+        "🎲 Lanzando...";
+
 
     resultadoDado.classList.remove(
         "mensaje-efecto"
     );
 
+
+    /*
+        Animación de lanzamiento
+    */
+
+    const rondas = 20;
+
+
+    for(
+        let i=0;
+        i<rondas;
+        i++
+    ){
+
+        const cara =
+            1 +
+            Math.floor(
+                Math.random()*6
+            );
+
+
+        mostrarCaraDado(
+            cara
+        );
+
+
+        await dormir(
+            100
+        );
+
+    }
+
+
+    /*
+        DETENER COMPLETAMENTE
+    */
+
+    dado3d.classList.remove(
+        "lanzando"
+    );
+
+
+    /*
+        Mostrar resultado final
+    */
+
+    mostrarCaraDado(
+        Number(resultado)
+    );
+
+
+    resultadoDado.textContent =
+        `🎲 Salió ${resultado}`;
+
+
+    resultadoDado.classList.remove(
+        "mensaje-efecto"
+    );
+
+
     void resultadoDado.offsetWidth;
+
 
     resultadoDado.classList.add(
         "mensaje-efecto"
     );
 
+
+    /*
+        PAUSA DESPUÉS DE DETENERSE.
+
+        Durante esta pausa la ficha
+        tampoco se mueve.
+    */
+
     await dormir(
-        500
+        900
     );
 
-    dado3d.style.transition =
-        "transform .8s cubic-bezier(.2,.8,.2,1)";
 
-    actualizarBotonDado();
-}
+    /*
+        Ahora sí:
+        EL DADO TERMINÓ.
+    */
 
-/* ============================================================
-   ESTADO TEXTO
-   ============================================================ */
+    dadoTerminado = true;
 
-function actualizarEstadoTexto() {
 
-    if (
-        !socket ||
-        socket.readyState !==
-        WebSocket.OPEN
-    ) {
+    /*
+        Si el movimiento llegó mientras
+        el dado estaba girando,
+        lo ejecutamos ahora.
+    */
 
-        estadoConexion.textContent =
-            "🔴 Desconectado";
+    if(
+        resultadoDadoPendiente
+    ){
 
-        return;
-    }
+        const movimiento =
+            resultadoDadoPendiente;
 
-    if (
-        estado.ganador
-    ) {
 
-        estadoConexion.textContent =
-            "🏆 Partida terminada";
+        resultadoDadoPendiente =
+            null;
 
-        return;
-    }
 
-    if (
-        Number(estado.turno) ===
-        Number(estado.mi_id)
-    ) {
-
-        estadoConexion.textContent =
-            "🟢 ¡Es tu turno!";
-
-        return;
-    }
-
-    if (
-        estado.turno
-    ) {
-
-        const jugador =
-            obtenerJugador(
-                estado.jugadores,
-                estado.turno
-            );
-
-        const nombre =
-            obtenerNombreJugador(
-                jugador,
-                estado.turno
-            );
-
-        estadoConexion.textContent =
-            `⏳ Turno de ${nombre}`;
-
-        return;
-    }
-
-    estadoConexion.textContent =
-        estado.ultimo_evento ||
-        "🟢 Conectado";
-}
-
-/* ============================================================
-   LISTA JUGADORES
-   ============================================================ */
-
-function actualizarListaJugadores() {
-
-    const jugadores =
-        estado.jugadores || {};
-
-    const ids =
-        Object.keys(
-            jugadores
+        await ejecutarMovimientoPendiente(
+            movimiento
         );
 
-    if (
-        ids.length === 0
-    ) {
+    }
 
-        listaJugadores.textContent =
-            "Esperando jugadores...";
+
+    actualizarBotonDado();
+
+}
+
+
+/* ============================================================
+   MOVIMIENTO PENDIENTE
+   ============================================================ */
+
+async function ejecutarMovimientoPendiente(
+    movimiento
+){
+
+    if(
+        !movimiento
+    ){
 
         return;
+
     }
+
+
+    await animarMovimientoJugador(
+
+        movimiento.id,
+
+        movimiento.anterior,
+
+        movimiento.nuevo,
+
+        movimiento.dado
+
+    );
+
+}
+
+
+/* ============================================================
+   ACTUALIZAR BOTÓN DEL DADO
+   ============================================================ */
+
+function actualizarBotonDado(){
+
+    if(!socket){
+
+        btnDado.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    if(
+        socket.readyState !==
+        WebSocket.OPEN
+    ){
+
+        btnDado.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    if(
+        animando
+    ){
+
+        btnDado.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        btnDado.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.mi_id === null ||
+        estado.mi_id === undefined
+    ){
+
+        btnDado.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        btnDado.disabled =
+            true;
+
+        return;
+
+    }
+
+
+    btnDado.disabled =
+        Number(estado.turno) !==
+        Number(estado.mi_id);
+
+}
+
+
+/* ============================================================
+   RENDERIZAR JUGADORES
+   ============================================================ */
+
+function renderizarJugadores(){
 
     listaJugadores.innerHTML =
         "";
 
-    ids
-        .sort(
-            (a, b) =>
-                Number(a) -
-                Number(b)
-        )
-        .forEach(
-            id => {
 
-                const jugador =
-                    jugadores[id];
+    const jugadores =
+        estado.jugadores || {};
 
-                const item =
-                    document.createElement(
-                        "div"
-                    );
 
-                item.className =
-                    "jugador-item";
+    const ids =
+        Object.keys(jugadores)
+            .sort(
+                (a,b) =>
+                    Number(a)-Number(b)
+            );
 
-                if (
-                    Number(id) ===
-                    Number(estado.mi_id)
-                ) {
 
-                    item.classList.add(
-                        "actual"
-                    );
-                }
+    ids.forEach(id => {
 
-                if (
-                    Number(id) ===
-                    Number(estado.turno)
-                ) {
+        const jugador =
+            jugadores[id];
 
-                    item.classList.add(
-                        "turno"
-                    );
-                }
 
-                const color =
-                    document.createElement(
-                        "span"
-                    );
+        const item =
+            document.createElement(
+                "div"
+            );
 
-                color.className =
-                    "jugador-color";
+        item.className =
+            "jugador-item";
 
-                color.style.background =
-                    obtenerColorJugador(
-                        jugador,
-                        id
-                    );
 
-                const nombre =
-                    obtenerNombreJugador(
-                        jugador,
-                        id
-                    );
+        if(
+            Number(id) ===
+            Number(estado.turno)
+        ){
 
-                const posicion =
-                    obtenerPosicionJugador(
-                        jugador
-                    );
+            item.classList.add(
+                "turno"
+            );
 
-                item.appendChild(
-                    color
-                );
+        }
 
-                const texto =
-                    document.createElement(
-                        "span"
-                    );
 
-                texto.textContent =
-                    `${nombre} — casilla ${posicion}`;
+        const color =
+            document.createElement(
+                "div"
+            );
 
-                item.appendChild(
-                    texto
-                );
+        color.className =
+            "color-jugador";
 
-                if (
-                    Number(id) ===
-                    Number(estado.mi_id)
-                ) {
+        color.style.background =
+            obtenerColorJugador(
+                jugador,
+                id
+            );
 
-                    const tu =
-                        document.createElement(
-                            "strong"
-                        );
 
-                    tu.textContent =
-                        " (TÚ)";
+        const info =
+            document.createElement(
+                "div"
+            );
 
-                    item.appendChild(
-                        tu
-                    );
-                }
+        info.className =
+            "info-jugador";
 
-                listaJugadores.appendChild(
-                    item
-                );
-            }
+
+        const nombre =
+            document.createElement(
+                "div"
+            );
+
+        nombre.className =
+            "nombre-jugador";
+
+        nombre.textContent =
+            obtenerNombreJugador(
+                jugador,
+                id
+            );
+
+
+        if(
+            Number(id) ===
+            Number(estado.mi_id)
+        ){
+
+            nombre.textContent +=
+                " ⭐";
+
+        }
+
+
+        const posicion =
+            document.createElement(
+                "div"
+            );
+
+        posicion.className =
+            "posicion-jugador";
+
+        posicion.textContent =
+            `Casilla ${obtenerPosicionJugador(
+                jugador
+            )}`;
+
+
+        info.appendChild(
+            nombre
         );
+
+        info.appendChild(
+            posicion
+        );
+
+
+        item.appendChild(
+            color
+        );
+
+        item.appendChild(
+            info
+        );
+
+
+        listaJugadores.appendChild(
+            item
+        );
+
+    });
+
+
 }
+
 
 /* ============================================================
-   BOTÓN DADO
+   ESTADO DE CONEXIÓN
    ============================================================ */
 
-function actualizarBotonDado() {
+function actualizarEstadoConexion(){
 
-    const conectado =
+    if(
         socket &&
         socket.readyState ===
-        WebSocket.OPEN;
+        WebSocket.OPEN
+    ){
 
-    if (!conectado) {
+        estadoConexion.textContent =
+            "🟢 Conectado al servidor";
 
-        btnDado.disabled =
-            true;
+        estadoConexion.style.background =
+            "#e8f5e9";
 
-        return;
+        estadoConexion.style.borderColor =
+            "#b7dfb9";
+
+    }else{
+
+        estadoConexion.textContent =
+            "🔴 Desconectado";
+
+        estadoConexion.style.background =
+            "#ffebee";
+
+        estadoConexion.style.borderColor =
+            "#ffcdd2";
+
     }
 
-    if (animando) {
+}
 
-        btnDado.disabled =
-            true;
 
-        return;
-    }
+/* ============================================================
+   ACTUALIZAR MENSAJE DE TURNO
+   ============================================================ */
 
-    if (estado.ganador) {
+function actualizarMensajeEstado(){
 
-        btnDado.disabled =
-            true;
-
-        return;
-    }
-
-    if (
-        estado.mi_id === null ||
-        estado.mi_id === undefined
-    ) {
-
-        btnDado.disabled =
-            true;
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
 
         return;
+
     }
 
-    if (
+
+    if(
         estado.turno === null ||
         estado.turno === undefined
-    ) {
-
-        btnDado.disabled =
-            true;
+    ){
 
         return;
+
     }
 
-    const esMiTurno =
-        Number(estado.turno) ===
-        Number(estado.mi_id);
 
-    btnDado.disabled =
-        !esMiTurno;
+    const jugadorTurno =
+        obtenerJugador(
+            estado.jugadores,
+            estado.turno
+        );
+
+
+    const nombre =
+        obtenerNombreJugador(
+            jugadorTurno,
+            estado.turno
+        );
+
+
+    if(
+        Number(estado.turno) ===
+        Number(estado.mi_id)
+    ){
+
+        estadoConexion.textContent =
+            "🟢 ¡Es tu turno!";
+
+    }else{
+
+        estadoConexion.textContent =
+            `⏳ Turno de ${nombre}`;
+
+    }
+
 }
+
+
+/* ============================================================
+   MOSTRAR VICTORIA
+   ============================================================ */
+
+function mostrarVictoria(
+    ganadorId
+){
+
+    const jugador =
+        obtenerJugador(
+            estado.jugadores,
+            ganadorId
+        );
+
+
+    const nombre =
+        obtenerNombreJugador(
+            jugador,
+            ganadorId
+        );
+
+
+    textoVictoria.textContent =
+        `🏆 ¡${nombre} ganó!`;
+
+
+    victoria.classList.add(
+        "visible"
+    );
+
+
+    crearParticulas(
+        100,
+        80
+    );
+
+}
+
+
+/* ============================================================
+   CERRAR VICTORIA
+   ============================================================ */
+
+function cerrarVictoria(){
+
+    victoria.classList.remove(
+        "visible"
+    );
+
+}
+
+
+/* ============================================================
+   WEBSOCKET
+   ============================================================ */
+
+function conectar(){
+
+    try{
+
+        estadoConexion.textContent =
+            "🔄 Conectando...";
+
+
+        socket =
+            new WebSocket(
+                SERVER_URL
+            );
+
+
+        socket.onopen =
+            () => {
+
+                console.log(
+                    "WebSocket conectado"
+                );
+
+
+                actualizarEstadoConexion();
+
+
+                /*
+                    Ping inicial
+                */
+
+                enviar({
+
+                    tipo:
+                        "ping"
+
+                });
+
+
+                actualizarBotonDado();
+
+            };
+
+
+        socket.onmessage =
+            async evento => {
+
+                try{
+
+                    const mensaje =
+                        JSON.parse(
+                            evento.data
+                        );
+
+
+                    await procesarMensaje(
+                        mensaje
+                    );
+
+
+                }catch(error){
+
+                    console.error(
+                        "Error procesando mensaje:",
+                        error
+                    );
+
+                }
+
+            };
+
+
+        socket.onclose =
+            () => {
+
+                console.log(
+                    "WebSocket cerrado"
+                );
+
+
+                actualizarEstadoConexion();
+
+
+                btnDado.disabled =
+                    true;
+
+
+                if(
+                    !abandonando
+                ){
+
+                    estadoConexion.textContent =
+                        "🔴 Conexión perdida";
+
+                }
+
+            };
+
+
+        socket.onerror =
+            error => {
+
+                console.error(
+                    "WebSocket error:",
+                    error
+                );
+
+
+                estadoConexion.textContent =
+                    "❌ Error de conexión";
+
+            };
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+        estadoConexion.textContent =
+            "❌ No se pudo conectar";
+
+    }
+
+}
+
 
 /* ============================================================
    ENVIAR
    ============================================================ */
 
 function enviar(
-    mensaje
-) {
+    datos
+){
 
-    if (
+    if(
         !socket ||
         socket.readyState !==
         WebSocket.OPEN
-    ) {
-
-        mostrarMensaje(
-            "🔴 No hay conexión con el servidor."
-        );
+    ){
 
         return false;
+
     }
 
-    try {
 
-        socket.send(
-            JSON.stringify(
-                mensaje
-            )
-        );
+    socket.send(
+        JSON.stringify(
+            datos
+        )
+    );
 
-        return true;
 
-    } catch (error) {
+    return true;
 
-        console.error(
-            "Error enviando:",
-            error
-        );
-
-        return false;
-    }
 }
+
+
+/* ============================================================
+   PROCESAR MENSAJES
+   ============================================================ */
+
+async function procesarMensaje(
+    mensaje
+){
+
+    console.log(
+        "Servidor:",
+        mensaje
+    );
+
+
+    const tipo =
+        mensaje.tipo;
+
+
+    /* --------------------------------------------------------
+       CONEXIÓN
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "conexion"
+    ){
+
+        estado.mi_id =
+            mensaje.jugador_id ??
+            mensaje.mi_id ??
+            mensaje.id ??
+            null;
+
+
+        if(
+            mensaje.estado
+        ){
+
+            await recibirEstado(
+                mensaje.estado
+            );
+
+        }
+
+
+        actualizarBotonDado();
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       ESTADO
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "estado"
+    ){
+
+        await recibirEstado(
+            mensaje
+        );
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       RESULTADO DEL DADO
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "resultado_dado"
+    ){
+
+        const resultado =
+            Number(
+                mensaje.resultado ??
+                mensaje.dado ??
+                mensaje.valor
+            );
+
+
+        estado.ultimo_dado =
+            resultado;
+
+
+        await animarDado(
+            resultado
+        );
+
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       MENSAJE
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "mensaje"
+    ){
+
+        if(
+            mensaje.mensaje
+        ){
+
+            await mostrarMensaje(
+                mensaje.mensaje
+            );
+
+        }
+
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       ERROR
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "error"
+    ){
+
+        await mostrarMensaje(
+            `⚠️ ${
+                mensaje.mensaje ||
+                "Ocurrió un error"
+            }`
+        );
+
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       SERVIDOR LLENO
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "lleno"
+    ){
+
+        estadoConexion.textContent =
+            "🚫 Servidor lleno";
+
+        btnDado.disabled =
+            true;
+
+
+        return;
+
+    }
+
+
+    /* --------------------------------------------------------
+       SERVIDOR CERRANDO
+       -------------------------------------------------------- */
+
+    if(
+        tipo === "servidor_cerrando"
+    ){
+
+        estadoConexion.textContent =
+            "🔴 Servidor cerrado";
+
+        btnDado.disabled =
+            true;
+
+
+        return;
+
+    }
+
+}
+
 
 /* ============================================================
    RECIBIR ESTADO
@@ -3224,37 +3583,46 @@ function enviar(
 
 async function recibirEstado(
     nuevoEstado
-) {
-
-    const estadoAnterior = {
-
-        ...estado,
-
-        jugadores:
-            estado.jugadores || {}
-
-    };
-
-    const jugadoresNuevos =
-        nuevoEstado.jugadores ||
-        {};
-
-    const jugadoresAnteriores =
-        estadoAnterior.jugadores ||
-        {};
-
-    const miIdAnterior =
-        estadoAnterior.mi_id;
+){
 
     /*
-     * IMPORTANTE:
-     *
-     * No reemplazamos completamente estado.
-     *
-     * Conservamos mi_id porque algunos
-     * estados enviados por el servidor
-     * no contienen el ID local.
-     */
+        Guardamos nuestro ID anterior.
+
+        Esto evita perderlo cuando el servidor
+        manda un estado que no contiene mi_id.
+    */
+
+    const miIdAnterior =
+        estado.mi_id;
+
+
+    /*
+        Detectar posiciones antes del cambio.
+    */
+
+    const jugadoresAnteriores =
+        estado.jugadores || {};
+
+
+    const posicionesAnteriores =
+        {};
+
+
+    Object.keys(
+        jugadoresAnteriores
+    ).forEach(id => {
+
+        posicionesAnteriores[id] =
+            obtenerPosicionJugador(
+                jugadoresAnteriores[id]
+            );
+
+    });
+
+
+    /*
+        Actualizamos estado sin perder mi_id.
+    */
 
     estado = {
 
@@ -3274,113 +3642,125 @@ async function recibirEstado(
 
     };
 
-    /*
-     * PRIMER ESTADO
-     */
-
-    if (
-        Object.keys(
-            posicionesVisuales
-        ).length === 0
-    ) {
-
-        for (
-            const [
-                id,
-                jugador
-            ]
-            of Object.entries(
-                jugadoresNuevos
-            )
-        ) {
-
-            posicionesVisuales[id] =
-                obtenerPosicionJugador(
-                    jugador
-                );
-        }
-
-        renderizarFichas();
-
-        actualizarEstadoTexto();
-
-        actualizarListaJugadores();
-
-        actualizarBotonDado();
-
-        return;
-    }
 
     /*
-     * BUSCAR JUGADOR QUE CAMBIÓ
-     */
+        Detectar qué jugador cambió.
+    */
 
     let jugadorMovido =
         null;
 
-    for (
-        const [
-            id,
-            jugadorNuevo
-        ]
-        of Object.entries(
-            jugadoresNuevos
-        )
-    ) {
 
-        const nuevo =
+    const jugadoresNuevos =
+        estado.jugadores || {};
+
+
+    Object.keys(
+        jugadoresNuevos
+    ).forEach(id => {
+
+        const nuevoJugador =
+            jugadoresNuevos[id];
+
+
+        const nuevaPosicion =
             obtenerPosicionJugador(
-                jugadorNuevo
+                nuevoJugador
             );
 
-        const jugadorAnterior =
-            obtenerJugador(
-                jugadoresAnteriores,
-                id
-            );
 
         const anterior =
+            posicionesAnteriores[id] ??
             posicionesVisuales[id] ??
-            (
-                jugadorAnterior
-                    ? obtenerPosicionJugador(
-                        jugadorAnterior
-                    )
-                    : nuevo
-            );
+            nuevaPosicion;
 
-        if (
-            nuevo !== anterior
-        ) {
+
+        if(
+            anterior !== nuevaPosicion &&
+            !jugadorMovido
+        ){
 
             jugadorMovido = {
 
-                id,
+                id:id,
 
-                anterior,
+                anterior:anterior,
 
-                nuevo
+                nuevo:nuevaPosicion
 
             };
 
-            break;
         }
-    }
 
-    renderizarFichas();
+    });
 
-    actualizarEstadoTexto();
-
-    actualizarListaJugadores();
 
     /*
-     * ANIMAR MOVIMIENTO
-     */
+        Render inicial / jugadores.
+    */
 
-    if (
-        jugadorMovido &&
+    renderizarJugadores();
+
+
+    /*
+        Si no estamos animando, actualizamos
+        visualmente las fichas que no están
+        involucradas en la animación.
+    */
+
+    Object.keys(
+        jugadoresNuevos
+    ).forEach(id => {
+
+        const nuevaPosicion =
+            obtenerPosicionJugador(
+                jugadoresNuevos[id]
+            );
+
+
+        if(
+            !jugadorMovido ||
+            String(id) !==
+            String(jugadorMovido.id)
+        ){
+
+            posicionesVisuales[id] =
+                nuevaPosicion;
+
+        }
+
+    });
+
+
+    if(
         !animando
-    ) {
+    ){
+
+        renderizarFichas();
+
+    }
+
+
+    /*
+        ========================================================
+        SINCRONIZACIÓN CRÍTICA
+        ========================================================
+
+        Si el jugador acaba de lanzar el dado:
+
+        dadoTerminado = false
+
+        Entonces el servidor puede enviar el estado
+        antes o durante la animación del dado.
+
+        En ese caso NO movemos inmediatamente la ficha.
+
+        Guardamos el movimiento.
+    */
+
+    if(
+        jugadorMovido
+    ){
 
         const dado =
             nuevoEstado.ultimo_dado ??
@@ -3389,509 +3769,109 @@ async function recibirEstado(
             estado.dado ??
             0;
 
-        await animarMovimientoJugador(
 
-            jugadorMovido.id,
+        const movimiento = {
 
-            jugadorMovido.anterior,
+            id:
+                jugadorMovido.id,
 
-            jugadorMovido.nuevo,
+            anterior:
+                jugadorMovido.anterior,
 
-            Number(dado)
+            nuevo:
+                jugadorMovido.nuevo,
 
-        );
-    }
+            dado:
+                Number(dado)
 
-    /*
-     * VICTORIA
-     */
+        };
 
-    if (
-        nuevoEstado.ganador &&
-        nuevoEstado.ganador !==
-        ultimaPosicionGanador
-    ) {
 
-        ultimaPosicionGanador =
-            nuevoEstado.ganador;
-
-        mostrarVictoria(
-            nuevoEstado.ganador
-        );
-    }
-
-    actualizarEstadoTexto();
-
-    actualizarListaJugadores();
-
-    actualizarBotonDado();
-}
-
-/* ============================================================
-   PROCESAR MENSAJE
-   ============================================================ */
-
-async function procesarMensaje(
-    mensaje
-) {
-
-    console.log(
-        "📨 Servidor:",
-        mensaje
-    );
-
-    switch (
-        mensaje.tipo
-    ) {
-
-        /* ====================================================
-           CONEXIÓN
-           ==================================================== */
-
-        case "conexion":
-
-        case "asignar_id":
-
-        {
-
-            const id =
-                mensaje.id ??
-                mensaje.jugador_id ??
-                mensaje.mi_id;
-
-            if (
-                id !== undefined &&
-                id !== null
-            ) {
-
-                estado.mi_id =
-                    Number(id);
-
-            }
-
-            if (
-                mensaje.estado
-            ) {
-
-                await recibirEstado(
-                    mensaje.estado
-                );
-
-            }
-
-            actualizarEstadoTexto();
-
-            actualizarListaJugadores();
-
-            actualizarBotonDado();
-
-            break;
-        }
-
-        /* ====================================================
-           ESTADO
-           ==================================================== */
-
-        case "estado":
-
-        {
-
-            let datos =
-                mensaje.estado ??
-                mensaje;
-
-            if (
-                datos &&
-                datos.estado
-            ) {
-
-                datos =
-                    datos.estado;
-            }
-
-            await recibirEstado(
-                datos
-            );
-
-            break;
-        }
-
-        /* ====================================================
-           RESULTADO DADO
-           ==================================================== */
-
-        case "resultado_dado":
-
-        case "resultado":
-
-        {
-
-            const resultado =
-                Number(
-                    mensaje.valor ??
-                    mensaje.resultado ??
-                    mensaje.dado ??
-                    mensaje.ultimo_dado
-                );
-
-            if (
-                resultado >= 1 &&
-                resultado <= 6
-            ) {
-
-                await animarDado(
-                    resultado
-                );
-
-            }
-
-            break;
-        }
-
-        /* ====================================================
-           MENSAJE
-           ==================================================== */
-
-        case "mensaje":
-
-        {
-
-            mostrarMensaje(
-                mensaje.mensaje ??
-                mensaje.texto ??
-                "Mensaje del servidor"
-            );
-
-            break;
-        }
-
-        /* ====================================================
-           ERROR
-           ==================================================== */
-
-        case "error":
-
-        {
-
-            mostrarMensaje(
-                `⚠️ ${
-                    mensaje.mensaje ??
-                    mensaje.error ??
-                    "Error"
-                }`
-            );
-
-            actualizarBotonDado();
-
-            break;
-        }
-
-        /* ====================================================
-           SERVIDOR LLENO
-           ==================================================== */
-
-        case "lleno":
-
-        {
-
-            estadoConexion.textContent =
-                "🔴 Servidor lleno";
-
-            mostrarMensaje(
-                mensaje.mensaje ??
-                "El servidor está lleno."
-            );
-
-            btnDado.disabled =
-                true;
-
-            break;
-        }
-
-        /* ====================================================
-           SERVIDOR CERRANDO
-           ==================================================== */
-
-        case "servidor_cerrando":
-
-        case "servidor_cerrado":
-
-        {
-
-            mostrarMensaje(
-                "🔴 El servidor se está cerrando."
-            );
-
-            btnDado.disabled =
-                true;
-
-            break;
-        }
-
-        /* ====================================================
-           REINICIO
-           ==================================================== */
-
-        case "reinicio":
-
-        {
-
-            posicionesVisuales =
-                {};
-
-            animando =
-                false;
-
-            ultimaPosicionGanador =
-                null;
-
-            ocultarVictoria();
-
-            mostrarCaraDado(1);
-
-            resultadoDado.textContent =
-                "🎲 Esperando...";
-
-            if (
-                mensaje.estado
-            ) {
-
-                await recibirEstado(
-                    mensaje.estado
-                );
-
-            }
-
-            actualizarBotonDado();
-
-            break;
-        }
-
-        default:
-
-            console.log(
-                "Mensaje desconocido:",
-                mensaje
-            );
-
-            break;
-    }
-}
-
-/* ============================================================
-   CONECTAR
-   ============================================================ */
-
-function conectar() {
-
-    if (
-        socket &&
-        (
-            socket.readyState ===
-            WebSocket.OPEN ||
-            socket.readyState ===
-            WebSocket.CONNECTING
-        )
-    ) {
-
-        return;
-    }
-
-    estadoConexion.textContent =
-        "🔄 Conectando...";
-
-    try {
-
-        socket =
-            new WebSocket(
-                SERVER_URL
-            );
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-        estadoConexion.textContent =
-            "🔴 Error creando conexión";
-
-        return;
-    }
-
-    socket.onopen =
-        () => {
-
-            console.log(
-                "🟢 WebSocket conectado"
-            );
-
-            estadoConexion.textContent =
-                "🟢 Conectado";
-
-            actualizarBotonDado();
+        if(
+            dadoTerminado
+        ){
 
             /*
-             * Pedimos al servidor un ping
-             * para confirmar que está activo.
-             */
+                El dado ya terminó.
+                Podemos mover.
+            */
 
-            enviar({
-                tipo: "ping"
-            });
-        };
+            if(
+                !animando
+            ){
 
-    socket.onmessage =
-        async evento => {
-
-            try {
-
-                const mensaje =
-                    JSON.parse(
-                        evento.data
-                    );
-
-                await procesarMensaje(
-                    mensaje
+                await ejecutarMovimientoPendiente(
+                    movimiento
                 );
 
-            } catch (error) {
-
-                console.error(
-                    "Error procesando mensaje:",
-                    error
-                );
             }
-        };
 
-    socket.onerror =
-        error => {
+        }else{
 
-            console.error(
-                "WebSocket error:",
-                error
+            /*
+                El dado todavía está girando.
+            */
+
+            resultadoDadoPendiente =
+                movimiento;
+
+        }
+
+    }
+
+
+    /*
+        Victoria.
+    */
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        if(
+            Number(
+                estado.ganador
+            ) !==
+            Number(
+                ultimaPosicionGanador
+            )
+        ){
+
+            ultimaPosicionGanador =
+                estado.ganador;
+
+
+            await dormir(
+                500
             );
 
-            estadoConexion.textContent =
-                "🔴 Error de conexión";
 
-            actualizarBotonDado();
-        };
-
-    socket.onclose =
-        () => {
-
-            console.log(
-                "🔴 WebSocket cerrado"
+            mostrarVictoria(
+                estado.ganador
             );
 
-            estadoConexion.textContent =
-                "🔴 Desconectado";
+        }
 
-            btnDado.disabled =
-                true;
-        };
+    }else{
+
+        ultimaPosicionGanador =
+            null;
+
+        cerrarVictoria();
+
+    }
+
+
+    actualizarMensajeEstado();
+
+    actualizarBotonDado();
+
 }
 
-/* ============================================================
-   BOTÓN DADO
-   ============================================================ */
-
-btnDado.addEventListener(
-    "click",
-    () => {
-
-        /*
-         * Comprobaciones de seguridad
-         */
-
-        if (
-            animando
-        ) {
-
-            return;
-        }
-
-        if (
-            !socket ||
-            socket.readyState !==
-            WebSocket.OPEN
-        ) {
-
-            mostrarMensaje(
-                "🔴 No estás conectado."
-            );
-
-            return;
-        }
-
-        if (
-            estado.mi_id === null ||
-            estado.mi_id === undefined
-        ) {
-
-            mostrarMensaje(
-                "⏳ Esperando asignación de jugador..."
-            );
-
-            return;
-        }
-
-        if (
-            estado.turno === null ||
-            estado.turno === undefined
-        ) {
-
-            mostrarMensaje(
-                "⏳ Esperando el turno..."
-            );
-
-            return;
-        }
-
-        if (
-            Number(estado.turno) !==
-            Number(estado.mi_id)
-        ) {
-
-            mostrarMensaje(
-                "⏳ Todavía no es tu turno."
-            );
-
-            actualizarBotonDado();
-
-            return;
-        }
-
-        /*
-         * Enviar al servidor
-         */
-
-        const enviado =
-            enviar({
-                tipo:
-                    "lanzar_dado"
-            });
-
-        if (
-            enviado
-        ) {
-
-            btnDado.disabled =
-                true;
-
-            resultadoDado.textContent =
-                "🎲 Lanzando...";
-
-            dado3d.classList.add(
-                "lanzando"
-            );
-        }
-    }
-);
 
 /* ============================================================
-   BOTÓN NOMBRE
+   NOMBRE
    ============================================================ */
 
 btnNombre.addEventListener(
@@ -3901,88 +3881,208 @@ btnNombre.addEventListener(
         const nombre =
             nombreInput.value.trim();
 
-        if (!nombre) {
 
-            mostrarMensaje(
-                "✏️ Escribe un nombre."
-            );
+        if(
+            !nombre
+        ){
 
             nombreInput.focus();
 
             return;
+
         }
 
-        const enviado =
-            enviar({
 
-                tipo: "nombre",
+        enviar({
 
-                nombre: nombre
+            tipo:
+                "nombre",
 
-            });
+            nombre:
+                nombre
 
-        if (
-            enviado
-        ) {
+        });
 
-            nombreInput.disabled =
-                true;
-
-            btnNombre.disabled =
-                true;
-
-            mostrarMensaje(
-                `👤 Nombre: ${nombre}`
-            );
-        }
     }
 );
 
-/* ============================================================
-   ENTER NOMBRE
-   ============================================================ */
 
 nombreInput.addEventListener(
     "keydown",
     evento => {
 
-        if (
+        if(
             evento.key ===
             "Enter"
-        ) {
+        ){
 
             btnNombre.click();
 
         }
+
     }
 );
+
+
+/* ============================================================
+   LANZAR DADO
+   ============================================================ */
+
+btnDado.addEventListener(
+    "click",
+    () => {
+
+        if(
+            animando
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            !socket ||
+            socket.readyState !==
+            WebSocket.OPEN
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            estado.mi_id === null ||
+            estado.mi_id === undefined
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            estado.turno === null ||
+            estado.turno === undefined
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            Number(estado.turno) !==
+            Number(estado.mi_id)
+        ){
+
+            return;
+
+        }
+
+
+        /*
+            ====================================================
+            MUY IMPORTANTE
+
+            Antes de enviar el lanzamiento:
+
+            el dado todavía NO está terminado.
+
+            Esto evita que un estado del servidor
+            recibido rápidamente haga que la ficha
+            se mueva antes del dado.
+            ====================================================
+        */
+
+        dadoTerminado =
+            false;
+
+
+        resultadoDadoPendiente =
+            null;
+
+
+        animando = true;
+
+
+        btnDado.disabled =
+            true;
+
+
+        const enviado =
+            enviar({
+
+                tipo:
+                    "lanzar_dado"
+
+            });
+
+
+        if(
+            !enviado
+        ){
+
+            animando =
+                false;
+
+            dadoTerminado =
+                true;
+
+            actualizarBotonDado();
+
+        }
+
+    }
+);
+
 
 /* ============================================================
    REINICIAR
    ============================================================ */
 
+function reiniciarPartida(){
+
+    cerrarVictoria();
+
+
+    dadoTerminado =
+        true;
+
+
+    resultadoDadoPendiente =
+        null;
+
+
+    animando =
+        false;
+
+
+    enviar({
+
+        tipo:
+            "reiniciar"
+
+    });
+
+
+    actualizarBotonDado();
+
+}
+
+
 btnReiniciar.addEventListener(
     "click",
-    () => {
-
-        if (
-            !socket ||
-            socket.readyState !==
-            WebSocket.OPEN
-        ) {
-
-            mostrarMensaje(
-                "🔴 No hay conexión."
-            );
-
-            return;
-        }
-
-        enviar({
-            tipo: "reiniciar"
-        });
-    }
+    reiniciarPartida
 );
+
+
+btnVictoriaReiniciar.addEventListener(
+    "click",
+    reiniciarPartida
+);
+
 
 /* ============================================================
    ABANDONAR
@@ -3992,112 +4092,58 @@ btnAbandonar.addEventListener(
     "click",
     () => {
 
-        if (
-            abandonando
-        ) {
-
-            enviar({
-                tipo: "abandonar"
-            });
+        if(
+            !abandonando
+        ){
 
             abandonando =
-                false;
+                true;
+
 
             btnAbandonar.textContent =
-                "🚪 ABANDONAR";
+                "⚠️ CONFIRMAR ABANDONO";
 
-            return;
-        }
 
-        abandonando =
-            true;
+            setTimeout(() => {
 
-        btnAbandonar.textContent =
-            "⚠️ CONFIRMAR ABANDONO";
-
-        mostrarMensaje(
-            "Pulsa nuevamente para abandonar."
-        );
-
-        setTimeout(
-            () => {
-
-                if (
+                if(
                     abandonando
-                ) {
+                ){
+
+                    btnAbandonar.textContent =
+                        "🚪 ABANDONAR";
 
                     abandonando =
                         false;
 
-                    btnAbandonar.textContent =
-                        "🚪 ABANDONAR";
                 }
 
-            },
-            4000
-        );
-    }
-);
+            },4000);
 
-/* ============================================================
-   VICTORIA
-   ============================================================ */
 
-function mostrarVictoria(
-    ganador
-) {
+            return;
 
-    const jugador =
-        obtenerJugador(
-            estado.jugadores,
-            ganador
-        );
+        }
 
-    const nombre =
-        obtenerNombreJugador(
-            jugador,
-            ganador
-        );
-
-    textoVictoria.textContent =
-        `🎉 ${nombre} ha llegado a la casilla 100.`;
-
-    overlayVictoria.classList.add(
-        "visible"
-    );
-
-    crearParticulas(
-        100,
-        60
-    );
-}
-
-/* ============================================================
-   OCULTAR VICTORIA
-   ============================================================ */
-
-function ocultarVictoria() {
-
-    overlayVictoria.classList.remove(
-        "visible"
-    );
-}
-
-/* ============================================================
-   BOTÓN VICTORIA
-   ============================================================ */
-
-btnVictoria.addEventListener(
-    "click",
-    () => {
-
-        ocultarVictoria();
 
         enviar({
-            tipo: "reiniciar"
+
+            tipo:
+                "abandonar"
+
         });
+
+
+        abandonando =
+            false;
+
+
+        btnAbandonar.textContent =
+            "🚪 ABANDONAR";
+
     }
 );
+
 
 /* ============================================================
    INICIALIZACIÓN
@@ -4107,42 +4153,43 @@ crearTablero();
 
 dibujarElementos();
 
-mostrarCaraDado(1);
+renderizarFichas();
+
+renderizarJugadores();
+
+actualizarEstadoConexion();
 
 actualizarBotonDado();
 
-actualizarEstadoTexto();
-
-actualizarListaJugadores();
-
 conectar();
 
+
 /* ============================================================
-   DEBUG
+   PROTECCIÓN CONTRA RECARGA / CIERRE
    ============================================================ */
 
 window.addEventListener(
     "beforeunload",
     () => {
 
-        try {
+        if(
+            socket &&
+            socket.readyState ===
+            WebSocket.OPEN
+        ){
 
-            if (
-                socket &&
-                socket.readyState ===
-                WebSocket.OPEN
-            ) {
+            try{
 
                 socket.close();
 
+            }catch(error){
+
+                console.error(error);
+
             }
 
-        } catch (error) {
-
-            console.error(
-                error
-            );
         }
+
     }
 );
 
@@ -4150,3 +4197,4 @@ window.addEventListener(
 
 </body>
 </html>
+```
