@@ -10,9 +10,16 @@
     content="width=device-width, initial-scale=1.0"
 >
 
-<title>Serpientes y Escaleras Online</title>
+<title>
+Serpientes y Escaleras Online
+</title>
+
 
 <style>
+
+/* ==========================================================
+   GENERAL
+   ========================================================== */
 
 * {
     box-sizing: border-box;
@@ -37,6 +44,7 @@ body {
     color: white;
 
     min-height: 100vh;
+
 }
 
 header {
@@ -44,6 +52,7 @@ header {
     text-align: center;
 
     padding: 20px;
+
 }
 
 h1 {
@@ -51,7 +60,13 @@ h1 {
     margin: 0;
 
     font-size: 32px;
+
 }
+
+
+/* ==========================================================
+   CONEXIÓN
+   ========================================================== */
 
 #estadoConexion {
 
@@ -66,17 +81,25 @@ h1 {
     background: #64748b;
 
     font-weight: bold;
+
 }
 
 .conectado {
 
     background: #16a34a !important;
+
 }
 
 .error {
 
     background: #dc2626 !important;
+
 }
+
+
+/* ==========================================================
+   CONTENEDOR
+   ========================================================== */
 
 .contenedor {
 
@@ -91,6 +114,7 @@ h1 {
     padding: 20px;
 
     flex-wrap: wrap;
+
 }
 
 
@@ -105,7 +129,9 @@ h1 {
     width: min(90vw, 700px);
 
     aspect-ratio: 1 / 1;
+
 }
+
 
 #tablero {
 
@@ -132,7 +158,9 @@ h1 {
     position: relative;
 
     z-index: 1;
+
 }
+
 
 .casilla {
 
@@ -151,17 +179,23 @@ h1 {
     border: 1px solid #94a3b8;
 
     overflow: hidden;
+
 }
+
 
 .casilla:nth-child(odd) {
 
     background: #dbeafe;
+
 }
+
 
 .casilla:nth-child(even) {
 
     background: #fef3c7;
+
 }
+
 
 .numero {
 
@@ -180,11 +214,12 @@ h1 {
     opacity: .75;
 
     z-index: 5;
+
 }
 
 
 /* ==========================================================
-   SVG DE SERPIENTES Y ESCALERAS
+   SVG
    ========================================================== */
 
 #elementosJuego {
@@ -204,6 +239,32 @@ h1 {
     pointer-events: none;
 
     overflow: visible;
+
+}
+
+
+/* ==========================================================
+   ANIMACIÓN
+   ========================================================== */
+
+#animacionJugador {
+
+    position: absolute;
+
+    left: 0;
+
+    top: 0;
+
+    width: 100%;
+
+    height: 100%;
+
+    z-index: 50;
+
+    pointer-events: none;
+
+    overflow: visible;
+
 }
 
 
@@ -218,15 +279,18 @@ h1 {
     stroke-width: 1.2;
 
     stroke-linecap: round;
+
 }
+
 
 .escalon {
 
     stroke: #f59e0b;
 
-    stroke-width: 0.9;
+    stroke-width: .9;
 
     stroke-linecap: round;
+
 }
 
 
@@ -245,7 +309,9 @@ h1 {
     stroke-linecap: round;
 
     stroke-linejoin: round;
+
 }
+
 
 .serpiente-cabeza {
 
@@ -253,17 +319,8 @@ h1 {
 
     stroke: #14532d;
 
-    stroke-width: 0.8;
-}
+    stroke-width: .8;
 
-.serpiente-ojo {
-
-    fill: white;
-}
-
-.serpiente-pupila {
-
-    fill: black;
 }
 
 
@@ -286,7 +343,9 @@ h1 {
     width: 80%;
 
     height: 80%;
+
 }
+
 
 .ficha {
 
@@ -326,22 +385,303 @@ h1 {
         0 2px 6px #0009;
 
     z-index: 20;
+
 }
 
+
+/* COLORES DE JUGADORES */
+
 .ficha1 {
+
     background: #ef4444;
+
 }
 
 .ficha2 {
+
     background: #3b82f6;
+
 }
 
 .ficha3 {
+
     background: #22c55e;
+
 }
 
 .ficha4 {
+
     background: #a855f7;
+
+}
+
+
+/* ==========================================================
+   FICHA ANIMADA
+   ========================================================== */
+
+.ficha-animada {
+
+    stroke: white;
+
+    stroke-width: .7;
+
+}
+
+
+/* ==========================================================
+   EFECTOS
+   ========================================================== */
+
+.efecto-escalera {
+
+    animation:
+        brilloEscalera
+        .7s
+        ease-in-out
+        infinite alternate;
+
+}
+
+
+@keyframes brilloEscalera {
+
+    from {
+
+        opacity: .5;
+
+        filter:
+            drop-shadow(
+                0 0 0px #facc15
+            );
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        filter:
+            drop-shadow(
+                0 0 5px #facc15
+            );
+
+    }
+
+}
+
+
+.efecto-serpiente {
+
+    animation:
+        serpienteSacude
+        .18s
+        ease-in-out
+        5;
+
+}
+
+
+@keyframes serpienteSacude {
+
+    0% {
+        transform: translateX(0);
+    }
+
+    25% {
+        transform: translateX(-1px);
+    }
+
+    50% {
+        transform: translateX(1px);
+    }
+
+    75% {
+        transform: translateX(-1px);
+    }
+
+    100% {
+        transform: translateX(0);
+    }
+
+}
+
+
+/* ==========================================================
+   TEXTO DE EFECTO
+   ========================================================== */
+
+#mensajeAnimacion {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 45%;
+
+    transform:
+        translate(-50%, -50%)
+        scale(.5);
+
+    z-index: 100;
+
+    pointer-events: none;
+
+    font-size: clamp(
+        22px,
+        5vw,
+        50px
+    );
+
+    font-weight: bold;
+
+    text-shadow:
+        0 3px 8px #000;
+
+    opacity: 0;
+
+    white-space: nowrap;
+
+}
+
+
+#mensajeAnimacion.mostrar {
+
+    animation:
+        mensajePop
+        1.2s
+        ease-out;
+
+}
+
+
+@keyframes mensajePop {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            translate(-50%, -50%)
+            scale(.3);
+
+    }
+
+    25% {
+
+        opacity: 1;
+
+        transform:
+            translate(-50%, -50%)
+            scale(1.2);
+
+    }
+
+    70% {
+
+        opacity: 1;
+
+        transform:
+            translate(-50%, -50%)
+            scale(1);
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            translate(-50%, -70%)
+            scale(1);
+
+    }
+
+}
+
+
+/* ==========================================================
+   VICTORIA
+   ========================================================== */
+
+#victoria {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 200;
+
+    display: none;
+
+    align-items: center;
+
+    justify-content: center;
+
+    pointer-events: none;
+
+}
+
+
+#victoria.mostrar {
+
+    display: flex;
+
+}
+
+
+.mensajeVictoria {
+
+    background:
+        rgba(
+            15,
+            23,
+            42,
+            .94
+        );
+
+    border:
+        3px solid #facc15;
+
+    border-radius: 20px;
+
+    padding: 25px;
+
+    text-align: center;
+
+    font-size: clamp(
+        22px,
+        5vw,
+        42px
+    );
+
+    font-weight: bold;
+
+    animation:
+        victoriaPop
+        1s
+        ease-in-out
+        infinite alternate;
+
+}
+
+
+@keyframes victoriaPop {
+
+    from {
+
+        transform:
+            scale(.95);
+
+    }
+
+    to {
+
+        transform:
+            scale(1.05);
+
+    }
+
 }
 
 
@@ -372,12 +712,20 @@ h1 {
 
     box-shadow:
         0 10px 30px #0008;
+
 }
+
 
 .panel h2 {
 
     margin-top: 0;
+
 }
+
+
+/* ==========================================================
+   DADO
+   ========================================================== */
 
 #dado {
 
@@ -386,7 +734,73 @@ h1 {
     text-align: center;
 
     margin: 15px 0;
+
+    display: inline-block;
+
+    width: 100%;
+
 }
+
+
+#dado.girando {
+
+    animation:
+        dadoGira
+        .15s
+        linear
+        infinite;
+
+}
+
+
+@keyframes dadoGira {
+
+    0% {
+
+        transform:
+            rotate(0deg)
+            scale(1);
+
+    }
+
+    25% {
+
+        transform:
+            rotate(90deg)
+            scale(1.15);
+
+    }
+
+    50% {
+
+        transform:
+            rotate(180deg)
+            scale(1);
+
+    }
+
+    75% {
+
+        transform:
+            rotate(270deg)
+            scale(1.15);
+
+    }
+
+    100% {
+
+        transform:
+            rotate(360deg)
+            scale(1);
+
+    }
+
+}
+
+
+/* ==========================================================
+   BOTONES
+   ========================================================== */
 
 button {
 
@@ -405,40 +819,52 @@ button {
     font-weight: bold;
 
     cursor: pointer;
+
 }
+
 
 #btnDado {
 
     background: #22c55e;
 
     color: white;
+
 }
+
 
 #btnDado:hover {
 
     background: #16a34a;
+
 }
+
 
 #btnDado:disabled {
 
     background: #475569;
 
     cursor: not-allowed;
+
 }
+
 
 #btnAbandonar {
 
     background: #dc2626;
 
     color: white;
+
 }
+
 
 #btnReiniciar {
 
     background: #2563eb;
 
     color: white;
+
 }
+
 
 #nombre {
 
@@ -453,12 +879,20 @@ button {
     margin-top: 8px;
 
     font-size: 16px;
+
 }
+
+
+/* ==========================================================
+   JUGADORES
+   ========================================================== */
 
 #jugadores {
 
     margin-top: 15px;
+
 }
+
 
 .jugador {
 
@@ -469,13 +903,21 @@ button {
     border-radius: 8px;
 
     background: #1e293b;
+
 }
+
 
 .mi-turno {
 
     border:
         2px solid #22c55e;
+
 }
+
+
+/* ==========================================================
+   EVENTO
+   ========================================================== */
 
 .evento {
 
@@ -488,7 +930,9 @@ button {
     border-radius: 8px;
 
     min-height: 50px;
+
 }
+
 
 .info {
 
@@ -497,6 +941,7 @@ button {
     color: #cbd5e1;
 
     line-height: 1.5;
+
 }
 
 
@@ -517,17 +962,25 @@ button {
     font-size: 14px;
 
     flex-wrap: wrap;
+
 }
+
 
 .leyenda span {
 
     background:
-        rgba(15,23,42,.8);
+        rgba(
+            15,
+            23,
+            42,
+            .8
+        );
 
     padding:
         6px 10px;
 
     border-radius: 8px;
+
 }
 
 </style>
@@ -569,6 +1022,28 @@ button {
         viewBox="0 0 100 100"
         preserveAspectRatio="none">
     </svg>
+
+    <svg
+        id="animacionJugador"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none">
+    </svg>
+
+    <div id="mensajeAnimacion"></div>
+
+    <div id="victoria">
+
+        <div class="mensajeVictoria">
+
+            🏆<br>
+
+            ¡GANADOR!<br>
+
+            <span id="nombreGanador"></span>
+
+        </div>
+
+    </div>
 
 </div>
 
@@ -646,6 +1121,7 @@ Guardar nombre
 👥 Jugadores
 </h2>
 
+
 <div id="jugadores">
 Esperando...
 </div>
@@ -702,6 +1178,10 @@ const SERVER_URL =
     "wss://serpientes-escaleras-phl7.onrender.com";
 
 
+// ==========================================================
+// VARIABLES
+// ==========================================================
+
 let socket = null;
 
 let miId = null;
@@ -718,7 +1198,15 @@ let estado = {
 
     ultimo_evento:
         "Conectando..."
+
 };
+
+
+let posicionesVisuales = {};
+
+let animando = false;
+
+let colaAnimaciones = [];
 
 
 // ==========================================================
@@ -730,40 +1218,72 @@ const tablero =
         "tablero"
     );
 
+
 const elementosJuego =
     document.getElementById(
         "elementosJuego"
     );
+
+
+const animacionJugador =
+    document.getElementById(
+        "animacionJugador"
+    );
+
+
+const mensajeAnimacion =
+    document.getElementById(
+        "mensajeAnimacion"
+    );
+
+
+const victoria =
+    document.getElementById(
+        "victoria"
+    );
+
+
+const nombreGanador =
+    document.getElementById(
+        "nombreGanador"
+    );
+
 
 const estadoConexion =
     document.getElementById(
         "estadoConexion"
     );
 
+
 const btnDado =
     document.getElementById(
         "btnDado"
     );
+
 
 const dado =
     document.getElementById(
         "dado"
     );
 
+
 const evento =
     document.getElementById(
         "evento"
     );
+
 
 const jugadores =
     document.getElementById(
         "jugadores"
     );
 
+
 const miIdElemento =
     document.getElementById(
         "miId"
     );
+
 
 const turnoElemento =
     document.getElementById(
@@ -780,17 +1300,6 @@ function crearTablero() {
     tablero.innerHTML = "";
 
 
-    /*
-        Numeración clásica:
-
-        100 99 98 ... 91
-        81  82 83 ... 90
-        ...
-        20  19 18 ... 11
-        1   2  3  ... 10
-    */
-
-
     for (
         let fila = 0;
         fila < 10;
@@ -798,7 +1307,6 @@ function crearTablero() {
     ) {
 
         const numeros = [];
-
 
         const numeroInicial =
             100 -
@@ -903,23 +1411,12 @@ function crearTablero() {
 
 
 // ==========================================================
-// POSICIÓN DE UNA CASILLA
+// COORDENADAS DE CASILLA
 // ==========================================================
 
 function posicionCasilla(
     numero
 ) {
-
-    /*
-        Devuelve coordenadas
-        en porcentaje del tablero.
-
-        1  = abajo izquierda
-        10 = abajo derecha
-        11 = segunda fila derecha
-        etc.
-    */
-
 
     const indice =
         numero - 1;
@@ -945,184 +1442,28 @@ function posicionCasilla(
     }
 
 
-    /*
-        SVG:
-
-        x = columna
-        y = fila
-
-        Cada casilla ocupa 10%.
-    */
-
-
     const x =
         columna * 10 + 5;
 
 
     const y =
-        95 - fila * 10;
+        95 -
+        fila * 10;
 
 
     return {
+
         x: x,
+
         y: y
+
     };
 
 }
 
 
 // ==========================================================
-// DIBUJAR ESCALERA
-// ==========================================================
-
-function dibujarEscalera(
-    desde,
-    hasta
-) {
-
-    const inicio =
-        posicionCasilla(
-            desde
-        );
-
-    const fin =
-        posicionCasilla(
-            hasta
-        );
-
-
-    const dx =
-        fin.x - inicio.x;
-
-    const dy =
-        fin.y - inicio.y;
-
-
-    const longitud =
-        Math.sqrt(
-            dx * dx +
-            dy * dy
-        );
-
-
-    if (
-        longitud === 0
-    ) {
-
-        return;
-
-    }
-
-
-    /*
-        Vector perpendicular
-    */
-
-    const px =
-        -dy / longitud * 1.2;
-
-    const py =
-        dx / longitud * 1.2;
-
-
-    const x1a =
-        inicio.x + px;
-
-    const y1a =
-        inicio.y + py;
-
-
-    const x1b =
-        inicio.x - px;
-
-    const y1b =
-        inicio.y - py;
-
-
-    const x2a =
-        fin.x + px;
-
-    const y2a =
-        fin.y + py;
-
-
-    const x2b =
-        fin.x - px;
-
-    const y2b =
-        fin.y - py;
-
-
-    /*
-        Lados de la escalera
-    */
-
-    crearLinea(
-        x1a,
-        y1a,
-        x2a,
-        y2a,
-        "escalera"
-    );
-
-
-    crearLinea(
-        x1b,
-        y1b,
-        x2b,
-        y2b,
-        "escalera"
-    );
-
-
-    /*
-        Peldaños
-    */
-
-    const cantidad =
-        Math.max(
-            4,
-            Math.floor(
-                longitud / 5
-            )
-        );
-
-
-    for (
-        let i = 1;
-        i < cantidad;
-        i++
-    ) {
-
-        const t =
-            i / cantidad;
-
-
-        const cx =
-            inicio.x +
-            dx * t;
-
-
-        const cy =
-            inicio.y +
-            dy * t;
-
-
-        crearLinea(
-            cx + px,
-            cy + py,
-            cx - px,
-            cy - py,
-            "escalon"
-        );
-
-    }
-
-}
-
-
-// ==========================================================
-// CREAR LÍNEA SVG
+// LÍNEA SVG
 // ==========================================================
 
 function crearLinea(
@@ -1175,7 +1516,127 @@ function crearLinea(
 
 
 // ==========================================================
-// DIBUJAR SERPIENTE
+// ESCALERA
+// ==========================================================
+
+function dibujarEscalera(
+    desde,
+    hasta
+) {
+
+    const inicio =
+        posicionCasilla(
+            desde
+        );
+
+
+    const fin =
+        posicionCasilla(
+            hasta
+        );
+
+
+    const dx =
+        fin.x -
+        inicio.x;
+
+
+    const dy =
+        fin.y -
+        inicio.y;
+
+
+    const longitud =
+        Math.sqrt(
+            dx * dx +
+            dy * dy
+        );
+
+
+    if (
+        longitud === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const px =
+        -dy /
+        longitud *
+        1.2;
+
+
+    const py =
+        dx /
+        longitud *
+        1.2;
+
+
+    crearLinea(
+        inicio.x + px,
+        inicio.y + py,
+        fin.x + px,
+        fin.y + py,
+        "escalera"
+    );
+
+
+    crearLinea(
+        inicio.x - px,
+        inicio.y - py,
+        fin.x - px,
+        fin.y - py,
+        "escalera"
+    );
+
+
+    const cantidad =
+        Math.max(
+            4,
+            Math.floor(
+                longitud / 5
+            )
+        );
+
+
+    for (
+        let i = 1;
+        i < cantidad;
+        i++
+    ) {
+
+        const t =
+            i /
+            cantidad;
+
+
+        const cx =
+            inicio.x +
+            dx * t;
+
+
+        const cy =
+            inicio.y +
+            dy * t;
+
+
+        crearLinea(
+            cx + px,
+            cy + py,
+            cx - px,
+            cy - py,
+            "escalon"
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// SERPIENTE
 // ==========================================================
 
 function dibujarSerpiente(
@@ -1188,6 +1649,7 @@ function dibujarSerpiente(
             desde
         );
 
+
     const fin =
         posicionCasilla(
             hasta
@@ -1195,10 +1657,13 @@ function dibujarSerpiente(
 
 
     const dx =
-        fin.x - inicio.x;
+        fin.x -
+        inicio.x;
+
 
     const dy =
-        fin.y - inicio.y;
+        fin.y -
+        inicio.y;
 
 
     const distancia =
@@ -1208,23 +1673,26 @@ function dibujarSerpiente(
         );
 
 
-    /*
-        Vector perpendicular
-    */
+    if (
+        distancia === 0
+    ) {
+
+        return;
+
+    }
+
 
     const px =
-        -dy / distancia;
+        -dy /
+        distancia;
+
 
     const py =
-        dx / distancia;
+        dx /
+        distancia;
 
 
-    /*
-        Curva central
-    */
-
-    const amplitud =
-        2.5;
+    const amplitud = 2.5;
 
 
     const segmentos =
@@ -1246,42 +1714,36 @@ function dibujarSerpiente(
     ) {
 
         const t =
-            i / segmentos;
+            i /
+            segmentos;
 
-
-        const x =
-            inicio.x +
-            dx * t;
-
-
-        const y =
-            inicio.y +
-            dy * t;
-
-
-        /*
-            Onda
-        */
 
         const onda =
             Math.sin(
-                t * Math.PI * 3
+                t *
+                Math.PI *
+                3
             ) *
             amplitud *
             (
-                0.3 +
-                Math.sin(t * Math.PI)
+                .3 +
+                Math.sin(
+                    t *
+                    Math.PI
+                )
             );
 
 
         puntos.push({
 
             x:
-                x +
+                inicio.x +
+                dx * t +
                 px * onda,
 
             y:
-                y +
+                inicio.y +
+                dy * t +
                 py * onda
 
         });
@@ -1289,8 +1751,7 @@ function dibujarSerpiente(
     }
 
 
-    let pathData =
-        "";
+    let pathData = "";
 
 
     puntos.forEach(
@@ -1340,10 +1801,6 @@ function dibujarSerpiente(
     );
 
 
-    /*
-        Cabeza
-    */
-
     const cabeza =
         document.createElementNS(
             "http://www.w3.org/2000/svg",
@@ -1366,6 +1823,7 @@ function dibujarSerpiente(
         "2.5"
     );
 
+
     cabeza.setAttribute(
         "class",
         "serpiente-cabeza"
@@ -1376,128 +1834,11 @@ function dibujarSerpiente(
         cabeza
     );
 
-
-    /*
-        Ojos
-    */
-
-    const ojo1 =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "circle"
-        );
-
-
-    ojo1.setAttribute(
-        "cx",
-        inicio.x - 0.8
-    );
-
-    ojo1.setAttribute(
-        "cy",
-        inicio.y - 0.7
-    );
-
-    ojo1.setAttribute(
-        "r",
-        "0.55"
-    );
-
-    ojo1.setAttribute(
-        "class",
-        "serpiente-ojo"
-    );
-
-
-    elementosJuego.appendChild(
-        ojo1
-    );
-
-
-    const ojo2 =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "circle"
-        );
-
-
-    ojo2.setAttribute(
-        "cx",
-        inicio.x + 0.8
-    );
-
-    ojo2.setAttribute(
-        "cy",
-        inicio.y - 0.7
-    );
-
-    ojo2.setAttribute(
-        "r",
-        "0.55"
-    );
-
-    ojo2.setAttribute(
-        "class",
-        "serpiente-ojo"
-    );
-
-
-    elementosJuego.appendChild(
-        ojo2
-    );
-
-
-    /*
-        Lengua
-    */
-
-    const lengua =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "line"
-        );
-
-
-    lengua.setAttribute(
-        "x1",
-        inicio.x
-    );
-
-    lengua.setAttribute(
-        "y1",
-        inicio.y - 2
-    );
-
-    lengua.setAttribute(
-        "x2",
-        inicio.x
-    );
-
-    lengua.setAttribute(
-        "y2",
-        inicio.y - 3.5
-    );
-
-    lengua.setAttribute(
-        "stroke",
-        "#dc2626"
-    );
-
-    lengua.setAttribute(
-        "stroke-width",
-        "0.6"
-    );
-
-
-    elementosJuego.appendChild(
-        lengua
-    );
-
 }
 
 
 // ==========================================================
-// DIBUJAR TODOS LOS ELEMENTOS
+// DIBUJAR ELEMENTOS
 // ==========================================================
 
 function dibujarElementosJuego() {
@@ -1505,25 +1846,15 @@ function dibujarElementosJuego() {
     elementosJuego.innerHTML = "";
 
 
-    /*
-        ESCALERAS
-    */
-
     const escaleras =
         estado.escaleras || {
 
             4: 25,
-
             13: 46,
-
             33: 49,
-
             42: 63,
-
             50: 69,
-
             62: 81,
-
             74: 92
 
         };
@@ -1543,27 +1874,16 @@ function dibujarElementosJuego() {
     );
 
 
-    /*
-        SERPIENTES
-    */
-
     const serpientes =
         estado.serpientes || {
 
             27: 5,
-
             40: 3,
-
             43: 18,
-
             54: 31,
-
             66: 45,
-
             76: 58,
-
             89: 53,
-
             99: 41
 
         };
@@ -1586,7 +1906,1025 @@ function dibujarElementosJuego() {
 
 
 // ==========================================================
-// CONECTAR
+// CREAR FICHA SVG ANIMADA
+// ==========================================================
+
+function crearFichaAnimada(
+    jugador,
+    posicion
+) {
+
+    animacionJugador.innerHTML = "";
+
+
+    const punto =
+        posicionCasilla(
+            posicion
+        );
+
+
+    const colores = {
+
+        0: "#ef4444",
+
+        1: "#3b82f6",
+
+        2: "#22c55e",
+
+        3: "#a855f7"
+
+    };
+
+
+    const lista =
+        Object.keys(
+            estado.jugadores || {}
+        );
+
+
+    const indice =
+        Math.max(
+            0,
+            lista.indexOf(
+                jugador.id
+            )
+        );
+
+
+    const color =
+        colores[
+            indice % 4
+        ];
+
+
+    const ficha =
+        document.createElementNS(
+            "http://www.w3.org/2000/svg",
+            "circle"
+        );
+
+
+    ficha.setAttribute(
+        "cx",
+        punto.x
+    );
+
+    ficha.setAttribute(
+        "cy",
+        punto.y
+    );
+
+    ficha.setAttribute(
+        "r",
+        "2.3"
+    );
+
+
+    ficha.setAttribute(
+        "fill",
+        color
+    );
+
+
+    ficha.setAttribute(
+        "class",
+        "ficha-animada"
+    );
+
+
+    animacionJugador.appendChild(
+        ficha
+    );
+
+
+    return ficha;
+
+}
+
+
+// ==========================================================
+// ESPERA
+// ==========================================================
+
+function esperar(
+    milisegundos
+) {
+
+    return new Promise(
+        resolver => {
+
+            setTimeout(
+                resolver,
+                milisegundos
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================================
+// ANIMAR MOVIMIENTO
+// ==========================================================
+
+async function moverFicha(
+    ficha,
+    jugador,
+    desde,
+    hasta,
+    duracion
+) {
+
+    if (
+        desde === hasta
+    ) {
+
+        return;
+
+    }
+
+
+    const inicio =
+        posicionCasilla(
+            desde
+        );
+
+
+    const fin =
+        posicionCasilla(
+            hasta
+        );
+
+
+    const distancia =
+        Math.abs(
+            hasta -
+            desde
+        );
+
+
+    const tiempoPorCasilla =
+        170;
+
+
+    const tiempo =
+        duracion ||
+        Math.max(
+            300,
+            distancia *
+            tiempoPorCasilla
+        );
+
+
+    const inicioTiempo =
+        performance.now();
+
+
+    return new Promise(
+        resolver => {
+
+            function animar(
+                tiempoActual
+            ) {
+
+                const progreso =
+                    Math.min(
+                        1,
+                        (
+                            tiempoActual -
+                            inicioTiempo
+                        ) /
+                        tiempo
+                    );
+
+
+                /*
+                    Suavizado
+                */
+
+                const suave =
+                    progreso < .5
+
+                        ? 2 *
+                          progreso *
+                          progreso
+
+                        : 1 -
+                          Math.pow(
+                              -2 *
+                              progreso +
+                              2,
+                              2
+                          ) /
+                          2;
+
+
+                /*
+                    Interpolación
+                */
+
+                const x =
+                    inicio.x +
+                    (
+                        fin.x -
+                        inicio.x
+                    ) *
+                    suave;
+
+
+                const y =
+                    inicio.y +
+                    (
+                        fin.y -
+                        inicio.y
+                    ) *
+                    suave;
+
+
+                ficha.setAttribute(
+                    "cx",
+                    x
+                );
+
+
+                ficha.setAttribute(
+                    "cy",
+                    y
+                );
+
+
+                if (
+                    progreso < 1
+                ) {
+
+                    requestAnimationFrame(
+                        animar
+                    );
+
+                }
+
+                else {
+
+                    resolver();
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                animar
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================================
+// EFECTO ESCALERA
+// ==========================================================
+
+async function efectoEscalera(
+    ficha,
+    desde,
+    hasta
+) {
+
+    mostrarMensaje(
+        "🪜 ¡ESCALERA!"
+    );
+
+
+    ficha.classList.add(
+        "efecto-escalera"
+    );
+
+
+    /*
+        Pequeña pausa antes
+        de comenzar a subir.
+    */
+
+    await esperar(
+        450
+    );
+
+
+    await moverFicha(
+        ficha,
+        null,
+        desde,
+        hasta,
+        900
+    );
+
+
+    ficha.classList.remove(
+        "efecto-escalera"
+    );
+
+
+    await esperar(
+        200
+    );
+
+}
+
+
+// ==========================================================
+// EFECTO SERPIENTE
+// ==========================================================
+
+async function efectoSerpiente(
+    ficha,
+    desde,
+    hasta
+) {
+
+    mostrarMensaje(
+        "🐍 ¡SERPIENTE!"
+    );
+
+
+    ficha.classList.add(
+        "efecto-serpiente"
+    );
+
+
+    await esperar(
+        500
+    );
+
+
+    await moverFicha(
+        ficha,
+        null,
+        desde,
+        hasta,
+        900
+    );
+
+
+    ficha.classList.remove(
+        "efecto-serpiente"
+    );
+
+
+    await esperar(
+        200
+    );
+
+}
+
+
+// ==========================================================
+// MOSTRAR MENSAJE
+// ==========================================================
+
+function mostrarMensaje(
+    texto
+) {
+
+    mensajeAnimacion.textContent =
+        texto;
+
+
+    mensajeAnimacion.classList.remove(
+        "mostrar"
+    );
+
+
+    /*
+        Forzar reinicio de animación
+    */
+
+    void mensajeAnimacion.offsetWidth;
+
+
+    mensajeAnimacion.classList.add(
+        "mostrar"
+    );
+
+}
+
+
+// ==========================================================
+// ANIMACIÓN COMPLETA DEL JUGADOR
+// ==========================================================
+
+async function animarJugador(
+    jugador,
+    posicionAnterior,
+    posicionFinal,
+    dadoResultado
+) {
+
+    if (
+        animando
+    ) {
+
+        return;
+
+    }
+
+
+    animando = true;
+
+
+    /*
+        Crear ficha sobre SVG
+    */
+
+    const ficha =
+        crearFichaAnimada(
+            jugador,
+            posicionAnterior
+        );
+
+
+    /*
+        Calcular dónde cayó
+        antes de serpiente/escalera.
+    */
+
+    let posicionIntermedia =
+        posicionAnterior +
+        dadoResultado;
+
+
+    /*
+        No pasar de 100.
+    */
+
+    if (
+        posicionIntermedia >
+        100
+    ) {
+
+        posicionIntermedia =
+            posicionAnterior;
+
+    }
+
+
+    /*
+        Si el resultado final
+        es diferente significa
+        que hubo serpiente/escalera.
+    */
+
+    const huboEspecial =
+        posicionIntermedia !==
+        posicionFinal;
+
+
+    /*
+        Movimiento normal
+    */
+
+    if (
+        posicionIntermedia !==
+        posicionAnterior
+    ) {
+
+        await moverFicha(
+            ficha,
+            jugador,
+            posicionAnterior,
+            posicionIntermedia,
+            null
+        );
+
+    }
+
+
+    /*
+        Serpiente / escalera
+    */
+
+    if (
+        huboEspecial
+    ) {
+
+        const escalera =
+            estado.escaleras &&
+            estado.escaleras[
+                posicionIntermedia
+            ];
+
+
+        const serpiente =
+            estado.serpientes &&
+            estado.serpientes[
+                posicionIntermedia
+            ];
+
+
+        if (
+            escalera &&
+            Number(escalera) ===
+            Number(posicionFinal)
+        ) {
+
+            await efectoEscalera(
+                ficha,
+                posicionIntermedia,
+                posicionFinal
+            );
+
+        }
+
+        else if (
+            serpiente &&
+            Number(serpiente) ===
+            Number(posicionFinal)
+        ) {
+
+            await efectoSerpiente(
+                ficha,
+                posicionIntermedia,
+                posicionFinal
+            );
+
+        }
+
+        else {
+
+            await moverFicha(
+                ficha,
+                jugador,
+                posicionIntermedia,
+                posicionFinal,
+                700
+            );
+
+        }
+
+    }
+
+
+    /*
+        Quitar ficha animada
+    */
+
+    animacionJugador.innerHTML =
+        "";
+
+
+    /*
+        Actualizar posición visual
+    */
+
+    posicionesVisuales[
+        jugador.id
+    ] =
+        posicionFinal;
+
+
+    animando = false;
+
+
+    /*
+        Mostrar estado final
+    */
+
+    renderizarFichas();
+
+
+    /*
+        Victoria
+    */
+
+    if (
+        posicionFinal >= 100
+    ) {
+
+        mostrarVictoria(
+            jugador
+        );
+
+    }
+
+}
+
+
+// ==========================================================
+// VICTORIA
+// ==========================================================
+
+function mostrarVictoria(
+    jugador
+) {
+
+    nombreGanador.textContent =
+        jugador.nombre;
+
+
+    victoria.classList.add(
+        "mostrar"
+    );
+
+}
+
+
+// ==========================================================
+// OCULTAR VICTORIA
+// ==========================================================
+
+function ocultarVictoria() {
+
+    victoria.classList.remove(
+        "mostrar"
+    );
+
+}
+
+
+// ==========================================================
+// RENDERIZAR FICHAS NORMALES
+// ==========================================================
+
+function renderizarFichas() {
+
+    document
+        .querySelectorAll(
+            ".fichas"
+        )
+        .forEach(
+            elemento => {
+
+                elemento.innerHTML =
+                    "";
+
+            }
+        );
+
+
+    const lista =
+        Object.values(
+            estado.jugadores || {}
+        );
+
+
+    lista.forEach(
+        (jugador, indice) => {
+
+            let posicion =
+                posicionesVisuales[
+                    jugador.id
+                ];
+
+
+            if (
+                posicion ===
+                undefined
+            ) {
+
+                posicion =
+                    jugador.posicion;
+
+            }
+
+
+            if (
+                posicion < 1
+            ) {
+
+                posicion = 1;
+
+            }
+
+
+            if (
+                posicion > 100
+            ) {
+
+                posicion = 100;
+
+            }
+
+
+            const contenedor =
+                document.getElementById(
+                    "fichas-" +
+                    posicion
+                );
+
+
+            if (!contenedor) {
+
+                return;
+
+            }
+
+
+            const ficha =
+                document.createElement(
+                    "div"
+                );
+
+
+            ficha.className =
+                "ficha ficha" +
+                (
+                    (indice % 4) + 1
+                );
+
+
+            ficha.textContent =
+                jugador.nombre
+                    .substring(
+                        0,
+                        1
+                    )
+                    .toUpperCase();
+
+
+            ficha.title =
+                jugador.nombre +
+                " - casilla " +
+                jugador.posicion;
+
+
+            contenedor.appendChild(
+                ficha
+            );
+
+        }
+    );
+
+}
+
+
+// ==========================================================
+// RENDERIZAR TODO
+// ==========================================================
+
+function renderizar() {
+
+    dibujarElementosJuego();
+
+    renderizarFichas();
+
+
+    const lista =
+        Object.values(
+            estado.jugadores || {}
+        );
+
+
+    /*
+        Lista de jugadores
+    */
+
+    jugadores.innerHTML =
+        "";
+
+
+    if (
+        lista.length === 0
+    ) {
+
+        jugadores.textContent =
+            "No hay jugadores.";
+
+    }
+
+
+    lista.forEach(
+        jugador => {
+
+            const elemento =
+                document.createElement(
+                    "div"
+                );
+
+
+            elemento.className =
+                "jugador";
+
+
+            if (
+                estado.turno ===
+                jugador.id
+            ) {
+
+                elemento.classList.add(
+                    "mi-turno"
+                );
+
+            }
+
+
+            let texto =
+                "🎮 " +
+                jugador.nombre +
+                " — casilla " +
+                jugador.posicion;
+
+
+            if (
+                jugador.id ===
+                miId
+            ) {
+
+                texto +=
+                    " ⭐ Tú";
+
+            }
+
+
+            if (
+                estado.turno ===
+                jugador.id
+            ) {
+
+                texto +=
+                    " 🎲";
+
+            }
+
+
+            elemento.textContent =
+                texto;
+
+
+            jugadores.appendChild(
+                elemento
+            );
+
+        }
+    );
+
+
+    /*
+        Turno
+    */
+
+    const jugadorTurno =
+        estado.jugadores[
+            estado.turno
+        ];
+
+
+    if (
+        jugadorTurno
+    ) {
+
+        turnoElemento.textContent =
+            jugadorTurno.nombre;
+
+    }
+
+    else {
+
+        turnoElemento.textContent =
+            "-";
+
+    }
+
+
+    /*
+        Botón
+    */
+
+    const esMiTurno =
+        estado.turno ===
+        miId;
+
+
+    const hayGanador =
+        estado.ganador !== null &&
+        estado.ganador !== undefined;
+
+
+    btnDado.disabled =
+        !esMiTurno ||
+        hayGanador ||
+        animando ||
+        !socket ||
+        socket.readyState !==
+            WebSocket.OPEN;
+
+
+    /*
+        Evento
+    */
+
+    if (
+        estado.ultimo_evento
+    ) {
+
+        evento.textContent =
+            estado.ultimo_evento;
+
+    }
+
+}
+
+
+// ==========================================================
+// DADO
+// ==========================================================
+
+function mostrarDado(
+    numero
+) {
+
+    const dados = {
+
+        1: "⚀",
+
+        2: "⚁",
+
+        3: "⚂",
+
+        4: "⚃",
+
+        5: "⚄",
+
+        6: "⚅"
+
+    };
+
+
+    dado.textContent =
+        dados[numero] ||
+        "🎲";
+
+}
+
+
+// ==========================================================
+// ANIMACIÓN DEL DADO
+// ==========================================================
+
+async function animarDado(
+    resultado
+) {
+
+    dado.classList.add(
+        "girando"
+    );
+
+
+    const valores = [
+        "⚀",
+        "⚁",
+        "⚂",
+        "⚃",
+        "⚄",
+        "⚅"
+    ];
+
+
+    /*
+        Cambiar caras rápidamente
+    */
+
+    for (
+        let i = 0;
+        i < 12;
+        i++
+    ) {
+
+        const aleatorio =
+            Math.floor(
+                Math.random() *
+                6
+            );
+
+
+        dado.textContent =
+            valores[
+                aleatorio
+            ];
+
+
+        await esperar(
+            75
+        );
+
+    }
+
+
+    dado.classList.remove(
+        "girando"
+    );
+
+
+    mostrarDado(
+        resultado
+    );
+
+}
+
+
+// ==========================================================
+// CONEXIÓN
 // ==========================================================
 
 function conectar() {
@@ -1703,7 +3041,7 @@ function conectar() {
 
 
 // ==========================================================
-// CONEXIÓN
+// ESTADO DE CONEXIÓN
 // ==========================================================
 
 function actualizarConexion(
@@ -1727,7 +3065,7 @@ function actualizarConexion(
 // PROCESAR MENSAJES
 // ==========================================================
 
-function procesarMensaje(
+async function procesarMensaje(
     mensaje
 ) {
 
@@ -1737,9 +3075,10 @@ function procesarMensaje(
     );
 
 
-    switch(
+    switch (
         mensaje.tipo
     ) {
+
 
         case "conexion":
 
@@ -1758,22 +3097,24 @@ function procesarMensaje(
             break;
 
 
-        case "estado":
+        case "resultado_dado":
 
-            estado =
-                mensaje;
+            /*
+                Animar el dado
+            */
 
-
-            renderizar();
+            animarDado(
+                mensaje.dado
+            );
 
 
             break;
 
 
-        case "resultado_dado":
+        case "estado":
 
-            mostrarDado(
-                mensaje.dado
+            await recibirEstado(
+                mensaje
             );
 
 
@@ -1786,7 +3127,7 @@ function procesarMensaje(
                 mensaje.dado
             ) {
 
-                mostrarDado(
+                animarDado(
                     mensaje.dado
                 );
 
@@ -1798,7 +3139,8 @@ function procesarMensaje(
         case "mensaje":
 
             evento.textContent =
-                mensaje.mensaje || "";
+                mensaje.mensaje ||
+                "";
 
 
             break;
@@ -1832,6 +3174,13 @@ function procesarMensaje(
 
         case "reinicio":
 
+            ocultarVictoria();
+
+
+            posicionesVisuales =
+                {};
+
+
             evento.textContent =
                 "🔄 " +
                 mensaje.mensaje;
@@ -1845,329 +3194,192 @@ function procesarMensaje(
 
 
 // ==========================================================
-// RENDERIZAR
+// RECIBIR ESTADO
 // ==========================================================
 
-function renderizar() {
+async function recibirEstado(
+    nuevoEstado
+) {
 
     /*
-        Dibujar serpientes y escaleras
+        Estado anterior
+    */
+
+    const estadoAnterior =
+        estado;
+
+
+    /*
+        Jugadores anteriores
+    */
+
+    const jugadoresAnteriores =
+        estadoAnterior.jugadores ||
+        {};
+
+
+    /*
+        Guardar nuevo estado
+    */
+
+    estado =
+        nuevoEstado;
+
+
+    /*
+        Dibujar tablero
     */
 
     dibujarElementosJuego();
 
 
     /*
-        Limpiar fichas
+        Buscar jugadores
+        que cambiaron de posición
     */
 
-    document
-        .querySelectorAll(
-            ".fichas"
-        )
-        .forEach(
-            elemento => {
-
-                elemento.innerHTML =
-                    "";
-
-            }
-        );
+    let jugadorMovido =
+        null;
 
 
-    /*
-        Jugadores
-    */
-
-    const lista =
-        Object.values(
-            estado.jugadores || {}
-        );
-
-
-    lista.forEach(
-        (jugador, indice) => {
-
-            let posicion =
-                jugador.posicion;
-
-
-            /*
-                Si está en 0,
-                lo colocamos visualmente
-                en la casilla 1.
-            */
-
-            if (
-                posicion < 1
-            ) {
-
-                posicion = 1;
-
-            }
-
-
-            if (
-                posicion > 100
-            ) {
-
-                posicion = 100;
-
-            }
-
-
-            const contenedor =
-                document.getElementById(
-                    "fichas-" +
-                    posicion
-                );
-
-
-            if (!contenedor) {
-
-                return;
-
-            }
-
-
-            const ficha =
-                document.createElement(
-                    "div"
-                );
-
-
-            ficha.className =
-                "ficha ficha" +
-                (
-                    (indice % 4) + 1
-                );
-
-
-            ficha.textContent =
-                jugador.nombre
-                    .substring(
-                        0,
-                        1
-                    )
-                    .toUpperCase();
-
-
-            ficha.title =
-                jugador.nombre +
-                " - casilla " +
-                jugador.posicion;
-
-
-            contenedor.appendChild(
-                ficha
-            );
-
-        }
-    );
-
-
-    /*
-        Lista de jugadores
-    */
-
-    jugadores.innerHTML = "";
-
-
-    if (
-        lista.length === 0
+    for (
+        const jugadorId
+        in estado.jugadores
     ) {
 
-        jugadores.textContent =
-            "No hay jugadores.";
-
-    }
-
-
-    lista.forEach(
-        jugador => {
-
-            const elemento =
-                document.createElement(
-                    "div"
-                );
-
-
-            elemento.className =
-                "jugador";
-
-
-            if (
-                estado.turno ===
-                jugador.id
-            ) {
-
-                elemento.classList.add(
-                    "mi-turno"
-                );
-
-            }
-
-
-            let texto =
-                "🎮 " +
-                jugador.nombre +
-                " — casilla " +
-                jugador.posicion;
-
-
-            if (
-                jugador.id ===
-                miId
-            ) {
-
-                texto +=
-                    " ⭐ Tú";
-
-            }
-
-
-            if (
-                estado.turno ===
-                jugador.id
-            ) {
-
-                texto +=
-                    " 🎲";
-
-            }
-
-
-            elemento.textContent =
-                texto;
-
-
-            jugadores.appendChild(
-                elemento
-            );
-
-        }
-    );
-
-
-    /*
-        Turno
-    */
-
-    const jugadorTurno =
-        estado.jugadores[
-            estado.turno
-        ];
-
-
-    if (
-        jugadorTurno
-    ) {
-
-        turnoElemento.textContent =
-            jugadorTurno.nombre;
-
-    }
-
-    else {
-
-        turnoElemento.textContent =
-            "-";
-
-    }
-
-
-    /*
-        Botón dado
-    */
-
-    const esMiTurno =
-        estado.turno ===
-        miId;
-
-
-    const hayGanador =
-        estado.ganador !== null &&
-        estado.ganador !== undefined;
-
-
-    btnDado.disabled =
-        !esMiTurno ||
-        hayGanador ||
-        !socket ||
-        socket.readyState !==
-            WebSocket.OPEN;
-
-
-    /*
-        Evento
-    */
-
-    if (
-        estado.ultimo_evento
-    ) {
-
-        evento.textContent =
-            estado.ultimo_evento;
-
-    }
-
-
-    /*
-        Ganador
-    */
-
-    if (
-        estado.ganador
-    ) {
-
-        const ganador =
+        const nuevoJugador =
             estado.jugadores[
-                estado.ganador
+                jugadorId
             ];
 
 
-        if (ganador) {
+        const anterior =
+            jugadoresAnteriores[
+                jugadorId
+            ];
 
-            evento.textContent =
-                "🏆 " +
-                ganador.nombre +
-                " ha ganado la partida!";
+
+        if (
+            anterior &&
+            nuevoJugador.posicion !==
+            anterior.posicion
+        ) {
+
+            jugadorMovido =
+                {
+
+                    jugador:
+                        nuevoJugador,
+
+                    desde:
+                        anterior.posicion,
+
+                    hasta:
+                        nuevoJugador.posicion,
+
+                    dado:
+                        estado.ultimo_dado ||
+                        0
+
+                };
+
+
+            break;
 
         }
 
     }
 
-}
+
+    /*
+        Primera carga
+    */
+
+    if (
+        !jugadorMovido
+    ) {
+
+        Object.values(
+            estado.jugadores
+        ).forEach(
+            jugador => {
+
+                if (
+                    posicionesVisuales[
+                        jugador.id
+                    ] ===
+                    undefined
+                ) {
+
+                    posicionesVisuales[
+                        jugador.id
+                    ] =
+                        jugador.posicion;
+
+                }
+
+            }
+        );
 
 
-// ==========================================================
-// MOSTRAR DADO
-// ==========================================================
+        renderizar();
 
-function mostrarDado(
-    numero
-) {
+        return;
 
-    const dados = {
-
-        1: "⚀",
-
-        2: "⚁",
-
-        3: "⚂",
-
-        4: "⚃",
-
-        5: "⚄",
-
-        6: "⚅"
-
-    };
+    }
 
 
-    dado.textContent =
-        dados[numero] ||
-        "🎲";
+    /*
+        Mostrar las fichas
+        que NO están animándose
+    */
+
+    Object.values(
+        estado.jugadores
+    ).forEach(
+        jugador => {
+
+            if (
+                jugador.id !==
+                jugadorMovido.jugador.id
+            ) {
+
+                posicionesVisuales[
+                    jugador.id
+                ] =
+                    jugador.posicion;
+
+            }
+
+        }
+    );
+
+
+    renderizarFichas();
+
+
+    /*
+        Animar jugador
+    */
+
+    await animarJugador(
+
+        jugadorMovido.jugador,
+
+        jugadorMovido.desde,
+
+        jugadorMovido.hasta,
+
+        jugadorMovido.dado
+
+    );
+
+
+    /*
+        Actualizar panel
+    */
+
+    renderizar();
 
 }
 
@@ -2247,10 +3459,53 @@ function cambiarNombre() {
 
 
 // ==========================================================
-// DADO
+// LANZAR DADO
 // ==========================================================
 
 function lanzarDado() {
+
+    if (
+        animando
+    ) {
+
+        return;
+
+    }
+
+
+    if (
+        !socket ||
+        socket.readyState !==
+            WebSocket.OPEN
+    ) {
+
+        return;
+
+    }
+
+
+    /*
+        Bloquear inmediatamente
+    */
+
+    btnDado.disabled =
+        true;
+
+
+    /*
+        Mostrar animación
+        inmediatamente.
+    */
+
+    dado.classList.add(
+        "girando"
+    );
+
+
+    /*
+        El resultado real
+        llegará desde Render.
+    */
 
     enviar(
         "lanzar_dado"
@@ -2264,6 +3519,23 @@ function lanzarDado() {
 // ==========================================================
 
 function reiniciarJuego() {
+
+    ocultarVictoria();
+
+
+    posicionesVisuales =
+        {};
+
+
+    dado.classList.remove(
+        "girando"
+    );
+
+
+    mostrarDado(
+        0
+    );
+
 
     enviar(
         "reiniciar"
@@ -2294,7 +3566,7 @@ function abandonar() {
 
 
 // ==========================================================
-// INICIO
+// INICIAR
 // ==========================================================
 
 crearTablero();
