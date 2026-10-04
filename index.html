@@ -1,473 +1,620 @@
-```html
 <!DOCTYPE html>
 <html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Serpientes y Escaleras Online</title>
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>🐍 Escaleras y Serpientes</title>
 
 <style>
 
 *{
     box-sizing:border-box;
-    margin:0;
-    padding:0;
 }
 
 body{
+
+    margin:0;
+
     min-height:100vh;
-    font-family:Arial, Helvetica, sans-serif;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
     background:
-        radial-gradient(circle at top left,#dff4ff,transparent 35%),
-        radial-gradient(circle at bottom right,#ffe5e5,transparent 35%),
-        linear-gradient(135deg,#eef7ff,#f7f7f7);
-    color:#202020;
-    overflow-x:hidden;
+        radial-gradient(
+            circle at top,
+            #ffffff,
+            #dcecff 45%,
+            #c7d8eb
+        );
+
+    color:#141414;
 }
+
 
 .app{
-    width:min(1450px,96%);
+
+    width:min(
+        1450px,
+        96%
+    );
+
     margin:auto;
-    padding:25px 0 40px;
+
+    padding:
+        25px 0 35px;
 }
+
 
 .titulo{
+
     text-align:center;
-    font-size:38px;
+
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            48px
+        );
+
     font-weight:900;
-    margin-bottom:22px;
-    text-shadow:0 4px 10px rgba(0,0,0,.15);
+
+    margin:
+        5px 0 25px;
+
+    color:#172b4d;
+
+    text-shadow:
+        0 4px 8px
+        rgba(0,0,0,.15);
 }
 
+
 .juego{
+
     display:grid;
-    grid-template-columns:minmax(600px,1fr) 340px;
+
+    grid-template-columns:
+        minmax(
+            650px,
+            1fr
+        )
+        340px;
+
     gap:25px;
+
     align-items:start;
 }
 
-/* ============================================================
-   TABLERO
-   ============================================================ */
 
 .tablero-contenedor{
+
+    position:relative;
+
     background:white;
-    border-radius:25px;
-    padding:20px;
+
+    padding:18px;
+
+    border-radius:24px;
+
     box-shadow:
-        0 20px 50px rgba(0,0,0,.15),
-        inset 0 0 0 1px rgba(0,0,0,.05);
+        0 15px 40px
+        rgba(0,0,0,.15);
 }
+
 
 #tablero{
+
     position:relative;
+
     width:100%;
-    aspect-ratio:1/1;
+
+    aspect-ratio:1;
+
     display:grid;
-    grid-template-columns:repeat(10,1fr);
-    grid-template-rows:repeat(10,1fr);
-    border:5px solid #171717;
-    border-radius:18px;
+
+    grid-template-columns:
+        repeat(10,1fr);
+
+    grid-template-rows:
+        repeat(10,1fr);
+
     overflow:hidden;
+
+    border:
+        4px solid #171717;
+
+    border-radius:14px;
+
     background:#fff;
 }
+
 
 .casilla{
+
     position:relative;
+
+    border:
+        1px solid
+        rgba(0,0,0,.18);
+
     display:flex;
-    justify-content:center;
-    align-items:center;
-    border:1px solid rgba(0,0,0,.18);
-    font-size:15px;
-    font-weight:800;
-    user-select:none;
+
+    align-items:flex-start;
+
+    justify-content:flex-start;
+
+    padding:5px;
+
+    font-weight:bold;
+
+    font-size:
+        clamp(
+            10px,
+            1.2vw,
+            15px
+        );
 }
 
-.casilla:nth-child(odd){
-    background:#f4f8ff;
-}
 
-.casilla:nth-child(even){
+.casilla:nth-child(
+    odd
+){
+
     background:#fff;
+
 }
+
+
+.casilla:nth-child(
+    even
+){
+
+    background:#f0f6ff;
+
+}
+
 
 .numero{
+
     position:absolute;
-    top:5px;
-    left:7px;
-    font-size:13px;
-    opacity:.7;
+
+    top:4px;
+
+    left:5px;
+
+    opacity:.65;
 }
 
-.svg-elementos{
+
+#svgElementos{
+
     position:absolute;
+
     inset:0;
+
     width:100%;
+
     height:100%;
+
     pointer-events:none;
-    z-index:4;
+
+    z-index:5;
 }
 
-.capa-fichas{
+
+#fichas{
+
     position:absolute;
+
     inset:0;
+
     pointer-events:none;
-    z-index:10;
+
+    z-index:20;
 }
 
-/* ============================================================
-   FICHAS
-   ============================================================ */
 
 .pieza{
+
     position:absolute;
-    width:34px;
-    height:34px;
+
+    width:36px;
+
+    height:36px;
+
     border-radius:50%;
-    transform:translate(-50%,-50%);
-    border:4px solid white;
+
+    border:
+        4px solid white;
+
     box-shadow:
-        0 5px 12px rgba(0,0,0,.35),
-        inset 0 2px 4px rgba(255,255,255,.6);
+        0 4px 9px
+        rgba(0,0,0,.35);
+
+    transform:
+        translate(-50%,-50%);
+
     transition:
         box-shadow .25s,
         transform .25s;
-    z-index:20;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    color:white;
-    font-size:13px;
-    font-weight:900;
+
+    z-index:30;
 }
+
 
 .pieza.mia{
-    width:40px;
-    height:40px;
-    border:4px solid #ffd600;
+
     box-shadow:
-        0 0 0 3px rgba(255,214,0,.25),
-        0 7px 16px rgba(0,0,0,.4);
+        0 0 0 4px #ffd600,
+        0 5px 12px
+        rgba(0,0,0,.35);
 }
+
 
 .pieza.moviendo{
-    z-index:50;
-    transform:translate(-50%,-50%) scale(1.12);
+
+    transform:
+        translate(-50%,-50%)
+        scale(1.18);
+
+    z-index:100;
 }
+
 
 .pieza.rebote{
-    animation:reboteFicha .45s ease;
+
+    animation:
+        rebote .45s
+        ease;
 }
 
-@keyframes reboteFicha{
+
+@keyframes rebote{
+
     0%{
-        transform:translate(-50%,-50%) scale(1);
-    }
-
-    40%{
-        transform:translate(-50%,-65%) scale(1.18);
-    }
-
-    70%{
-        transform:translate(-50%,-45%) scale(.96);
-    }
-
-    100%{
-        transform:translate(-50%,-50%) scale(1);
-    }
-}
-
-/* ============================================================
-   RESALTADO DE CASILLA
-   ============================================================ */
-
-.resaltado-casilla{
-    position:absolute;
-    width:58px;
-    height:58px;
-    border-radius:50%;
-    border:5px solid #ffd600;
-    transform:translate(-50%,-50%);
-    pointer-events:none;
-    z-index:7;
-    animation:resaltarCasilla 1s ease-in-out infinite;
-}
-
-@keyframes resaltarCasilla{
-    0%,100%{
-        opacity:.35;
-        transform:translate(-50%,-50%) scale(.9);
+        transform:
+            translate(-50%,-50%)
+            scale(1);
     }
 
     50%{
-        opacity:1;
-        transform:translate(-50%,-50%) scale(1.12);
-    }
-}
-
-/* ============================================================
-   ESCALERAS Y SERPIENTES
-   ============================================================ */
-
-.escalera-activa{
-    filter:
-        drop-shadow(0 0 6px #00ff66)
-        drop-shadow(0 0 12px #00ff66);
-    animation:brilloEscalera .7s ease-in-out infinite alternate;
-}
-
-@keyframes brilloEscalera{
-    from{
-        opacity:.7;
-    }
-
-    to{
-        opacity:1;
-    }
-}
-
-.serpiente-activa{
-    filter:
-        drop-shadow(0 0 6px #ff1744)
-        drop-shadow(0 0 12px #ff1744);
-    animation:brilloSerpiente .7s ease-in-out infinite alternate;
-}
-
-@keyframes brilloSerpiente{
-    from{
-        opacity:.7;
-    }
-
-    to{
-        opacity:1;
-    }
-}
-
-/* ============================================================
-   PARTICULAS
-   ============================================================ */
-
-.particula{
-    position:absolute;
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    pointer-events:none;
-    z-index:100;
-    animation:particulaVuelo 1s ease-out forwards;
-}
-
-@keyframes particulaVuelo{
-    0%{
-        opacity:1;
-        transform:translate(0,0) scale(1);
+        transform:
+            translate(-50%,-50%)
+            scale(1.3);
     }
 
     100%{
-        opacity:0;
         transform:
-            translate(
-                calc((var(--x) - .5) * 150px),
-                calc((var(--y) - .5) * 150px)
-            )
-            scale(.2);
+            translate(-50%,-50%)
+            scale(1);
     }
 }
 
-/* ============================================================
+
+.resaltado-casilla{
+
+    position:absolute;
+
+    width:8%;
+
+    height:8%;
+
+    transform:
+        translate(-50%,-50%);
+
+    border:
+        5px solid #ffd600;
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 25px
+        rgba(255,214,0,.95);
+
+    animation:
+        resaltarCasilla
+        .8s infinite alternate;
+
+    z-index:15;
+
+    pointer-events:none;
+}
+
+
+@keyframes resaltarCasilla{
+
+    from{
+        opacity:.45;
+        transform:
+            translate(-50%,-50%)
+            scale(.85);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            scale(1.1);
+    }
+}
+
+
+/* ==========================================================
    PANEL
-   ============================================================ */
+   ========================================================== */
 
 .panel{
+
     background:white;
-    border-radius:25px;
-    padding:25px;
+
+    border-radius:24px;
+
+    padding:22px;
+
     box-shadow:
-        0 20px 50px rgba(0,0,0,.15),
-        inset 0 0 0 1px rgba(0,0,0,.05);
+        0 15px 40px
+        rgba(0,0,0,.15);
+
+    min-height:600px;
 }
+
 
 .panel h2{
+
+    margin:
+        0 0 18px;
+
     text-align:center;
-    margin-bottom:20px;
-    font-size:27px;
+
+    color:#172b4d;
 }
 
+
 .estado{
-    padding:14px;
-    border-radius:13px;
-    background:#edf6ff;
-    border:1px solid #c9e5ff;
+
+    padding:12px;
+
+    border-radius:12px;
+
     text-align:center;
-    font-weight:700;
+
+    font-weight:800;
+
+    background:#edf6ff;
+
+    border:
+        2px solid #90caf9;
+
+    margin-bottom:15px;
+
+    transition:
+        .25s;
+}
+
+
+.nombre-box{
+
+    display:flex;
+
+    gap:8px;
+
     margin-bottom:15px;
 }
 
-.nombre-box{
-    display:flex;
-    gap:8px;
-    margin-bottom:20px;
-}
 
 .nombre-box input{
+
     flex:1;
+
     min-width:0;
-    border:2px solid #ddd;
-    border-radius:10px;
+
     padding:11px;
-    outline:none;
+
+    border:
+        2px solid #ddd;
+
+    border-radius:10px;
+
     font-size:15px;
 }
 
-.nombre-box input:focus{
-    border-color:#1976d2;
-}
 
 .nombre-box button{
-    border:0;
+
+    border:none;
+
     border-radius:10px;
-    padding:0 15px;
+
     background:#1976d2;
+
     color:white;
-    font-weight:800;
+
+    font-weight:bold;
+
+    padding:
+        0 15px;
+
     cursor:pointer;
 }
 
-/* ============================================================
-   DADO 3D
-   ============================================================ */
 
-.zona-dado{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    margin:15px 0 20px;
-}
+.dado-contenedor{
 
-.dado-escena{
-    width:110px;
-    height:110px;
-    perspective:700px;
+    height:150px;
+
     display:flex;
+
     align-items:center;
+
     justify-content:center;
+
+    perspective:700px;
 }
+
 
 .dado-3d{
-    width:80px;
-    height:80px;
+
+    width:85px;
+
+    height:85px;
+
     position:relative;
+
     transform-style:preserve-3d;
-    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+
+    transition:
+        transform .5s;
+
 }
+
 
 .cara{
+
     position:absolute;
-    width:80px;
-    height:80px;
-    border-radius:15px;
-    background:linear-gradient(145deg,#ffffff,#e9e9e9);
-    border:3px solid #333;
+
+    width:85px;
+
+    height:85px;
+
+    border-radius:14px;
+
+    background:#fff;
+
+    border:
+        4px solid #222;
+
     display:flex;
+
     align-items:center;
+
     justify-content:center;
+
+    font-size:38px;
+
+    font-weight:900;
+
     box-shadow:
-        inset 0 0 15px rgba(0,0,0,.1);
+        inset 0 0 15px
+        rgba(0,0,0,.08);
 }
 
+
 .cara1{
-    transform:translateZ(40px);
+    transform:
+        rotateY(0deg)
+        translateZ(42.5px);
 }
 
 .cara2{
-    transform:rotateY(90deg) translateZ(40px);
+    transform:
+        rotateY(90deg)
+        translateZ(42.5px);
 }
 
 .cara3{
-    transform:rotateY(180deg) translateZ(40px);
+    transform:
+        rotateY(180deg)
+        translateZ(42.5px);
 }
 
 .cara4{
-    transform:rotateY(-90deg) translateZ(40px);
+    transform:
+        rotateY(-90deg)
+        translateZ(42.5px);
 }
 
 .cara5{
-    transform:rotateX(90deg) translateZ(40px);
+    transform:
+        rotateX(90deg)
+        translateZ(42.5px);
 }
 
 .cara6{
-    transform:rotateX(-90deg) translateZ(40px);
+    transform:
+        rotateX(-90deg)
+        translateZ(42.5px);
 }
 
-.puntos{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    grid-template-rows:repeat(3,1fr);
-    width:55px;
-    height:55px;
-    gap:5px;
-}
-
-.punto{
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    background:#222;
-    align-self:center;
-    justify-self:center;
-}
 
 .dado-3d.lanzando{
-    animation:dadoSacudida .15s infinite;
+
+    animation:
+        dadoSacudida
+        .18s
+        infinite;
 }
 
-@keyframes dadoSacudida{
-    0%{
-        transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg)
-                   translate(0,0);
-    }
 
-    25%{
-        transform:rotateX(25deg) rotateY(35deg) rotateZ(10deg)
-                   translate(-4px,3px);
+@keyframes dadoSacudida{
+
+    0%{
+        transform:
+            rotateX(0)
+            rotateY(0)
+            rotateZ(0)
+            scale(1);
     }
 
     50%{
-        transform:rotateX(-35deg) rotateY(-50deg) rotateZ(-15deg)
-                   translate(4px,-3px);
-    }
-
-    75%{
-        transform:rotateX(45deg) rotateY(30deg) rotateZ(15deg)
-                   translate(-3px,-2px);
+        transform:
+            rotateX(180deg)
+            rotateY(180deg)
+            rotateZ(90deg)
+            scale(1.08);
     }
 
     100%{
-        transform:rotateX(-20deg) rotateY(-30deg) rotateZ(-5deg)
-                   translate(2px,3px);
+        transform:
+            rotateX(360deg)
+            rotateY(360deg)
+            rotateZ(180deg)
+            scale(1);
     }
 }
 
-.resultado-dado{
-    min-height:30px;
+
+.resultado{
+
     text-align:center;
-    font-size:19px;
+
+    min-height:32px;
+
     font-weight:900;
+
+    font-size:20px;
+
+    margin-bottom:12px;
 }
+
 
 .mensaje-efecto{
-    animation:efectoTexto .65s ease;
+
+    animation:
+        efectoTexto
+        .55s
+        ease;
 }
 
+
 @keyframes efectoTexto{
+
     0%{
-        transform:scale(.5);
-        opacity:0;
+        transform:scale(.8);
+        opacity:.2;
     }
 
     60%{
-        transform:scale(1.25);
+        transform:scale(1.18);
         opacity:1;
     }
 
@@ -476,454 +623,735 @@ body{
     }
 }
 
-/* ============================================================
-   BOTONES
-   ============================================================ */
 
-.btn{
+button.accion{
+
     width:100%;
-    border:0;
+
+    border:none;
+
     border-radius:13px;
+
     padding:15px;
+
     font-size:16px;
+
     font-weight:900;
+
     cursor:pointer;
+
+    margin-bottom:10px;
+
     transition:
-        transform .2s,
-        filter .2s,
-        opacity .2s;
-    margin-top:10px;
+        transform .15s,
+        opacity .15s,
+        box-shadow .15s;
 }
 
-.btn:hover:not(:disabled){
-    transform:translateY(-2px);
-    filter:brightness(1.05);
+
+button.accion:hover:not(:disabled){
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 7px 15px
+        rgba(0,0,0,.18);
 }
 
-.btn:active:not(:disabled){
-    transform:translateY(1px);
+
+button.accion:active:not(:disabled){
+
+    transform:
+        translateY(1px);
 }
 
-.btn:disabled{
+
+button.accion:disabled{
+
     opacity:.45;
+
     cursor:not-allowed;
 }
 
-.btn-dado{
-    background:linear-gradient(135deg,#1976d2,#42a5f5);
-    color:white;
-    box-shadow:0 8px 18px rgba(25,118,210,.25);
+
+#btnDado{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffca28,
+            #ff9800
+        );
+
+    color:#171717;
 }
 
-.btn-reiniciar{
-    background:linear-gradient(135deg,#43a047,#66bb6a);
+
+#btnReiniciar{
+
+    background:#43a047;
+
     color:white;
 }
 
-.btn-abandonar{
-    background:linear-gradient(135deg,#e53935,#ef5350);
+
+#btnAbandonar{
+
+    background:#e53935;
+
     color:white;
 }
 
-/* ============================================================
-   JUGADORES
-   ============================================================ */
 
 .jugadores{
-    margin-top:22px;
+
+    margin-top:15px;
 }
+
 
 .jugadores h3{
-    margin-bottom:10px;
+
+    margin:
+        0 0 10px;
 }
 
-.jugador-item{
+
+.jugador{
+
     display:flex;
+
     align-items:center;
-    gap:10px;
-    padding:10px;
+
+    gap:9px;
+
+    padding:9px;
+
     border-radius:10px;
-    background:#f5f5f5;
+
     margin-bottom:7px;
-    transition:.25s;
+
+    background:#f4f6f8;
+
+    border:
+        2px solid transparent;
+
+    transition:
+        .25s;
 }
 
-.jugador-item.turno{
+
+.jugador.turno{
+
+    border:
+        3px solid #ffd600;
+
     background:#fff8d6;
-    box-shadow:inset 0 0 0 2px #ffd600;
+
+    box-shadow:
+        0 3px 9px
+        rgba(255,214,0,.3);
 }
 
-.color-jugador{
+
+.jugador .color{
+
     width:18px;
+
     height:18px;
+
     border-radius:50%;
-    border:2px solid white;
-    box-shadow:0 2px 5px rgba(0,0,0,.3);
+
+    border:
+        2px solid white;
+
+    box-shadow:
+        0 1px 4px
+        rgba(0,0,0,.3);
 }
 
-.info-jugador{
+
+.jugador .nombre{
+
     flex:1;
+
+    font-weight:bold;
 }
 
-.nombre-jugador{
-    font-weight:900;
+
+.jugador .casilla{
+
+    position:static;
+
+    padding:0;
+
+    font-size:13px;
+
+    opacity:.7;
 }
 
-.posicion-jugador{
-    font-size:12px;
-    color:#666;
-}
 
-/* ============================================================
-   VICTORIA
-   ============================================================ */
+/* ==========================================================
+   MENSAJES
+   ========================================================== */
 
-.victoria{
+.mensaje-flotante{
+
     position:fixed;
-    inset:0;
-    background:rgba(0,0,0,.7);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:1000;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity .4s;
-}
 
-.victoria.visible{
-    opacity:1;
-    pointer-events:auto;
-}
+    left:50%;
 
-.victoria-card{
-    background:white;
-    border-radius:30px;
-    padding:40px;
-    width:min(450px,90%);
+    top:35%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:500;
+
+    background:
+        rgba(20,20,20,.92);
+
+    color:white;
+
+    padding:
+        18px 28px;
+
+    border-radius:18px;
+
+    font-size:24px;
+
+    font-weight:900;
+
     text-align:center;
-    box-shadow:0 30px 80px rgba(0,0,0,.4);
-    animation:entradaVictoria .7s cubic-bezier(.2,.8,.2,1);
+
+    pointer-events:none;
+
+    animation:
+        mensajeEntrada
+        1.8s
+        forwards;
 }
 
-@keyframes entradaVictoria{
+
+@keyframes mensajeEntrada{
+
     0%{
-        transform:scale(.4) rotate(-10deg);
         opacity:0;
+        transform:
+            translate(-50%,-50%)
+            scale(.7);
     }
 
-    70%{
-        transform:scale(1.08) rotate(2deg);
+    15%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            scale(1.05);
+    }
+
+    75%{
+        opacity:1;
     }
 
     100%{
-        transform:scale(1) rotate(0);
+        opacity:0;
+        transform:
+            translate(-50%,-65%)
+            scale(1);
+    }
+}
+
+
+/* ==========================================================
+   PARTICULAS
+   ========================================================== */
+
+.particula{
+
+    position:absolute;
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+
+    background:#ffd600;
+
+    pointer-events:none;
+
+    z-index:200;
+
+    animation:
+        particulaVuelo
+        1s
+        ease-out
+        forwards;
+}
+
+
+@keyframes particulaVuelo{
+
+    from{
+
+        opacity:1;
+
+        transform:
+            translate(0,0)
+            scale(1);
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:
+            translate(
+                var(--dx),
+                var(--dy)
+            )
+            scale(.2);
+    }
+}
+
+
+/* ==========================================================
+   VICTORIA
+   ========================================================== */
+
+.victoria{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:1000;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter:
+        blur(5px);
+}
+
+
+.victoria.oculto{
+
+    display:none;
+}
+
+
+.victoria-box{
+
+    width:min(
+        500px,
+        90%
+    );
+
+    background:white;
+
+    border-radius:28px;
+
+    padding:40px;
+
+    text-align:center;
+
+    box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.4);
+
+    animation:
+        victoriaEntrada
+        .7s
+        ease;
+}
+
+
+@keyframes victoriaEntrada{
+
+    from{
+        opacity:0;
+        transform:
+            scale(.5)
+            rotate(-5deg);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            scale(1)
+            rotate(0);
+    }
+}
+
+
+.trofeo{
+
+    font-size:85px;
+
+    animation:
+        trofeo
+        1s
+        infinite alternate;
+}
+
+
+@keyframes trofeo{
+
+    from{
+        transform:
+            translateY(0)
+            rotate(-5deg);
+    }
+
+    to{
+        transform:
+            translateY(-12px)
+            rotate(5deg);
+    }
+}
+
+
+.victoria h1{
+
+    margin:
+        10px 0;
+
+    color:#ff9800;
+
+    font-size:38px;
+}
+
+
+.victoria p{
+
+    font-size:19px;
+
+    font-weight:bold;
+}
+
+
+/* ==========================================================
+   ESCALERAS / SERPIENTES ACTIVAS
+   ========================================================== */
+
+.escalera-activa{
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            #00ff66
+        );
+
+    animation:
+        escaleraGlow
+        .7s
+        infinite alternate;
+}
+
+
+@keyframes escaleraGlow{
+
+    from{
+        opacity:.6;
+    }
+
+    to{
         opacity:1;
     }
 }
 
-.trofeo{
-    font-size:85px;
-    animation:trofeo .9s infinite alternate ease-in-out;
+
+.serpiente-activa{
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            #ff3333
+        );
+
+    animation:
+        serpienteGlow
+        .7s
+        infinite alternate;
 }
 
-@keyframes trofeo{
+
+@keyframes serpienteGlow{
+
     from{
-        transform:translateY(0) rotate(-5deg);
+        opacity:.6;
     }
 
     to{
-        transform:translateY(-12px) rotate(5deg);
+        opacity:1;
     }
 }
 
-.victoria-card h2{
-    font-size:34px;
-    margin:10px 0;
-}
 
-.victoria-card p{
-    font-size:18px;
-    color:#555;
-}
-
-/* ============================================================
+/* ==========================================================
    RESPONSIVE
-   ============================================================ */
+   ========================================================== */
 
-@media(max-width:1000px){
+@media(max-width:1050px){
 
     .juego{
-        grid-template-columns:1fr;
+
+        grid-template-columns:
+            1fr;
+
     }
 
     .panel{
-        max-width:700px;
-        width:100%;
+
+        width:min(
+            700px,
+            100%
+        );
+
         margin:auto;
     }
 
 }
 
+
 @media(max-width:700px){
 
     .app{
-        width:98%;
-        padding-top:12px;
-    }
 
-    .titulo{
-        font-size:27px;
+        width:97%;
     }
 
     .tablero-contenedor{
-        padding:10px;
-    }
 
-    .casilla{
-        font-size:11px;
-    }
-
-    .numero{
-        top:2px;
-        left:3px;
-        font-size:9px;
+        padding:8px;
     }
 
     .pieza{
-        width:25px;
-        height:25px;
-        font-size:10px;
+
+        width:27px;
+
+        height:27px;
+
         border-width:3px;
     }
 
-    .pieza.mia{
-        width:29px;
-        height:29px;
+    .panel{
+
+        padding:15px;
     }
 
 }
 
+
 </style>
+
 </head>
+
 
 <body>
 
+
 <div class="app">
 
-    <div class="titulo">
+
+    <h1 class="titulo">
         🐍 ESCALERAS Y SERPIENTES 🪜
-    </div>
+    </h1>
+
 
     <div class="juego">
 
-        <!-- ====================================================
+
+        <!-- =================================================
              TABLERO
-             ==================================================== -->
+             ================================================= -->
 
         <div class="tablero-contenedor">
 
             <div id="tablero">
 
-                <svg
-                    id="svgElementos"
-                    class="svg-elementos"
-                    viewBox="0 0 100 100"
-                    preserveAspectRatio="none">
-                </svg>
+                <div id="svgElementos"></div>
 
-                <div id="capaFichas" class="capa-fichas"></div>
+                <div id="fichas"></div>
 
             </div>
 
         </div>
 
-        <!-- ====================================================
+
+        <!-- =================================================
              PANEL
-             ==================================================== -->
+             ================================================= -->
 
         <div class="panel">
 
-            <h2>🎮 Partida</h2>
 
-            <div id="estadoConexion" class="estado">
-                🔄 Conectando al servidor...
+            <h2>
+                🎮 Partida
+            </h2>
+
+
+            <div
+                id="estadoConexion"
+                class="estado"
+            >
+                ⏳ Conectando...
             </div>
+
 
             <div class="nombre-box">
 
                 <input
-                    id="nombreInput"
+                    id="nombreJugador"
                     type="text"
-                    maxlength="20"
-                    placeholder="Tu nombre">
+                    maxlength="18"
+                    placeholder="Tu nombre"
+                >
 
-                <button id="btnNombre">
+                <button
+                    id="btnNombre"
+                >
                     OK
                 </button>
 
             </div>
 
-            <!-- DADO -->
 
-            <div class="zona-dado">
+            <div class="dado-contenedor">
 
-                <div class="dado-escena">
+                <div
+                    id="dado3d"
+                    class="dado-3d"
+                >
 
-                    <div id="dado3d" class="dado-3d">
+                    <div
+                        class="cara cara1"
+                    >
+                        1
+                    </div>
 
-                        <div class="cara cara1">
-                            <div class="puntos">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
+                    <div
+                        class="cara cara2"
+                    >
+                        2
+                    </div>
 
-                        <div class="cara cara2">
-                            <div class="puntos">
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                        </div>
+                    <div
+                        class="cara cara3"
+                    >
+                        3
+                    </div>
 
-                        <div class="cara cara3">
-                            <div class="puntos">
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                            </div>
-                        </div>
+                    <div
+                        class="cara cara4"
+                    >
+                        4
+                    </div>
 
-                        <div class="cara cara4">
-                            <div class="puntos">
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                                <span class="punto"></span>
-                            </div>
-                        </div>
+                    <div
+                        class="cara cara5"
+                    >
+                        5
+                    </div>
 
-                        <div class="cara cara5">
-                            <div class="puntos">
-                                <span class="punto"></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span></span>
-                                <span class="punto"></span>
-                            </div>
-                        </div>
-
-                        <div class="cara cara6">
-                            <div class="puntos">
-                                <span class="punto"></span>
-                                <span></span>
-                                <span class="punto"></span>
-                                <span class="punto"></span>
-                                <span class="punto"></span>
-                                <span class="punto"></span>
-                                <span class="span"></span>
-                                <span></span>
-                                <span class="punto"></span>
-                            </div>
-                        </div>
-
+                    <div
+                        class="cara cara6"
+                    >
+                        6
                     </div>
 
                 </div>
 
-                <div
-                    id="resultadoDado"
-                    class="resultado-dado">
-                    🎲
-                </div>
-
             </div>
+
+
+            <div
+                id="resultadoDado"
+                class="resultado"
+            >
+                🎲 Esperando...
+            </div>
+
 
             <button
                 id="btnDado"
-                class="btn btn-dado"
-                disabled>
+                class="accion"
+                disabled
+            >
                 🎲 LANZAR DADO
             </button>
 
+
             <button
                 id="btnReiniciar"
-                class="btn btn-reiniciar">
+                class="accion"
+            >
                 🔄 REINICIAR PARTIDA
             </button>
 
+
             <button
                 id="btnAbandonar"
-                class="btn btn-abandonar">
+                class="accion"
+            >
                 🚪 ABANDONAR
             </button>
 
+
             <div class="jugadores">
 
-                <h3>👥 Jugadores</h3>
+                <h3>
+                    👥 Jugadores
+                </h3>
 
                 <div id="listaJugadores"></div>
 
             </div>
 
+
         </div>
+
 
     </div>
 
 </div>
 
-<!-- ============================================================
+
+<!-- ==========================================================
      VICTORIA
-     ============================================================ -->
+     ========================================================== -->
 
-<div id="victoria" class="victoria">
+<div
+    id="victoria"
+    class="victoria oculto"
+>
 
-    <div class="victoria-card">
+    <div class="victoria-box">
 
         <div class="trofeo">
             🏆
         </div>
 
-        <h2 id="textoVictoria">
-            ¡Ganaste!
-        </h2>
+        <h1>
+            ¡VICTORIA!
+        </h1>
 
-        <p>
-            Has llegado a la casilla 100.
+        <p id="textoVictoria">
+            ¡Has ganado!
         </p>
 
         <button
             id="btnVictoriaReiniciar"
-            class="btn btn-reiniciar">
+            class="accion"
+            style="background:#43a047;color:white;"
+        >
             🔄 JUGAR DE NUEVO
         </button>
 
@@ -931,11 +1359,13 @@ body{
 
 </div>
 
+
 <script>
 
-/* ============================================================
-   CONFIGURACIÓN
-   ============================================================ */
+
+// ============================================================
+// CONFIGURACIÓN
+// ============================================================
 
 const SERVER_URL =
     "wss://serpientes-escaleras-phl7.onrender.com";
@@ -944,11 +1374,17 @@ const SERVER_URL =
 const ESCALERAS = {
 
     4:25,
+
     13:46,
+
     33:49,
+
     42:63,
+
     50:69,
+
     62:81,
+
     74:92
 
 };
@@ -957,12 +1393,19 @@ const ESCALERAS = {
 const SERPIENTES = {
 
     27:5,
+
     40:3,
+
     43:18,
+
     54:31,
+
     66:45,
+
     76:58,
+
     89:53,
+
     99:41
 
 };
@@ -971,18 +1414,116 @@ const SERPIENTES = {
 const COLORES = [
 
     "#e53935",
+
     "#1976d2",
+
     "#43a047",
+
     "#8e24aa"
 
 ];
 
 
-/* ============================================================
-   VARIABLES
-   ============================================================ */
+// ============================================================
+// DOM
+// ============================================================
+
+const tablero =
+    document.getElementById(
+        "tablero"
+    );
+
+
+const svgElementos =
+    document.getElementById(
+        "svgElementos"
+    );
+
+
+const fichas =
+    document.getElementById(
+        "fichas"
+    );
+
+
+const estadoConexion =
+    document.getElementById(
+        "estadoConexion"
+    );
+
+
+const nombreJugador =
+    document.getElementById(
+        "nombreJugador"
+    );
+
+
+const btnNombre =
+    document.getElementById(
+        "btnNombre"
+    );
+
+
+const btnDado =
+    document.getElementById(
+        "btnDado"
+    );
+
+
+const btnReiniciar =
+    document.getElementById(
+        "btnReiniciar"
+    );
+
+
+const btnAbandonar =
+    document.getElementById(
+        "btnAbandonar"
+    );
+
+
+const listaJugadores =
+    document.getElementById(
+        "listaJugadores"
+    );
+
+
+const dado3d =
+    document.getElementById(
+        "dado3d"
+    );
+
+
+const resultadoDado =
+    document.getElementById(
+        "resultadoDado"
+    );
+
+
+const victoria =
+    document.getElementById(
+        "victoria"
+    );
+
+
+const textoVictoria =
+    document.getElementById(
+        "textoVictoria"
+    );
+
+
+const btnVictoriaReiniciar =
+    document.getElementById(
+        "btnVictoriaReiniciar"
+    );
+
+
+// ============================================================
+// ESTADO
+// ============================================================
 
 let socket = null;
+
 
 let estado = {
 
@@ -1001,132 +1542,106 @@ let estado = {
 
 };
 
+
 let posicionesVisuales = {};
+
 
 let animando = false;
 
+
 let abandonando = false;
+
 
 let ultimaPosicionGanador = null;
 
 
-/*
-    IMPORTANTE:
-
-    dadoTerminado indica si el dado ya terminó completamente.
-
-    resultadoDadoPendiente guarda el movimiento de la ficha
-    mientras el dado todavía está girando.
-*/
-
 let dadoTerminado = true;
+
 
 let resultadoDadoPendiente = null;
 
 
-/* ============================================================
-   ELEMENTOS HTML
-   ============================================================ */
-
-const tablero =
-    document.getElementById("tablero");
-
-const capaFichas =
-    document.getElementById("capaFichas");
-
-const svgElementos =
-    document.getElementById("svgElementos");
-
-const estadoConexion =
-    document.getElementById("estadoConexion");
-
-const nombreInput =
-    document.getElementById("nombreInput");
-
-const btnNombre =
-    document.getElementById("btnNombre");
-
-const btnDado =
-    document.getElementById("btnDado");
-
-const btnReiniciar =
-    document.getElementById("btnReiniciar");
-
-const btnAbandonar =
-    document.getElementById("btnAbandonar");
-
-const btnVictoriaReiniciar =
-    document.getElementById("btnVictoriaReiniciar");
-
-const listaJugadores =
-    document.getElementById("listaJugadores");
-
-const dado3d =
-    document.getElementById("dado3d");
-
-const resultadoDado =
-    document.getElementById("resultadoDado");
-
-const victoria =
-    document.getElementById("victoria");
-
-const textoVictoria =
-    document.getElementById("textoVictoria");
-
-
-/* ============================================================
-   UTILIDADES
-   ============================================================ */
+// ============================================================
+// UTILIDADES
+// ============================================================
 
 function dormir(ms){
 
-    return new Promise(resolve =>
-        setTimeout(resolve,ms)
+    return new Promise(
+        resolver =>
+            setTimeout(
+                resolver,
+                ms
+            )
     );
 
 }
 
 
-/* ============================================================
-   TABLERO
-   ============================================================ */
+function escapeHTML(texto){
+
+    return String(texto)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+// ============================================================
+// TABLERO
+// ============================================================
 
 function crearTablero(){
 
-    tablero
-        .querySelectorAll(".casilla")
-        .forEach(elemento =>
+    tablero.querySelectorAll(
+        ".casilla"
+    ).forEach(
+        elemento =>
             elemento.remove()
-        );
+    );
 
 
     for(
-        let numero = 1;
-        numero <= 100;
-        numero++
+        let numero = 100;
+        numero >= 1;
+        numero--
     ){
 
         const casilla =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         casilla.className =
             "casilla";
 
+
         casilla.dataset.numero =
             numero;
 
-        const numeroTexto =
-            document.createElement("span");
 
-        numeroTexto.className =
+        const numeroElemento =
+            document.createElement(
+                "span"
+            );
+
+
+        numeroElemento.className =
             "numero";
 
-        numeroTexto.textContent =
+
+        numeroElemento.textContent =
             numero;
 
+
         casilla.appendChild(
-            numeroTexto
+            numeroElemento
         );
+
 
         tablero.insertBefore(
             casilla,
@@ -1137,17 +1652,6 @@ function crearTablero(){
 
 }
 
-
-/*
-    Convierte número de casilla
-    a coordenadas porcentuales.
-
-    El tablero usa zigzag:
-    1 -> izquierda abajo
-    10 -> derecha abajo
-    11 -> derecha segunda fila
-    etc.
-*/
 
 function posicionCasilla(numero){
 
@@ -1160,31 +1664,44 @@ function posicionCasilla(numero){
             )
         );
 
+
     const indice =
         numero - 1;
 
+
     const fila =
-        Math.floor(indice / 10);
+        Math.floor(
+            indice / 10
+        );
+
 
     const columna =
         indice % 10;
 
+
     const filaVisual =
         9 - fila;
 
+
     let columnaVisual;
 
-    if(fila % 2 === 0){
+
+    if(
+        fila % 2 === 0
+    ){
 
         columnaVisual =
             columna;
 
-    }else{
+    }
+
+    else{
 
         columnaVisual =
             9 - columna;
 
     }
+
 
     return {
 
@@ -1199,489 +1716,571 @@ function posicionCasilla(numero){
 }
 
 
-/* ============================================================
-   SVG
-   ============================================================ */
+function centroCasilla(numero){
 
-function crearLinea(
-    x1,
-    y1,
-    x2,
-    y2,
-    color,
-    grosor=1
-){
-
-    const linea =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "line"
-        );
-
-    linea.setAttribute(
-        "x1",
-        x1
+    return posicionCasilla(
+        numero
     );
-
-    linea.setAttribute(
-        "y1",
-        y1
-    );
-
-    linea.setAttribute(
-        "x2",
-        x2
-    );
-
-    linea.setAttribute(
-        "y2",
-        y2
-    );
-
-    linea.setAttribute(
-        "stroke",
-        color
-    );
-
-    linea.setAttribute(
-        "stroke-width",
-        grosor
-    );
-
-    linea.setAttribute(
-        "stroke-linecap",
-        "round"
-    );
-
-    return linea;
 
 }
 
 
-/* ============================================================
-   ESCALERAS
-   ============================================================ */
+// ============================================================
+// SVG
+// ============================================================
 
-function dibujarEscalera(
-    desde,
-    hasta
-){
+function crearSVG(){
 
-    const inicio =
-        posicionCasilla(desde);
+    svgElementos.innerHTML = `
 
-    const final =
-        posicionCasilla(hasta);
+        <svg
+            id="svgTablero"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            width="100%"
+            height="100%"
+        >
 
-    const grupo =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "g"
-        );
+            <g id="grupoEscaleras"></g>
 
-    grupo.dataset.tipo =
-        "escalera";
+            <g id="grupoSerpientes"></g>
 
-    grupo.dataset.desde =
-        desde;
+        </svg>
 
-    grupo.dataset.hasta =
-        hasta;
+    `;
 
-    grupo.classList.add(
-        "escalera-svg"
-    );
+}
 
 
-    const dx =
-        final.x - inicio.x;
+function dibujarElementos(){
 
-    const dy =
-        final.y - inicio.y;
-
-    const distancia =
-        Math.sqrt(
-            dx*dx +
-            dy*dy
-        );
-
-    if(distancia === 0){
-        return grupo;
-    }
-
-
-    const nx =
-        -dy / distancia;
-
-    const ny =
-        dx / distancia;
-
-
-    const separacion =
-        1.4;
-
-
-    const rail1 =
-        crearLinea(
-            inicio.x + nx*separacion,
-            inicio.y + ny*separacion,
-            final.x + nx*separacion,
-            final.y + ny*separacion,
-            "#1eaa45",
-            1.2
+    const svg =
+        document.getElementById(
+            "svgTablero"
         );
 
 
-    const rail2 =
-        crearLinea(
-            inicio.x - nx*separacion,
-            inicio.y - ny*separacion,
-            final.x - nx*separacion,
-            final.y - ny*separacion,
-            "#1eaa45",
-            1.2
+    if(!svg) return;
+
+
+    const grupoEscaleras =
+        document.getElementById(
+            "grupoEscaleras"
         );
 
 
-    grupo.appendChild(
-        rail1
-    );
-
-    grupo.appendChild(
-        rail2
-    );
+    const grupoSerpientes =
+        document.getElementById(
+            "grupoSerpientes"
+        );
 
 
-    const peldaños = 7;
+    grupoEscaleras.innerHTML = "";
+
+
+    grupoSerpientes.innerHTML = "";
 
 
     for(
-        let i=1;
-        i<peldaños;
-        i++
+        const [desde,hasta]
+        of Object.entries(
+            ESCALERAS
+        )
     ){
 
-        const t =
-            i / peldaños;
-
-        const cx =
-            inicio.x +
-            dx*t;
-
-        const cy =
-            inicio.y +
-            dy*t;
+        const a =
+            centroCasilla(
+                Number(desde)
+            );
 
 
-        const peldaño =
-            crearLinea(
-                cx + nx*separacion,
-                cy + ny*separacion,
-                cx - nx*separacion,
-                cy - ny*separacion,
-                "#26c65b",
+        const b =
+            centroCasilla(
+                Number(hasta)
+            );
+
+
+        const dx =
+            b.x - a.x;
+
+
+        const dy =
+            b.y - a.y;
+
+
+        const longitud =
+            Math.sqrt(
+                dx*dx + dy*dy
+            );
+
+
+        const angulo =
+            Math.atan2(
+                dy,
+                dx
+            ) *
+            180 /
+            Math.PI;
+
+
+        const x1 =
+            a.x -
+            1.5 *
+            Math.sin(
+                angulo *
+                Math.PI /
+                180
+            );
+
+
+        const y1 =
+            a.y +
+            1.5 *
+            Math.cos(
+                angulo *
+                Math.PI /
+                180
+            );
+
+
+        const x2 =
+            b.x -
+            1.5 *
+            Math.sin(
+                angulo *
+                Math.PI /
+                180
+            );
+
+
+        const y2 =
+            b.y +
+            1.5 *
+            Math.cos(
+                angulo *
+                Math.PI /
+                180
+            );
+
+
+        const rail1 =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "line"
+            );
+
+
+        rail1.setAttribute(
+            "x1",
+            x1
+        );
+
+        rail1.setAttribute(
+            "y1",
+            y1
+        );
+
+        rail1.setAttribute(
+            "x2",
+            x2
+        );
+
+        rail1.setAttribute(
+            "y2",
+            y2
+        );
+
+        rail1.setAttribute(
+            "stroke",
+            "#1eaa4d"
+        );
+
+        rail1.setAttribute(
+            "stroke-width",
+            "1.5"
+        );
+
+        rail1.setAttribute(
+            "stroke-linecap",
+            "round"
+        );
+
+
+        const rail2 =
+            rail1.cloneNode();
+
+
+        rail2.setAttribute(
+            "x1",
+            a.x +
+            1.5 *
+            Math.sin(
+                angulo *
+                Math.PI /
+                180
+            )
+        );
+
+
+        rail2.setAttribute(
+            "y1",
+            a.y -
+            1.5 *
+            Math.cos(
+                angulo *
+                Math.PI /
+                180
+            )
+        );
+
+
+        rail2.setAttribute(
+            "x2",
+            b.x +
+            1.5 *
+            Math.sin(
+                angulo *
+                Math.PI /
+                180
+            )
+        );
+
+
+        rail2.setAttribute(
+            "y2",
+            b.y -
+            1.5 *
+            Math.cos(
+                angulo *
+                Math.PI /
+                180
+            )
+        );
+
+
+        grupoEscaleras.appendChild(
+            rail1
+        );
+
+        grupoEscaleras.appendChild(
+            rail2
+        );
+
+
+        const cantidadEscalones =
+            Math.max(
+                3,
+                Math.floor(
+                    longitud / 5
+                )
+            );
+
+
+        for(
+            let i = 1;
+            i < cantidadEscalones;
+            i++
+        ){
+
+            const t =
+                i /
+                cantidadEscalones;
+
+
+            const cx =
+                a.x +
+                dx * t;
+
+
+            const cy =
+                a.y +
+                dy * t;
+
+
+            const rung =
+                document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "line"
+                );
+
+
+            rung.setAttribute(
+                "x1",
+                cx -
+                2.5 *
+                Math.sin(
+                    angulo *
+                    Math.PI /
+                    180
+                )
+            );
+
+
+            rung.setAttribute(
+                "y1",
+                cy +
+                2.5 *
+                Math.cos(
+                    angulo *
+                    Math.PI /
+                    180
+                )
+            );
+
+
+            rung.setAttribute(
+                "x2",
+                cx +
+                2.5 *
+                Math.sin(
+                    angulo *
+                    Math.PI /
+                    180
+                )
+            );
+
+
+            rung.setAttribute(
+                "y2",
+                cy -
+                2.5 *
+                Math.cos(
+                    angulo *
+                    Math.PI /
+                    180
+                )
+            );
+
+
+            rung.setAttribute(
+                "stroke",
+                "#27b957"
+            );
+
+
+            rung.setAttribute(
+                "stroke-width",
+                "1"
+            );
+
+
+            grupoEscaleras.appendChild(
+                rung
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
+    // SERPIENTES
+    // ========================================================
+
+    for(
+        const [desde,hasta]
+        of Object.entries(
+            SERPIENTES
+        )
+    ){
+
+        const a =
+            centroCasilla(
+                Number(desde)
+            );
+
+
+        const b =
+            centroCasilla(
+                Number(hasta)
+            );
+
+
+        const dx =
+            b.x - a.x;
+
+
+        const dy =
+            b.y - a.y;
+
+
+        const longitud =
+            Math.sqrt(
+                dx*dx + dy*dy
+            );
+
+
+        const normalX =
+            -dy /
+            Math.max(
+                longitud,
                 1
             );
 
 
-        grupo.appendChild(
-            peldaño
-        );
+        const normalY =
+            dx /
+            Math.max(
+                longitud,
+                1
+            );
 
-    }
 
+        const puntos = [];
 
-    svgElementos.appendChild(
-        grupo
-    );
 
-}
+        const pasos =
+            Math.max(
+                8,
+                Math.floor(
+                    longitud / 3
+                )
+            );
 
 
-/* ============================================================
-   SERPIENTES
-   ============================================================ */
+        for(
+            let i=0;
+            i<=pasos;
+            i++
+        ){
 
-function dibujarSerpiente(
-    desde,
-    hasta
-){
+            const t =
+                i /
+                pasos;
 
-    const inicio =
-        posicionCasilla(desde);
 
-    const final =
-        posicionCasilla(hasta);
+            const curva =
+                Math.sin(
+                    t *
+                    Math.PI *
+                    4
+                ) *
+                2.5;
 
-    const grupo =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "g"
-        );
 
-    grupo.dataset.tipo =
-        "serpiente";
+            puntos.push(
 
-    grupo.dataset.desde =
-        desde;
+                `${
+                    a.x +
+                    dx*t +
+                    normalX*curva
+                },${
+                    a.y +
+                    dy*t +
+                    normalY*curva
+                }`
 
-    grupo.dataset.hasta =
-        hasta;
-
-    grupo.classList.add(
-        "serpiente-svg"
-    );
-
-
-    const path =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "path"
-        );
-
-
-    const dx =
-        final.x - inicio.x;
-
-    const dy =
-        final.y - inicio.y;
-
-
-    const longitud =
-        Math.sqrt(
-            dx*dx +
-            dy*dy
-        );
-
-
-    const nx =
-        -dy / Math.max(
-            longitud,
-            1
-        );
-
-    const ny =
-        dx / Math.max(
-            longitud,
-            1
-        );
-
-
-    const amplitud =
-        Math.min(
-            6,
-            longitud * .25
-        );
-
-
-    const puntos = [];
-
-    const segmentos = 20;
-
-
-    for(
-        let i=0;
-        i<=segmentos;
-        i++
-    ){
-
-        const t =
-            i / segmentos;
-
-        const baseX =
-            inicio.x +
-            dx*t;
-
-        const baseY =
-            inicio.y +
-            dy*t;
-
-        const onda =
-            Math.sin(
-                t * Math.PI * 4
-            ) *
-            amplitud *
-            (1 - Math.abs(
-                t-.5
-            )*.5);
-
-        puntos.push({
-
-            x:
-                baseX +
-                nx*onda,
-
-            y:
-                baseY +
-                ny*onda
-
-        });
-
-    }
-
-
-    let d =
-        `M ${puntos[0].x} ${puntos[0].y}`;
-
-
-    for(
-        let i=1;
-        i<puntos.length;
-        i++
-    ){
-
-        d +=
-            ` L ${puntos[i].x} ${puntos[i].y}`;
-
-    }
-
-
-    path.setAttribute(
-        "d",
-        d
-    );
-
-    path.setAttribute(
-        "fill",
-        "none"
-    );
-
-    path.setAttribute(
-        "stroke",
-        "#d23232"
-    );
-
-    path.setAttribute(
-        "stroke-width",
-        "1.7"
-    );
-
-    path.setAttribute(
-        "stroke-linecap",
-        "round"
-    );
-
-
-    grupo.appendChild(
-        path
-    );
-
-
-    /*
-        Cabeza
-    */
-
-    const cabeza =
-        document.createElementNS(
-            "http://www.w3.org/2000/svg",
-            "circle"
-        );
-
-    cabeza.setAttribute(
-        "cx",
-        inicio.x
-    );
-
-    cabeza.setAttribute(
-        "cy",
-        inicio.y
-    );
-
-    cabeza.setAttribute(
-        "r",
-        "2"
-    );
-
-    cabeza.setAttribute(
-        "fill",
-        "#c62828"
-    );
-
-
-    grupo.appendChild(
-        cabeza
-    );
-
-
-    svgElementos.appendChild(
-        grupo
-    );
-
-}
-
-
-/* ============================================================
-   DIBUJAR TODOS LOS ELEMENTOS
-   ============================================================ */
-
-function dibujarElementos(){
-
-    svgElementos.innerHTML = "";
-
-
-    Object.entries(
-        ESCALERAS
-    ).forEach(
-        ([desde,hasta]) => {
-
-            dibujarEscalera(
-                Number(desde),
-                Number(hasta)
             );
 
         }
-    );
 
 
-    Object.entries(
-        SERPIENTES
-    ).forEach(
-        ([desde,hasta]) => {
-
-            dibujarSerpiente(
-                Number(desde),
-                Number(hasta)
+        const cuerpo =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "polyline"
             );
 
-        }
-    );
+
+        cuerpo.setAttribute(
+            "points",
+            puntos.join(" ")
+        );
+
+
+        cuerpo.setAttribute(
+            "fill",
+            "none"
+        );
+
+
+        cuerpo.setAttribute(
+            "stroke",
+            "#d23232"
+        );
+
+
+        cuerpo.setAttribute(
+            "stroke-width",
+            "3"
+        );
+
+
+        cuerpo.setAttribute(
+            "stroke-linecap",
+            "round"
+        );
+
+
+        cuerpo.setAttribute(
+            "stroke-linejoin",
+            "round"
+        );
+
+
+        grupoSerpientes.appendChild(
+            cuerpo
+        );
+
+
+        const cabeza =
+            document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "circle"
+            );
+
+
+        cabeza.setAttribute(
+            "cx",
+            a.x
+        );
+
+
+        cabeza.setAttribute(
+            "cy",
+            a.y
+        );
+
+
+        cabeza.setAttribute(
+            "r",
+            "2.5"
+        );
+
+
+        cabeza.setAttribute(
+            "fill",
+            "#a51f1f"
+        );
+
+
+        grupoSerpientes.appendChild(
+            cabeza
+        );
+
+    }
 
 }
 
 
-/* ============================================================
-   DATOS DE JUGADOR
-   ============================================================ */
+// ============================================================
+// JUGADORES
+// ============================================================
 
-function obtenerPosicionJugador(
-    jugador
+function obtenerJugador(
+    jugadores,
+    id
 ){
 
-    if(!jugador){
-        return 1;
-    }
+    if(!jugadores)
+        return null;
 
-    if(
-        jugador.posicion !== undefined
-    ){
 
-        return Number(
-            jugador.posicion
-        );
-
-    }
-
-    if(
-        jugador.casilla !== undefined
-    ){
-
-        return Number(
-            jugador.casilla
-        );
-
-    }
-
-    return 1;
+    return (
+        jugadores[id] ||
+        jugadores[String(id)] ||
+        null
+    );
 
 }
 
@@ -1700,7 +2299,43 @@ function obtenerNombreJugador(
 
     }
 
+
     return `Jugador ${id}`;
+
+}
+
+
+function obtenerPosicionJugador(
+    jugador
+){
+
+    if(!jugador)
+        return 1;
+
+
+    if(
+        jugador.posicion !== undefined
+    ){
+
+        return Number(
+            jugador.posicion
+        );
+
+    }
+
+
+    if(
+        jugador.casilla !== undefined
+    ){
+
+        return Number(
+            jugador.casilla
+        );
+
+    }
+
+
+    return 1;
 
 }
 
@@ -1719,179 +2354,685 @@ function obtenerColorJugador(
 
     }
 
-    const indice =
-        (Number(id)-1) %
-        COLORES.length;
 
     return COLORES[
-        indice
+        (Number(id)-1)
+        %
+        COLORES.length
     ];
 
 }
 
 
-/* ============================================================
-   POSICIÓN VISUAL
-   ============================================================ */
-
-function obtenerJugador(
-    jugadores,
-    id
-){
-
-    if(!jugadores){
-        return null;
-    }
-
-    return (
-        jugadores[id] ??
-        jugadores[String(id)] ??
-        null
-    );
-
-}
-
-
-/* ============================================================
-   RENDERIZAR FICHAS
-   ============================================================ */
+// ============================================================
+// RENDERIZAR JUGADORES
+// ============================================================
 
 function renderizarFichas(){
+
+    fichas.innerHTML = "";
+
 
     const jugadores =
         estado.jugadores || {};
 
 
     const ids =
-        Object.keys(jugadores);
+        Object.keys(
+            jugadores
+        );
 
 
-    ids.forEach(id => {
+    const gruposCasilla = {};
 
-        const jugador =
-            jugadores[id];
 
-        const posicion =
-            obtenerPosicionJugador(
-                jugador
+    ids.forEach(
+        id => {
+
+            const jugador =
+                jugadores[id];
+
+
+            const posicion =
+                obtenerPosicionJugador(
+                    jugador
+                );
+
+
+            if(
+                !gruposCasilla[posicion]
+            ){
+
+                gruposCasilla[posicion] =
+                    [];
+
+            }
+
+
+            gruposCasilla[posicion].push(
+                id
             );
 
+        }
+    );
 
-        if(
-            posicionesVisuales[id] ===
-            undefined
-        ){
+
+    ids.forEach(
+        id => {
+
+            const jugador =
+                jugadores[id];
+
+
+            const posicion =
+                obtenerPosicionJugador(
+                    jugador
+                );
+
+
+            const p =
+                posicionCasilla(
+                    posicion
+                );
+
+
+            const ficha =
+                document.createElement(
+                    "div"
+                );
+
+
+            ficha.className =
+                "pieza";
+
+
+            if(
+                Number(id) ===
+                Number(estado.mi_id)
+            ){
+
+                ficha.classList.add(
+                    "mia"
+                );
+
+            }
+
+
+            ficha.id =
+                `pieza-${id}`;
+
+
+            ficha.style.background =
+                obtenerColorJugador(
+                    jugador,
+                    id
+                );
+
+
+            const grupo =
+                gruposCasilla[
+                    posicion
+                ];
+
+
+            const indice =
+                grupo.indexOf(
+                    id
+                );
+
+
+            const offsets = [
+
+                [0,0],
+
+                [-2.2,-2.2],
+
+                [2.2,2.2],
+
+                [-2.2,2.2]
+
+            ];
+
+
+            const offset =
+                offsets[
+                    indice %
+                    offsets.length
+                ];
+
+
+            ficha.style.left =
+                `${p.x + offset[0]}%`;
+
+
+            ficha.style.top =
+                `${p.y + offset[1]}%`;
+
+
+            fichas.appendChild(
+                ficha
+            );
+
 
             posicionesVisuales[id] =
                 posicion;
 
         }
-
-
-        let ficha =
-            document.getElementById(
-                `pieza-${id}`
-            );
-
-
-        if(!ficha){
-
-            ficha =
-                document.createElement(
-                    "div"
-                );
-
-            ficha.id =
-                `pieza-${id}`;
-
-            ficha.className =
-                "pieza";
-
-            capaFichas.appendChild(
-                ficha
-            );
-
-        }
-
-
-        if(
-            Number(id) ===
-            Number(estado.mi_id)
-        ){
-
-            ficha.classList.add(
-                "mia"
-            );
-
-        }else{
-
-            ficha.classList.remove(
-                "mia"
-            );
-
-        }
-
-
-        ficha.textContent =
-            id;
-
-
-        ficha.style.background =
-            obtenerColorJugador(
-                jugador,
-                id
-            );
-
-
-        const pos =
-            posicionCasilla(
-                posicionesVisuales[id]
-            );
-
-
-        ficha.style.left =
-            `${pos.x}%`;
-
-        ficha.style.top =
-            `${pos.y}%`;
-
-    });
-
-
-    /*
-        Elimina fichas que ya no existen.
-    */
-
-    Array.from(
-        capaFichas.children
-    ).forEach(ficha => {
-
-        const id =
-            ficha.id.replace(
-                "pieza-",
-                ""
-            );
-
-        if(
-            !jugadores[id]
-        ){
-
-            ficha.remove();
-
-            delete posicionesVisuales[
-                id
-            ];
-
-        }
-
-    });
+    );
 
 }
 
 
-/* ============================================================
-   MOVIMIENTO SUAVE
-   ============================================================ */
+// ============================================================
+// RENDERIZAR LISTA
+// ============================================================
+
+function renderizarJugadores(){
+
+    listaJugadores.innerHTML = "";
+
+
+    const jugadores =
+        estado.jugadores || {};
+
+
+    const ids =
+        Object.keys(
+            jugadores
+        ).sort(
+            (a,b) =>
+                Number(a) -
+                Number(b)
+        );
+
+
+    if(ids.length === 0){
+
+        listaJugadores.innerHTML =
+            "<div style='opacity:.6'>Esperando jugadores...</div>";
+
+        return;
+
+    }
+
+
+    ids.forEach(
+        id => {
+
+            const jugador =
+                jugadores[id];
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "jugador";
+
+
+            if(
+                Number(id) ===
+                Number(estado.turno)
+            ){
+
+                item.classList.add(
+                    "turno"
+                );
+
+                item.style.border =
+                    "3px solid #ffd600";
+
+                item.style.background =
+                    "#fff8d6";
+
+            }
+
+
+            const color =
+                document.createElement(
+                    "span"
+                );
+
+
+            color.className =
+                "color";
+
+
+            color.style.background =
+                obtenerColorJugador(
+                    jugador,
+                    id
+                );
+
+
+            const nombre =
+                document.createElement(
+                    "span"
+                );
+
+
+            nombre.className =
+                "nombre";
+
+
+            nombre.textContent =
+                obtenerNombreJugador(
+                    jugador,
+                    id
+                );
+
+
+            if(
+                Number(id) ===
+                Number(estado.turno)
+            ){
+
+                nombre.textContent +=
+                    " 🎲 TURNO";
+
+            }
+
+
+            if(
+                Number(id) ===
+                Number(estado.mi_id)
+            ){
+
+                nombre.textContent +=
+                    " ⭐";
+
+            }
+
+
+            const casilla =
+                document.createElement(
+                    "span"
+                );
+
+
+            casilla.className =
+                "casilla";
+
+
+            casilla.textContent =
+                `Casilla ${
+                    obtenerPosicionJugador(
+                        jugador
+                    )
+                }`;
+
+
+            item.appendChild(
+                color
+            );
+
+
+            item.appendChild(
+                nombre
+            );
+
+
+            item.appendChild(
+                casilla
+            );
+
+
+            listaJugadores.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// ESTADO / TURNOS
+// ============================================================
+
+function actualizarMensajeEstado(){
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        estadoConexion.textContent =
+            "🏆 Partida terminada";
+
+
+        estadoConexion.style.background =
+            "#fff8e1";
+
+
+        estadoConexion.style.borderColor =
+            "#ffca28";
+
+
+        return;
+
+    }
+
+
+    if(
+        !estado.jugadores ||
+        Object.keys(
+            estado.jugadores
+        ).length === 0
+    ){
+
+        estadoConexion.textContent =
+            "⏳ Esperando jugadores...";
+
+
+        estadoConexion.style.background =
+            "#edf6ff";
+
+
+        estadoConexion.style.borderColor =
+            "#90caf9";
+
+
+        return;
+
+    }
+
+
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        estadoConexion.textContent =
+            "⏳ Preparando turno...";
+
+        return;
+
+    }
+
+
+    const jugadorTurno =
+        obtenerJugador(
+            estado.jugadores,
+            estado.turno
+        );
+
+
+    const nombre =
+        obtenerNombreJugador(
+            jugadorTurno,
+            estado.turno
+        );
+
+
+    if(
+        Number(estado.turno) ===
+        Number(estado.mi_id)
+    ){
+
+        estadoConexion.textContent =
+            "🟢 ¡ES TU TURNO! 🎲";
+
+
+        estadoConexion.style.background =
+            "#e8f5e9";
+
+
+        estadoConexion.style.borderColor =
+            "#81c784";
+
+    }
+
+    else{
+
+        estadoConexion.textContent =
+            `🔵 Turno de ${nombre} 🎲`;
+
+
+        estadoConexion.style.background =
+            "#edf6ff";
+
+
+        estadoConexion.style.borderColor =
+            "#90caf9";
+
+    }
+
+}
+
+
+// ============================================================
+// BOTÓN DADO
+// ============================================================
+
+function actualizarBotonDado(){
+
+    if(
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(animando){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.mi_id === null ||
+        estado.mi_id === undefined
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    btnDado.disabled =
+        Number(
+            estado.turno
+        ) !==
+        Number(
+            estado.mi_id
+        );
+
+}
+
+
+// ============================================================
+// DADO
+// ============================================================
+
+const ROTACIONES_DADO = {
+
+    1:
+        "rotateX(0deg) rotateY(0deg) rotateZ(0deg)",
+
+    2:
+        "rotateX(0deg) rotateY(-90deg) rotateZ(0deg)",
+
+    3:
+        "rotateX(0deg) rotateY(180deg) rotateZ(0deg)",
+
+    4:
+        "rotateX(0deg) rotateY(90deg) rotateZ(0deg)",
+
+    5:
+        "rotateX(-90deg) rotateY(0deg) rotateZ(0deg)",
+
+    6:
+        "rotateX(90deg) rotateY(0deg) rotateZ(0deg)"
+
+};
+
+
+function mostrarCaraDado(
+    numero
+){
+
+    dado3d.style.transform =
+        ROTACIONES_DADO[
+            numero
+        ] ||
+        ROTACIONES_DADO[1];
+
+}
+
+
+async function animarDado(
+    resultado
+){
+
+    dadoTerminado = false;
+
+
+    btnDado.disabled = true;
+
+
+    dado3d.classList.add(
+        "lanzando"
+    );
+
+
+    resultadoDado.textContent =
+        "🎲 Lanzando...";
+
+
+    resultadoDado.classList.remove(
+        "mensaje-efecto"
+    );
+
+
+    const rondas = 20;
+
+
+    for(
+        let i=0;
+        i<rondas;
+        i++
+    ){
+
+        const cara =
+            1 +
+            Math.floor(
+                Math.random()*6
+            );
+
+
+        mostrarCaraDado(
+            cara
+        );
+
+
+        await dormir(100);
+
+    }
+
+
+    dado3d.classList.remove(
+        "lanzando"
+    );
+
+
+    mostrarCaraDado(
+        Number(resultado)
+    );
+
+
+    resultadoDado.textContent =
+        `🎲 Salió ${resultado}`;
+
+
+    resultadoDado.classList.remove(
+        "mensaje-efecto"
+    );
+
+
+    void resultadoDado.offsetWidth;
+
+
+    resultadoDado.classList.add(
+        "mensaje-efecto"
+    );
+
+
+    // IMPORTANTE:
+    // El dado termina completamente antes
+    // de mover la ficha.
+
+    await dormir(900);
+
+
+    dadoTerminado = true;
+
+
+    if(
+        resultadoDadoPendiente
+    ){
+
+        const movimiento =
+            resultadoDadoPendiente;
+
+
+        resultadoDadoPendiente =
+            null;
+
+
+        await ejecutarMovimientoPendiente(
+            movimiento
+        );
+
+    }
+
+
+    actualizarBotonDado();
+
+}
+
+
+// ============================================================
+// MOVIMIENTO SUAVE
+// ============================================================
 
 function easeInOutCubic(t){
 
@@ -1915,124 +3056,137 @@ function moverElementoSuave(
     duracion=450
 ){
 
-    return new Promise(resolve => {
+    return new Promise(
+        resolver => {
 
-        const ficha =
-            document.getElementById(
-                `pieza-${id}`
-            );
-
-
-        if(!ficha){
-
-            resolve();
-
-            return;
-
-        }
-
-
-        const inicio =
-            posicionCasilla(
-                desde
-            );
-
-        const final =
-            posicionCasilla(
-                hasta
-            );
-
-
-        ficha.classList.add(
-            "moviendo"
-        );
-
-
-        const tiempoInicio =
-            performance.now();
-
-
-        function animar(
-            tiempoActual
-        ){
-
-            const progreso =
-                Math.min(
-                    1,
-                    (
-                        tiempoActual -
-                        tiempoInicio
-                    ) / duracion
+            const elemento =
+                document.getElementById(
+                    `pieza-${id}`
                 );
 
 
-            const suavizado =
-                easeInOutCubic(
-                    progreso
-                );
+            if(!elemento){
 
+                resolver();
 
-            const x =
-                inicio.x +
-                (
-                    final.x -
-                    inicio.x
-                ) *
-                suavizado;
-
-
-            const y =
-                inicio.y +
-                (
-                    final.y -
-                    inicio.y
-                ) *
-                suavizado;
-
-
-            ficha.style.left =
-                `${x}%`;
-
-            ficha.style.top =
-                `${y}%`;
-
-
-            if(
-                progreso < 1
-            ){
-
-                requestAnimationFrame(
-                    animar
-                );
-
-            }else{
-
-                ficha.classList.remove(
-                    "moviendo"
-                );
-
-                posicionesVisuales[id] =
-                    hasta;
-
-                resolve();
+                return;
 
             }
 
+
+            const inicio =
+                posicionCasilla(
+                    desde
+                );
+
+
+            const fin =
+                posicionCasilla(
+                    hasta
+                );
+
+
+            const comienzo =
+                performance.now();
+
+
+            elemento.classList.add(
+                "moviendo"
+            );
+
+
+            function animar(
+                tiempo
+            ){
+
+                const progreso =
+                    Math.min(
+                        1,
+                        (
+                            tiempo -
+                            comienzo
+                        ) /
+                        duracion
+                    );
+
+
+                const suave =
+                    easeInOutCubic(
+                        progreso
+                    );
+
+
+                const x =
+                    inicio.x +
+                    (
+                        fin.x -
+                        inicio.x
+                    ) *
+                    suave;
+
+
+                const y =
+                    inicio.y +
+                    (
+                        fin.y -
+                        inicio.y
+                    ) *
+                    suave;
+
+
+                elemento.style.left =
+                    `${x}%`;
+
+
+                elemento.style.top =
+                    `${y}%`;
+
+
+                if(
+                    progreso < 1
+                ){
+
+                    requestAnimationFrame(
+                        animar
+                    );
+
+                }
+
+                else{
+
+                    elemento.style.left =
+                        `${fin.x}%`;
+
+
+                    elemento.style.top =
+                        `${fin.y}%`;
+
+
+                    elemento.classList.remove(
+                        "moviendo"
+                    );
+
+
+                    resolver();
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                animar
+            );
+
         }
-
-
-        requestAnimationFrame(
-            animar
-        );
-
-    });
+    );
 
 }
 
 
-/* ============================================================
-   MOVER CASILLA POR CASILLA
-   ============================================================ */
+// ============================================================
+// MOVIMIENTO CASILLA POR CASILLA
+// ============================================================
 
 async function moverFichaPorCasillas(
     id,
@@ -2045,7 +3199,9 @@ async function moverFichaPorCasillas(
         inicio === final
     ){
 
-        await dormir(200);
+        await reboteFicha(
+            id
+        );
 
         return;
 
@@ -2082,135 +3238,101 @@ async function moverFichaPorCasillas(
             siguiente;
 
 
-        await dormir(80);
+        await dormir(60);
 
     }
 
 }
 
 
-/* ============================================================
-   REBOTE
-   ============================================================ */
+async function reboteFicha(
+    id
+){
 
-async function reboteFicha(id){
-
-    const ficha =
+    const elemento =
         document.getElementById(
             `pieza-${id}`
         );
 
-    if(!ficha){
+
+    if(!elemento)
         return;
-    }
 
-    ficha.classList.remove(
+
+    elemento.classList.add(
         "rebote"
     );
 
-    void ficha.offsetWidth;
-
-    ficha.classList.add(
-        "rebote"
-    );
 
     await dormir(450);
 
+
+    elemento.classList.remove(
+        "rebote"
+    );
+
 }
 
 
-/* ============================================================
-   MENSAJES
-   ============================================================ */
+// ============================================================
+// MENSAJE
+// ============================================================
 
-async function mostrarMensaje(
+function mostrarMensaje(
     texto
 ){
 
-    resultadoDado.textContent =
-        texto;
-
-    resultadoDado.classList.remove(
-        "mensaje-efecto"
-    );
-
-    void resultadoDado.offsetWidth;
-
-    resultadoDado.classList.add(
-        "mensaje-efecto"
-    );
-
-}
-
-
-/* ============================================================
-   RESALTAR CASILLA
-   ============================================================ */
-
-async function resaltarCasilla(
-    numero,
-    duracion=1200
-){
-
-    const existente =
-        document.getElementById(
-            "resaltadoTemporal"
-        );
-
-    if(existente){
-        existente.remove();
-    }
-
-
-    const pos =
-        posicionCasilla(
-            numero
+    const anterior =
+        document.querySelector(
+            ".mensaje-flotante"
         );
 
 
-    const elemento =
+    if(anterior)
+        anterior.remove();
+
+
+    const mensaje =
         document.createElement(
             "div"
         );
 
-    elemento.id =
-        "resaltadoTemporal";
 
-    elemento.className =
-        "resaltado-casilla";
-
-    elemento.style.left =
-        `${pos.x}%`;
-
-    elemento.style.top =
-        `${pos.y}%`;
+    mensaje.className =
+        "mensaje-flotante";
 
 
-    tablero.appendChild(
-        elemento
+    mensaje.textContent =
+        texto;
+
+
+    document.body.appendChild(
+        mensaje
     );
 
 
-    await dormir(
-        duracion
+    setTimeout(
+        () => {
+
+            mensaje.remove();
+
+        },
+        1900
     );
-
-
-    elemento.remove();
 
 }
 
 
-/* ============================================================
-   PARTICULAS
-   ============================================================ */
+// ============================================================
+// PARTÍCULAS
+// ============================================================
 
 function crearParticulas(
     numeroCasilla,
     cantidad=25
 ){
 
-    const pos =
+    const posicion =
         posicionCasilla(
             numeroCasilla
         );
@@ -2227,150 +3349,143 @@ function crearParticulas(
                 "div"
             );
 
+
         particula.className =
             "particula";
 
 
         particula.style.left =
-            `${pos.x}%`;
+            `${posicion.x}%`;
+
 
         particula.style.top =
-            `${pos.y}%`;
+            `${posicion.y}%`;
+
+
+        const angulo =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const distancia =
+            30 +
+            Math.random() *
+            120;
 
 
         particula.style.setProperty(
-            "--x",
-            Math.random()
+            "--dx",
+            `${Math.cos(angulo)*distancia}px`
         );
+
 
         particula.style.setProperty(
-            "--y",
-            Math.random()
+            "--dy",
+            `${Math.sin(angulo)*distancia}px`
         );
 
 
-        particula.style.background =
-            COLORES[
-                Math.floor(
-                    Math.random() *
-                    COLORES.length
-                )
-            ];
-
-
-        tablero.appendChild(
+        fichas.appendChild(
             particula
         );
 
 
-        setTimeout(() => {
-
-            particula.remove();
-
-        },1000);
+        setTimeout(
+            () =>
+                particula.remove(),
+            1100
+        );
 
     }
 
 }
 
 
-/* ============================================================
-   ACTIVAR ESCALERA
-   ============================================================ */
+// ============================================================
+// RESALTAR CASILLA
+// ============================================================
+
+async function resaltarCasilla(
+    numero,
+    duracion=1000
+){
+
+    const existente =
+        document.querySelector(
+            ".resaltado-casilla"
+        );
+
+
+    if(existente)
+        existente.remove();
+
+
+    const p =
+        posicionCasilla(
+            numero
+        );
+
+
+    const elemento =
+        document.createElement(
+            "div"
+        );
+
+
+    elemento.className =
+        "resaltado-casilla";
+
+
+    elemento.style.left =
+        `${p.x}%`;
+
+
+    elemento.style.top =
+        `${p.y}%`;
+
+
+    fichas.appendChild(
+        elemento
+    );
+
+
+    await dormir(
+        duracion
+    );
+
+
+    elemento.remove();
+
+}
+
+
+// ============================================================
+// ACTIVAR ESCALERA
+// ============================================================
 
 async function activarEscalera(
     desde,
     hasta
 ){
 
-    const grupos =
-        svgElementos.querySelectorAll(
-            ".escalera-svg"
+    const grupo =
+        document.getElementById(
+            "grupoEscaleras"
         );
 
 
-    grupos.forEach(grupo => {
-
-        if(
-            Number(
-                grupo.dataset.desde
-            ) === Number(desde) &&
-            Number(
-                grupo.dataset.hasta
-            ) === Number(hasta)
-        ){
-
-            grupo.classList.add(
-                "escalera-activa"
-            );
-
-        }
-
-    });
+    if(!grupo)
+        return;
 
 
-    await mostrarMensaje(
-        `🪜 ¡Escalera! ${desde} → ${hasta}`
+    grupo.classList.add(
+        "escalera-activa"
     );
 
 
-    crearParticulas(
-        hasta,
-        35
-    );
-
-
-    await dormir(700);
-
-
-    grupos.forEach(grupo => {
-
-        grupo.classList.remove(
-            "escalera-activa"
-        );
-
-    });
-
-}
-
-
-/* ============================================================
-   ACTIVAR SERPIENTE
-   ============================================================ */
-
-async function activarSerpiente(
-    desde,
-    hasta
-){
-
-    const grupos =
-        svgElementos.querySelectorAll(
-            ".serpiente-svg"
-        );
-
-
-    grupos.forEach(grupo => {
-
-        if(
-            Number(
-                grupo.dataset.desde
-            ) === Number(desde) &&
-            Number(
-                grupo.dataset.hasta
-            ) === Number(hasta)
-        ){
-
-            grupo.classList.add(
-                "serpiente-activa"
-            );
-
-        }
-
-    });
-
-
-    await mostrarMensaje(
-        `🐍 ¡Serpiente! ${desde} → ${hasta}`
+    mostrarMensaje(
+        `🪜 ¡ESCALERA! ${desde} → ${hasta}`
     );
 
 
@@ -2380,23 +3495,68 @@ async function activarSerpiente(
     );
 
 
-    await dormir(700);
+    await dormir(
+        900
+    );
 
 
-    grupos.forEach(grupo => {
-
-        grupo.classList.remove(
-            "serpiente-activa"
-        );
-
-    });
+    grupo.classList.remove(
+        "escalera-activa"
+    );
 
 }
 
 
-/* ============================================================
-   ANIMACIÓN COMPLETA DEL MOVIMIENTO
-   ============================================================ */
+// ============================================================
+// ACTIVAR SERPIENTE
+// ============================================================
+
+async function activarSerpiente(
+    desde,
+    hasta
+){
+
+    const grupo =
+        document.getElementById(
+            "grupoSerpientes"
+        );
+
+
+    if(!grupo)
+        return;
+
+
+    grupo.classList.add(
+        "serpiente-activa"
+    );
+
+
+    mostrarMensaje(
+        `🐍 ¡SERPIENTE! ${desde} → ${hasta}`
+    );
+
+
+    crearParticulas(
+        desde,
+        25
+    );
+
+
+    await dormir(
+        900
+    );
+
+
+    grupo.classList.remove(
+        "serpiente-activa"
+    );
+
+}
+
+
+// ============================================================
+// ANIMAR MOVIMIENTO
+// ============================================================
 
 async function animarMovimientoJugador(
     id,
@@ -2405,200 +3565,174 @@ async function animarMovimientoJugador(
     dado
 ){
 
-    if(animando){
-        return;
-    }
-
-
     animando = true;
+
 
     actualizarBotonDado();
 
 
-    let inicio =
+    const jugador =
+        obtenerJugador(
+            estado.jugadores,
+            id
+        );
+
+
+    let intermedia =
         Number(
             posicionAnterior
-        );
-
-
-    let final =
+        ) +
         Number(
-            posicionFinal
+            dado
         );
 
 
-    dado =
-        Number(dado) || 0;
+    if(intermedia > 100){
 
-
-    /*
-        El movimiento normal que produjo el dado.
-    */
-
-    let posicionIntermedia =
-        inicio + dado;
-
-
-    if(
-        posicionIntermedia > 100
-    ){
-
-        posicionIntermedia =
-            100;
+        intermedia =
+            posicionAnterior;
 
     }
 
 
-    /*
-        Si por alguna razón el servidor
-        informa una posición diferente,
-        siempre respetamos el servidor
-        al final.
-    */
+    // --------------------------------------------------------
+    // MOVIMIENTO NORMAL
+    // --------------------------------------------------------
+
+    if(
+        posicionAnterior !==
+        intermedia
+    ){
+
+        await moverFichaPorCasillas(
+            id,
+            Number(posicionAnterior),
+            Number(intermedia),
+            330
+        );
+
+    }
+
+    else{
+
+        await reboteFicha(
+            id
+        );
+
+    }
 
 
-    await moverFichaPorCasillas(
-        id,
-        inicio,
-        posicionIntermedia,
-        360
-    );
-
-
-    await reboteFicha(
-        id
-    );
-
-
-    /*
-        ESCALERA
-    */
+    // --------------------------------------------------------
+    // ESCALERA
+    // --------------------------------------------------------
 
     if(
         ESCALERAS[
-            posicionIntermedia
-        ] !== undefined
+            intermedia
+        ]
     ){
 
-        const destinoEscalera =
-            Number(
-                ESCALERAS[
-                    posicionIntermedia
-                ]
-            );
+        const destino =
+            ESCALERAS[
+                intermedia
+            ];
 
 
         await resaltarCasilla(
-            posicionIntermedia,
-            900
+            intermedia,
+            850
         );
 
 
         await activarEscalera(
-            posicionIntermedia,
-            destinoEscalera
+            intermedia,
+            destino
         );
-
-
-        await dormir(300);
 
 
         await moverElementoSuave(
             id,
-            posicionIntermedia,
-            destinoEscalera,
+            intermedia,
+            destino,
             1500
         );
 
 
         crearParticulas(
-            destinoEscalera,
-            40
+            destino,
+            35
         );
 
 
-        await reboteFicha(
-            id
+        await dormir(
+            300
         );
-
-
-        posicionIntermedia =
-            destinoEscalera;
 
     }
 
 
-    /*
-        SERPIENTE
-    */
+    // --------------------------------------------------------
+    // SERPIENTE
+    // --------------------------------------------------------
 
     else if(
         SERPIENTES[
-            posicionIntermedia
-        ] !== undefined
+            intermedia
+        ]
     ){
 
-        const destinoSerpiente =
-            Number(
-                SERPIENTES[
-                    posicionIntermedia
-                ]
-            );
+        const destino =
+            SERPIENTES[
+                intermedia
+            ];
 
 
         await resaltarCasilla(
-            posicionIntermedia,
-            900
+            intermedia,
+            850
         );
 
 
         await activarSerpiente(
-            posicionIntermedia,
-            destinoSerpiente
+            intermedia,
+            destino
         );
-
-
-        await dormir(300);
 
 
         await moverElementoSuave(
             id,
-            posicionIntermedia,
-            destinoSerpiente,
+            intermedia,
+            destino,
             1700
         );
 
 
         crearParticulas(
-            destinoSerpiente,
-            35
+            destino,
+            30
         );
 
 
-        await reboteFicha(
-            id
+        await dormir(
+            300
         );
-
-
-        posicionIntermedia =
-            destinoSerpiente;
 
     }
 
 
-    /*
-        Corrección final usando
-        la posición real del servidor.
-    */
+    // --------------------------------------------------------
+    // CORRECCIÓN FINAL DEL SERVIDOR
+    // --------------------------------------------------------
 
     if(
-        posicionIntermedia !== final
+        Number(posicionFinal) !==
+        Number(intermedia)
     ){
 
         await moverElementoSuave(
             id,
-            posicionIntermedia,
-            final,
+            intermedia,
+            Number(posicionFinal),
             500
         );
 
@@ -2606,12 +3740,7 @@ async function animarMovimientoJugador(
 
 
     posicionesVisuales[id] =
-        final;
-
-
-    await reboteFicha(
-        id
-    );
+        Number(posicionFinal);
 
 
     animando = false;
@@ -2622,279 +3751,47 @@ async function animarMovimientoJugador(
 }
 
 
-/* ============================================================
-   DADO
-   ============================================================ */
-
-const ROTACIONES_DADO = {
-
-    1:
-        "rotateX(0deg) rotateY(0deg) rotateZ(0deg)",
-
-    2:
-        "rotateX(0deg) rotateY(-90deg) rotateZ(0deg)",
-
-    3:
-        "rotateX(0deg) rotateY(180deg) rotateZ(0deg)",
-
-    4:
-        "rotateX(0deg) rotateY(90deg) rotateZ(0deg)",
-
-    5:
-        "rotateX(-90deg) rotateY(0deg) rotateZ(0deg)",
-
-    6:
-        "rotateX(90deg) rotateY(0deg) rotateZ(0deg)"
-
-};
-
-
-function mostrarCaraDado(
-    numero
-){
-
-    numero =
-        Number(numero);
-
-
-    if(
-        !ROTACIONES_DADO[numero]
-    ){
-
-        return;
-
-    }
-
-
-    dado3d.style.transform =
-        ROTACIONES_DADO[numero];
-
-}
-
-
-/* ============================================================
-   ANIMAR DADO
-   ============================================================ */
-
-async function animarDado(
-    resultado
-){
-
-    /*
-        MUY IMPORTANTE:
-
-        Mientras el dado está girando,
-        la ficha NO puede moverse.
-    */
-
-    dadoTerminado = false;
-
-
-    btnDado.disabled = true;
-
-
-    dado3d.classList.add(
-        "lanzando"
-    );
-
-
-    resultadoDado.textContent =
-        "🎲 Lanzando...";
-
-
-    resultadoDado.classList.remove(
-        "mensaje-efecto"
-    );
-
-
-    /*
-        Animación de lanzamiento
-    */
-
-    const rondas = 20;
-
-
-    for(
-        let i=0;
-        i<rondas;
-        i++
-    ){
-
-        const cara =
-            1 +
-            Math.floor(
-                Math.random()*6
-            );
-
-
-        mostrarCaraDado(
-            cara
-        );
-
-
-        await dormir(
-            100
-        );
-
-    }
-
-
-    /*
-        DETENER COMPLETAMENTE
-    */
-
-    dado3d.classList.remove(
-        "lanzando"
-    );
-
-
-    /*
-        Mostrar resultado final
-    */
-
-    mostrarCaraDado(
-        Number(resultado)
-    );
-
-
-    resultadoDado.textContent =
-        `🎲 Salió ${resultado}`;
-
-
-    resultadoDado.classList.remove(
-        "mensaje-efecto"
-    );
-
-
-    void resultadoDado.offsetWidth;
-
-
-    resultadoDado.classList.add(
-        "mensaje-efecto"
-    );
-
-
-    /*
-        PAUSA DESPUÉS DE DETENERSE.
-
-        Durante esta pausa la ficha
-        tampoco se mueve.
-    */
-
-    await dormir(
-        900
-    );
-
-
-    /*
-        Ahora sí:
-        EL DADO TERMINÓ.
-    */
-
-    dadoTerminado = true;
-
-
-    /*
-        Si el movimiento llegó mientras
-        el dado estaba girando,
-        lo ejecutamos ahora.
-    */
-
-    if(
-        resultadoDadoPendiente
-    ){
-
-        const movimiento =
-            resultadoDadoPendiente;
-
-
-        resultadoDadoPendiente =
-            null;
-
-
-        await ejecutarMovimientoPendiente(
-            movimiento
-        );
-
-    }
-
-
-    actualizarBotonDado();
-
-}
-
-
-/* ============================================================
-   MOVIMIENTO PENDIENTE
-   ============================================================ */
+// ============================================================
+// EJECUTAR MOVIMIENTO PENDIENTE
+// ============================================================
 
 async function ejecutarMovimientoPendiente(
     movimiento
 ){
 
-    if(
-        !movimiento
-    ){
-
+    if(!movimiento)
         return;
-
-    }
 
 
     await animarMovimientoJugador(
 
-        movimiento.id,
+        movimiento.jugador_id,
 
-        movimiento.anterior,
+        Number(
+            movimiento.posicion_anterior
+        ),
 
-        movimiento.nuevo,
+        Number(
+            movimiento.posicion
+        ),
 
-        movimiento.dado
+        Number(
+            movimiento.dado
+        )
 
     );
 
-}
+
+    renderizarFichas();
 
 
-/* ============================================================
-   ACTUALIZAR BOTÓN DEL DADO
-   ============================================================ */
-
-function actualizarBotonDado(){
-
-    if(!socket){
-
-        btnDado.disabled =
-            true;
-
-        return;
-
-    }
+    renderizarJugadores();
 
 
-    if(
-        socket.readyState !==
-        WebSocket.OPEN
-    ){
-
-        btnDado.disabled =
-            true;
-
-        return;
-
-    }
+    actualizarMensajeEstado();
 
 
-    if(
-        animando
-    ){
-
-        btnDado.disabled =
-            true;
-
-        return;
-
-    }
+    actualizarBotonDado();
 
 
     if(
@@ -2902,286 +3799,18 @@ function actualizarBotonDado(){
         estado.ganador !== undefined
     ){
 
-        btnDado.disabled =
-            true;
-
-        return;
-
-    }
-
-
-    if(
-        estado.mi_id === null ||
-        estado.mi_id === undefined
-    ){
-
-        btnDado.disabled =
-            true;
-
-        return;
-
-    }
-
-
-    if(
-        estado.turno === null ||
-        estado.turno === undefined
-    ){
-
-        btnDado.disabled =
-            true;
-
-        return;
-
-    }
-
-
-    btnDado.disabled =
-        Number(estado.turno) !==
-        Number(estado.mi_id);
-
-}
-
-
-/* ============================================================
-   RENDERIZAR JUGADORES
-   ============================================================ */
-
-function renderizarJugadores(){
-
-    listaJugadores.innerHTML =
-        "";
-
-
-    const jugadores =
-        estado.jugadores || {};
-
-
-    const ids =
-        Object.keys(jugadores)
-            .sort(
-                (a,b) =>
-                    Number(a)-Number(b)
-            );
-
-
-    ids.forEach(id => {
-
-        const jugador =
-            jugadores[id];
-
-
-        const item =
-            document.createElement(
-                "div"
-            );
-
-        item.className =
-            "jugador-item";
-
-
-        if(
-            Number(id) ===
-            Number(estado.turno)
-        ){
-
-            item.classList.add(
-                "turno"
-            );
-
-        }
-
-
-        const color =
-            document.createElement(
-                "div"
-            );
-
-        color.className =
-            "color-jugador";
-
-        color.style.background =
-            obtenerColorJugador(
-                jugador,
-                id
-            );
-
-
-        const info =
-            document.createElement(
-                "div"
-            );
-
-        info.className =
-            "info-jugador";
-
-
-        const nombre =
-            document.createElement(
-                "div"
-            );
-
-        nombre.className =
-            "nombre-jugador";
-
-        nombre.textContent =
-            obtenerNombreJugador(
-                jugador,
-                id
-            );
-
-
-        if(
-            Number(id) ===
-            Number(estado.mi_id)
-        ){
-
-            nombre.textContent +=
-                " ⭐";
-
-        }
-
-
-        const posicion =
-            document.createElement(
-                "div"
-            );
-
-        posicion.className =
-            "posicion-jugador";
-
-        posicion.textContent =
-            `Casilla ${obtenerPosicionJugador(
-                jugador
-            )}`;
-
-
-        info.appendChild(
-            nombre
+        mostrarVictoria(
+            estado.ganador
         );
-
-        info.appendChild(
-            posicion
-        );
-
-
-        item.appendChild(
-            color
-        );
-
-        item.appendChild(
-            info
-        );
-
-
-        listaJugadores.appendChild(
-            item
-        );
-
-    });
-
-
-}
-
-
-/* ============================================================
-   ESTADO DE CONEXIÓN
-   ============================================================ */
-
-function actualizarEstadoConexion(){
-
-    if(
-        socket &&
-        socket.readyState ===
-        WebSocket.OPEN
-    ){
-
-        estadoConexion.textContent =
-            "🟢 Conectado al servidor";
-
-        estadoConexion.style.background =
-            "#e8f5e9";
-
-        estadoConexion.style.borderColor =
-            "#b7dfb9";
-
-    }else{
-
-        estadoConexion.textContent =
-            "🔴 Desconectado";
-
-        estadoConexion.style.background =
-            "#ffebee";
-
-        estadoConexion.style.borderColor =
-            "#ffcdd2";
 
     }
 
 }
 
 
-/* ============================================================
-   ACTUALIZAR MENSAJE DE TURNO
-   ============================================================ */
-
-function actualizarMensajeEstado(){
-
-    if(
-        estado.ganador !== null &&
-        estado.ganador !== undefined
-    ){
-
-        return;
-
-    }
-
-
-    if(
-        estado.turno === null ||
-        estado.turno === undefined
-    ){
-
-        return;
-
-    }
-
-
-    const jugadorTurno =
-        obtenerJugador(
-            estado.jugadores,
-            estado.turno
-        );
-
-
-    const nombre =
-        obtenerNombreJugador(
-            jugadorTurno,
-            estado.turno
-        );
-
-
-    if(
-        Number(estado.turno) ===
-        Number(estado.mi_id)
-    ){
-
-        estadoConexion.textContent =
-            "🟢 ¡Es tu turno!";
-
-    }else{
-
-        estadoConexion.textContent =
-            `⏳ Turno de ${nombre}`;
-
-    }
-
-}
-
-
-/* ============================================================
-   MOSTRAR VICTORIA
-   ============================================================ */
+// ============================================================
+// VICTORIA
+// ============================================================
 
 function mostrarVictoria(
     ganadorId
@@ -3201,169 +3830,53 @@ function mostrarVictoria(
         );
 
 
-    textoVictoria.textContent =
-        `🏆 ¡${nombre} ganó!`;
+    if(
+        Number(ganadorId) ===
+        Number(estado.mi_id)
+    ){
+
+        textoVictoria.textContent =
+            `🎉 ¡${nombre}, has ganado!`;
+
+    }
+
+    else{
+
+        textoVictoria.textContent =
+            `🏆 ¡${nombre} ganó la partida!`;
+
+    }
 
 
-    victoria.classList.add(
-        "visible"
+    victoria.classList.remove(
+        "oculto"
     );
 
 
     crearParticulas(
         100,
-        80
+        70
     );
 
 }
 
 
-/* ============================================================
-   CERRAR VICTORIA
-   ============================================================ */
+// ============================================================
+// OCULTAR VICTORIA
+// ============================================================
 
-function cerrarVictoria(){
+function ocultarVictoria(){
 
-    victoria.classList.remove(
-        "visible"
+    victoria.classList.add(
+        "oculto"
     );
 
 }
 
 
-/* ============================================================
-   WEBSOCKET
-   ============================================================ */
-
-function conectar(){
-
-    try{
-
-        estadoConexion.textContent =
-            "🔄 Conectando...";
-
-
-        socket =
-            new WebSocket(
-                SERVER_URL
-            );
-
-
-        socket.onopen =
-            () => {
-
-                console.log(
-                    "WebSocket conectado"
-                );
-
-
-                actualizarEstadoConexion();
-
-
-                /*
-                    Ping inicial
-                */
-
-                enviar({
-
-                    tipo:
-                        "ping"
-
-                });
-
-
-                actualizarBotonDado();
-
-            };
-
-
-        socket.onmessage =
-            async evento => {
-
-                try{
-
-                    const mensaje =
-                        JSON.parse(
-                            evento.data
-                        );
-
-
-                    await procesarMensaje(
-                        mensaje
-                    );
-
-
-                }catch(error){
-
-                    console.error(
-                        "Error procesando mensaje:",
-                        error
-                    );
-
-                }
-
-            };
-
-
-        socket.onclose =
-            () => {
-
-                console.log(
-                    "WebSocket cerrado"
-                );
-
-
-                actualizarEstadoConexion();
-
-
-                btnDado.disabled =
-                    true;
-
-
-                if(
-                    !abandonando
-                ){
-
-                    estadoConexion.textContent =
-                        "🔴 Conexión perdida";
-
-                }
-
-            };
-
-
-        socket.onerror =
-            error => {
-
-                console.error(
-                    "WebSocket error:",
-                    error
-                );
-
-
-                estadoConexion.textContent =
-                    "❌ Error de conexión";
-
-            };
-
-
-    }catch(error){
-
-        console.error(
-            error
-        );
-
-        estadoConexion.textContent =
-            "❌ No se pudo conectar";
-
-    }
-
-}
-
-
-/* ============================================================
-   ENVIAR
-   ============================================================ */
+// ============================================================
+// ENVIAR
+// ============================================================
 
 function enviar(
     datos
@@ -3380,249 +3893,59 @@ function enviar(
     }
 
 
-    socket.send(
-        JSON.stringify(
-            datos
-        )
-    );
+    try{
 
-
-    return true;
-
-}
-
-
-/* ============================================================
-   PROCESAR MENSAJES
-   ============================================================ */
-
-async function procesarMensaje(
-    mensaje
-){
-
-    console.log(
-        "Servidor:",
-        mensaje
-    );
-
-
-    const tipo =
-        mensaje.tipo;
-
-
-    /* --------------------------------------------------------
-       CONEXIÓN
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "conexion"
-    ){
-
-        estado.mi_id =
-            mensaje.jugador_id ??
-            mensaje.mi_id ??
-            mensaje.id ??
-            null;
-
-
-        if(
-            mensaje.estado
-        ){
-
-            await recibirEstado(
-                mensaje.estado
-            );
-
-        }
-
-
-        actualizarBotonDado();
-
-        return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       ESTADO
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "estado"
-    ){
-
-        await recibirEstado(
-            mensaje
-        );
-
-        return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       RESULTADO DEL DADO
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "resultado_dado"
-    ){
-
-        const resultado =
-            Number(
-                mensaje.resultado ??
-                mensaje.dado ??
-                mensaje.valor
-            );
-
-
-        estado.ultimo_dado =
-            resultado;
-
-
-        await animarDado(
-            resultado
+        socket.send(
+            JSON.stringify(
+                datos
+            )
         );
 
 
-        return;
+        return true;
 
     }
 
+    catch(error){
 
-    /* --------------------------------------------------------
-       MENSAJE
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "mensaje"
-    ){
-
-        if(
-            mensaje.mensaje
-        ){
-
-            await mostrarMensaje(
-                mensaje.mensaje
-            );
-
-        }
-
-
-        return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       ERROR
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "error"
-    ){
-
-        await mostrarMensaje(
-            `⚠️ ${
-                mensaje.mensaje ||
-                "Ocurrió un error"
-            }`
+        console.error(
+            error
         );
 
 
-        return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       SERVIDOR LLENO
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "lleno"
-    ){
-
-        estadoConexion.textContent =
-            "🚫 Servidor lleno";
-
-        btnDado.disabled =
-            true;
-
-
-        return;
-
-    }
-
-
-    /* --------------------------------------------------------
-       SERVIDOR CERRANDO
-       -------------------------------------------------------- */
-
-    if(
-        tipo === "servidor_cerrando"
-    ){
-
-        estadoConexion.textContent =
-            "🔴 Servidor cerrado";
-
-        btnDado.disabled =
-            true;
-
-
-        return;
+        return false;
 
     }
 
 }
 
 
-/* ============================================================
-   RECIBIR ESTADO
-   ============================================================ */
+// ============================================================
+// RECIBIR ESTADO
+// ============================================================
 
 async function recibirEstado(
     nuevoEstado
 ){
 
-    /*
-        Guardamos nuestro ID anterior.
-
-        Esto evita perderlo cuando el servidor
-        manda un estado que no contiene mi_id.
-    */
-
     const miIdAnterior =
         estado.mi_id;
 
 
-    /*
-        Detectar posiciones antes del cambio.
-    */
-
     const jugadoresAnteriores =
-        estado.jugadores || {};
-
-
-    const posicionesAnteriores =
+        estado.jugadores ||
         {};
 
 
-    Object.keys(
-        jugadoresAnteriores
-    ).forEach(id => {
-
-        posicionesAnteriores[id] =
-            obtenerPosicionJugador(
-                jugadoresAnteriores[id]
-            );
-
-    });
+    const nuevoJugadorId =
+        nuevoEstado.mi_id ??
+        nuevoEstado.jugador_id ??
+        nuevoEstado.id ??
+        miIdAnterior;
 
 
-    /*
-        Actualizamos estado sin perder mi_id.
-    */
+    // IMPORTANTE:
+    // No perder mi_id al recibir un estado.
 
     estado = {
 
@@ -3631,283 +3954,532 @@ async function recibirEstado(
         ...nuevoEstado,
 
         mi_id:
-            nuevoEstado.mi_id ??
-            nuevoEstado.jugador_id ??
-            nuevoEstado.id ??
-            miIdAnterior,
+            nuevoJugadorId,
+
+        turno:
+            nuevoEstado.turno ??
+            nuevoEstado.jugador_turno ??
+            nuevoEstado.turno_actual ??
+            estado.turno,
 
         jugadores:
-            nuevoEstado.jugadores ||
+            nuevoEstado.jugadores ??
+            estado.jugadores ??
             {}
 
     };
 
 
-    /*
-        Detectar qué jugador cambió.
-    */
-
-    let jugadorMovido =
-        null;
-
-
-    const jugadoresNuevos =
-        estado.jugadores || {};
-
-
-    Object.keys(
-        jugadoresNuevos
-    ).forEach(id => {
-
-        const nuevoJugador =
-            jugadoresNuevos[id];
-
-
-        const nuevaPosicion =
-            obtenerPosicionJugador(
-                nuevoJugador
-            );
-
-
-        const anterior =
-            posicionesAnteriores[id] ??
-            posicionesVisuales[id] ??
-            nuevaPosicion;
-
-
-        if(
-            anterior !== nuevaPosicion &&
-            !jugadorMovido
-        ){
-
-            jugadorMovido = {
-
-                id:id,
-
-                anterior:anterior,
-
-                nuevo:nuevaPosicion
-
-            };
-
-        }
-
-    });
-
-
-    /*
-        Render inicial / jugadores.
-    */
-
-    renderizarJugadores();
-
-
-    /*
-        Si no estamos animando, actualizamos
-        visualmente las fichas que no están
-        involucradas en la animación.
-    */
-
-    Object.keys(
-        jugadoresNuevos
-    ).forEach(id => {
-
-        const nuevaPosicion =
-            obtenerPosicionJugador(
-                jugadoresNuevos[id]
-            );
-
-
-        if(
-            !jugadorMovido ||
-            String(id) !==
-            String(jugadorMovido.id)
-        ){
-
-            posicionesVisuales[id] =
-                nuevaPosicion;
-
-        }
-
-    });
-
-
-    if(
-        !animando
-    ){
-
-        renderizarFichas();
-
-    }
-
-
-    /*
-        ========================================================
-        SINCRONIZACIÓN CRÍTICA
-        ========================================================
-
-        Si el jugador acaba de lanzar el dado:
-
-        dadoTerminado = false
-
-        Entonces el servidor puede enviar el estado
-        antes o durante la animación del dado.
-
-        En ese caso NO movemos inmediatamente la ficha.
-
-        Guardamos el movimiento.
-    */
-
-    if(
-        jugadorMovido
-    ){
-
-        const dado =
-            nuevoEstado.ultimo_dado ??
-            nuevoEstado.dado ??
-            estado.ultimo_dado ??
-            estado.dado ??
-            0;
-
-
-        const movimiento = {
-
-            id:
-                jugadorMovido.id,
-
-            anterior:
-                jugadorMovido.anterior,
-
-            nuevo:
-                jugadorMovido.nuevo,
-
-            dado:
-                Number(dado)
-
-        };
-
-
-        if(
-            dadoTerminado
-        ){
-
-            /*
-                El dado ya terminó.
-                Podemos mover.
-            */
-
-            if(
-                !animando
-            ){
-
-                await ejecutarMovimientoPendiente(
-                    movimiento
-                );
-
-            }
-
-        }else{
-
-            /*
-                El dado todavía está girando.
-            */
-
-            resultadoDadoPendiente =
-                movimiento;
-
-        }
-
-    }
-
-
-    /*
-        Victoria.
-    */
+    // --------------------------------------------------------
+    // Si llegó estado con ganador
+    // --------------------------------------------------------
 
     if(
         estado.ganador !== null &&
         estado.ganador !== undefined
     ){
 
-        if(
-            Number(
-                estado.ganador
-            ) !==
-            Number(
-                ultimaPosicionGanador
-            )
-        ){
-
-            ultimaPosicionGanador =
-                estado.ganador;
-
-
-            await dormir(
-                500
-            );
-
-
-            mostrarVictoria(
-                estado.ganador
-            );
-
-        }
-
-    }else{
-
         ultimaPosicionGanador =
-            null;
-
-        cerrarVictoria();
+            estado.ganador;
 
     }
+
+
+    // --------------------------------------------------------
+    // Render básico
+    // --------------------------------------------------------
+
+    renderizarJugadores();
 
 
     actualizarMensajeEstado();
 
+
     actualizarBotonDado();
+
+
+    // --------------------------------------------------------
+    // Actualizar fichas
+    // --------------------------------------------------------
+
+    const ids =
+        Object.keys(
+            estado.jugadores
+        );
+
+
+    // Si no hay movimiento activo,
+    // colocar fichas nuevas.
+
+    if(!animando){
+
+        ids.forEach(
+            id => {
+
+                const jugador =
+                    estado.jugadores[id];
+
+
+                const nuevaPosicion =
+                    obtenerPosicionJugador(
+                        jugador
+                    );
+
+
+                if(
+                    !posicionesVisuales[id]
+                ){
+
+                    posicionesVisuales[id] =
+                        nuevaPosicion;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    renderizarFichas();
 
 }
 
 
-/* ============================================================
-   NOMBRE
-   ============================================================ */
+// ============================================================
+// RESULTADO DEL DADO
+// ============================================================
 
-btnNombre.addEventListener(
-    "click",
-    () => {
+async function recibirResultadoDado(
+    datos
+){
 
-        const nombre =
-            nombreInput.value.trim();
-
-
-        if(
-            !nombre
-        ){
-
-            nombreInput.focus();
-
-            return;
-
-        }
+    const resultado =
+        Number(
+            datos.dado ??
+            datos.ultimo_dado
+        );
 
 
-        enviar({
+    if(
+        !Number.isFinite(
+            resultado
+        )
+    ){
 
-            tipo:
-                "nombre",
-
-            nombre:
-                nombre
-
-        });
+        return;
 
     }
-);
 
 
-nombreInput.addEventListener(
+    // Actualizamos el turno que vino
+    // del servidor.
+
+    if(
+        datos.turno !== undefined
+    ){
+
+        estado.turno =
+            datos.turno;
+
+    }
+
+
+    // --------------------------------------------------------
+    // ANIMACIÓN DEL DADO
+    // --------------------------------------------------------
+
+    animarDado(
+        resultado
+    );
+
+
+    // --------------------------------------------------------
+    // Preparar movimiento
+    // --------------------------------------------------------
+
+    const movimiento = {
+
+        jugador_id:
+            Number(
+                datos.jugador_id
+            ),
+
+        dado:
+            resultado,
+
+        posicion_anterior:
+            Number(
+                datos.posicion_anterior
+            ),
+
+        posicion:
+            Number(
+                datos.posicion
+            )
+
+    };
+
+
+    // --------------------------------------------------------
+    // El movimiento espera a que termine
+    // completamente el dado.
+    // --------------------------------------------------------
+
+    resultadoDadoPendiente =
+        movimiento;
+
+}
+
+
+// ============================================================
+// CONEXIÓN WEBSOCKET
+// ============================================================
+
+function conectar(){
+
+    estadoConexion.textContent =
+        "🟡 Conectando al servidor...";
+
+
+    estadoConexion.style.background =
+        "#fff8e1";
+
+
+    estadoConexion.style.borderColor =
+        "#ffca28";
+
+
+    try{
+
+        socket =
+            new WebSocket(
+                SERVER_URL
+            );
+
+    }
+
+    catch(error){
+
+        estadoConexion.textContent =
+            "🔴 Error creando conexión";
+
+        return;
+
+    }
+
+
+    socket.onopen = () => {
+
+        console.log(
+            "WebSocket conectado"
+        );
+
+
+        estadoConexion.textContent =
+            "🟢 Conectado. Esperando jugadores...";
+
+
+        estadoConexion.style.background =
+            "#e8f5e9";
+
+
+        estadoConexion.style.borderColor =
+            "#81c784";
+
+
+        actualizarBotonDado();
+
+    };
+
+
+    socket.onmessage =
+        async evento => {
+
+            try{
+
+                const datos =
+                    JSON.parse(
+                        evento.data
+                    );
+
+
+                console.log(
+                    "Servidor:",
+                    datos
+                );
+
+
+                // ==========================================
+                // CONEXIÓN
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "conexion"
+                ){
+
+                    estado = {
+
+                        ...estado,
+
+                        ...datos,
+
+                        mi_id:
+                            datos.mi_id ??
+                            datos.jugador_id ??
+                            estado.mi_id,
+
+                        turno:
+                            datos.turno ??
+                            estado.turno,
+
+                        jugadores:
+                            datos.jugadores ??
+                            estado.jugadores ??
+                            {}
+
+                    };
+
+
+                    renderizarJugadores();
+
+                    renderizarFichas();
+
+                    actualizarMensajeEstado();
+
+                    actualizarBotonDado();
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // ESTADO
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "estado"
+                ){
+
+                    await recibirEstado(
+                        datos
+                    );
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // RESULTADO DADO
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "resultado_dado"
+                ){
+
+                    await recibirResultadoDado(
+                        datos
+                    );
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // MENSAJE
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "mensaje"
+                ){
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        ""
+                    );
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // LLENO
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "lleno"
+                ){
+
+                    estadoConexion.textContent =
+                        "🔴 Servidor lleno";
+
+
+                    btnDado.disabled =
+                        true;
+
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "Servidor lleno."
+                    );
+
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // ERROR
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "error"
+                ){
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "Error del servidor."
+                    );
+
+
+                    return;
+
+                }
+
+
+                // ==========================================
+                // SERVIDOR CERRANDO
+                // ==========================================
+
+                if(
+                    datos.tipo ===
+                    "servidor_cerrando"
+                ){
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "Conexión cerrada."
+                    );
+
+
+                    return;
+
+                }
+
+            }
+
+            catch(error){
+
+                console.error(
+                    "Error procesando mensaje:",
+                    error
+                );
+
+            }
+
+        };
+
+
+    socket.onerror = error => {
+
+        console.error(
+            "WebSocket error:",
+            error
+        );
+
+
+        estadoConexion.textContent =
+            "🔴 Error de conexión";
+
+
+        estadoConexion.style.background =
+            "#ffebee";
+
+
+        estadoConexion.style.borderColor =
+            "#ef9a9a";
+
+
+        btnDado.disabled =
+            true;
+
+    };
+
+
+    socket.onclose = () => {
+
+        console.log(
+            "WebSocket cerrado"
+        );
+
+
+        estadoConexion.textContent =
+            "🔴 Desconectado";
+
+
+        estadoConexion.style.background =
+            "#ffebee";
+
+
+        estadoConexion.style.borderColor =
+            "#ef9a9a";
+
+
+        btnDado.disabled =
+            true;
+
+    };
+
+}
+
+
+// ============================================================
+// BOTÓN NOMBRE
+// ============================================================
+
+btnNombre.onclick = () => {
+
+    const nombre =
+        nombreJugador.value.trim();
+
+
+    if(!nombre){
+
+        mostrarMensaje(
+            "Escribe tu nombre."
+        );
+
+        return;
+
+    }
+
+
+    enviar({
+
+        tipo:"nombre",
+
+        nombre:nombre
+
+    });
+
+
+    nombreJugador.blur();
+
+};
+
+
+nombreJugador.addEventListener(
     "keydown",
     evento => {
 
@@ -3924,139 +4496,141 @@ nombreInput.addEventListener(
 );
 
 
-/* ============================================================
-   LANZAR DADO
-   ============================================================ */
+// ============================================================
+// BOTÓN DADO
+// ============================================================
 
-btnDado.addEventListener(
-    "click",
-    () => {
+btnDado.onclick = () => {
 
-        if(
-            animando
-        ){
-
-            return;
-
-        }
+    if(animando)
+        return;
 
 
-        if(
-            !socket ||
-            socket.readyState !==
-            WebSocket.OPEN
-        ){
+    if(
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ){
 
-            return;
+        mostrarMensaje(
+            "No estás conectado."
+        );
 
-        }
-
-
-        if(
-            estado.mi_id === null ||
-            estado.mi_id === undefined
-        ){
-
-            return;
-
-        }
-
-
-        if(
-            estado.turno === null ||
-            estado.turno === undefined
-        ){
-
-            return;
-
-        }
-
-
-        if(
-            Number(estado.turno) !==
-            Number(estado.mi_id)
-        ){
-
-            return;
-
-        }
-
-
-        /*
-            ====================================================
-            MUY IMPORTANTE
-
-            Antes de enviar el lanzamiento:
-
-            el dado todavía NO está terminado.
-
-            Esto evita que un estado del servidor
-            recibido rápidamente haga que la ficha
-            se mueva antes del dado.
-            ====================================================
-        */
-
-        dadoTerminado =
-            false;
-
-
-        resultadoDadoPendiente =
-            null;
-
-
-        animando = true;
-
-
-        btnDado.disabled =
-            true;
-
-
-        const enviado =
-            enviar({
-
-                tipo:
-                    "lanzar_dado"
-
-            });
-
-
-        if(
-            !enviado
-        ){
-
-            animando =
-                false;
-
-            dadoTerminado =
-                true;
-
-            actualizarBotonDado();
-
-        }
+        return;
 
     }
-);
 
 
-/* ============================================================
-   REINICIAR
-   ============================================================ */
+    if(
+        estado.mi_id === null ||
+        estado.mi_id === undefined
+    ){
 
-function reiniciarPartida(){
+        mostrarMensaje(
+            "Esperando identificación..."
+        );
 
-    cerrarVictoria();
+        return;
+
+    }
 
 
-    dadoTerminado =
-        true;
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        mostrarMensaje(
+            "Todavía no hay turno."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        Number(
+            estado.turno
+        ) !==
+        Number(
+            estado.mi_id
+        )
+    ){
+
+        const jugador =
+            obtenerJugador(
+                estado.jugadores,
+                estado.turno
+            );
+
+
+        mostrarMensaje(
+            `Es turno de ${
+                obtenerNombreJugador(
+                    jugador,
+                    estado.turno
+                )
+            }`
+        );
+
+
+        return;
+
+    }
+
+
+    animando = true;
+
+
+    dadoTerminado = false;
 
 
     resultadoDadoPendiente =
         null;
 
 
-    animando =
-        false;
+    btnDado.disabled =
+        true;
+
+
+    enviar({
+
+        tipo:
+            "lanzar_dado"
+
+    });
+
+};
+
+
+// ============================================================
+// REINICIAR
+// ============================================================
+
+function reiniciarPartida(){
+
+    ocultarVictoria();
+
+
+    posicionesVisuales = {};
+
+
+    animando = false;
+
+
+    dadoTerminado = true;
+
+
+    resultadoDadoPendiente =
+        null;
+
+
+    mostrarCaraDado(1);
+
+
+    resultadoDado.textContent =
+        "🎲 Esperando...";
 
 
     enviar({
@@ -4066,135 +4640,91 @@ function reiniciarPartida(){
 
     });
 
-
-    actualizarBotonDado();
-
 }
 
 
-btnReiniciar.addEventListener(
-    "click",
-    reiniciarPartida
-);
+btnReiniciar.onclick =
+    reiniciarPartida;
 
 
-btnVictoriaReiniciar.addEventListener(
-    "click",
-    reiniciarPartida
-);
+btnVictoriaReiniciar.onclick =
+    reiniciarPartida;
 
 
-/* ============================================================
-   ABANDONAR
-   ============================================================ */
+// ============================================================
+// ABANDONAR
+// ============================================================
 
-btnAbandonar.addEventListener(
-    "click",
-    () => {
+btnAbandonar.onclick = () => {
 
-        if(
-            !abandonando
-        ){
+    if(!abandonando){
 
-            abandonando =
-                true;
-
-
-            btnAbandonar.textContent =
-                "⚠️ CONFIRMAR ABANDONO";
-
-
-            setTimeout(() => {
-
-                if(
-                    abandonando
-                ){
-
-                    btnAbandonar.textContent =
-                        "🚪 ABANDONAR";
-
-                    abandonando =
-                        false;
-
-                }
-
-            },4000);
-
-
-            return;
-
-        }
-
-
-        enviar({
-
-            tipo:
-                "abandonar"
-
-        });
-
-
-        abandonando =
-            false;
+        abandonando = true;
 
 
         btnAbandonar.textContent =
-            "🚪 ABANDONAR";
+            "⚠️ CONFIRMAR ABANDONO";
+
+
+        return;
 
     }
+
+
+    enviar({
+
+        tipo:
+            "abandonar"
+
+    });
+
+
+    abandonando = false;
+
+
+    btnAbandonar.textContent =
+        "🚪 ABANDONAR";
+
+
+    btnDado.disabled =
+        true;
+
+};
+
+
+// ============================================================
+// PING
+// ============================================================
+
+setInterval(
+    () => {
+
+        enviar({
+            tipo:"ping"
+        });
+
+    },
+    15000
 );
 
 
-/* ============================================================
-   INICIALIZACIÓN
-   ============================================================ */
+// ============================================================
+// INICIO
+// ============================================================
 
 crearTablero();
 
+crearSVG();
+
 dibujarElementos();
 
-renderizarFichas();
-
-renderizarJugadores();
-
-actualizarEstadoConexion();
-
-actualizarBotonDado();
+mostrarCaraDado(1);
 
 conectar();
 
 
-/* ============================================================
-   PROTECCIÓN CONTRA RECARGA / CIERRE
-   ============================================================ */
-
-window.addEventListener(
-    "beforeunload",
-    () => {
-
-        if(
-            socket &&
-            socket.readyState ===
-            WebSocket.OPEN
-        ){
-
-            try{
-
-                socket.close();
-
-            }catch(error){
-
-                console.error(error);
-
-            }
-
-        }
-
-    }
-);
-
 </script>
 
 </body>
+
 </html>
-```
