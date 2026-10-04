@@ -166,18 +166,14 @@ body{
 }
 
 
-.casilla:nth-child(
-    odd
-){
+.casilla:nth-child(odd){
 
     background:#fff;
 
 }
 
 
-.casilla:nth-child(
-    even
-){
+.casilla:nth-child(even){
 
     background:#f0f6ff;
 
@@ -1149,7 +1145,6 @@ button.accion:disabled{
 
 }
 
-
 </style>
 
 </head>
@@ -1157,21 +1152,13 @@ button.accion:disabled{
 
 <body>
 
-
 <div class="app">
-
 
     <h1 class="titulo">
         🐍 ESCALERAS Y SERPIENTES 🪜
     </h1>
 
-
     <div class="juego">
-
-
-        <!-- =================================================
-             TABLERO
-             ================================================= -->
 
         <div class="tablero-contenedor">
 
@@ -1186,17 +1173,11 @@ button.accion:disabled{
         </div>
 
 
-        <!-- =================================================
-             PANEL
-             ================================================= -->
-
         <div class="panel">
-
 
             <h2>
                 🎮 Partida
             </h2>
-
 
             <div
                 id="estadoConexion"
@@ -1215,9 +1196,7 @@ button.accion:disabled{
                     placeholder="Tu nombre"
                 >
 
-                <button
-                    id="btnNombre"
-                >
+                <button id="btnNombre">
                     OK
                 </button>
 
@@ -1231,39 +1210,27 @@ button.accion:disabled{
                     class="dado-3d"
                 >
 
-                    <div
-                        class="cara cara1"
-                    >
+                    <div class="cara cara1">
                         1
                     </div>
 
-                    <div
-                        class="cara cara2"
-                    >
+                    <div class="cara cara2">
                         2
                     </div>
 
-                    <div
-                        class="cara cara3"
-                    >
+                    <div class="cara cara3">
                         3
                     </div>
 
-                    <div
-                        class="cara cara4"
-                    >
+                    <div class="cara cara4">
                         4
                     </div>
 
-                    <div
-                        class="cara cara5"
-                    >
+                    <div class="cara cara5">
                         5
                     </div>
 
-                    <div
-                        class="cara cara6"
-                    >
+                    <div class="cara cara6">
                         6
                     </div>
 
@@ -1315,18 +1282,12 @@ button.accion:disabled{
 
             </div>
 
-
         </div>
-
 
     </div>
 
 </div>
 
-
-<!-- ==========================================================
-     VICTORIA
-     ========================================================== -->
 
 <div
     id="victoria"
@@ -1362,7 +1323,6 @@ button.accion:disabled{
 
 <script>
 
-
 // ============================================================
 // CONFIGURACIÓN
 // ============================================================
@@ -1374,17 +1334,11 @@ const SERVER_URL =
 const ESCALERAS = {
 
     4:25,
-
     13:46,
-
     33:49,
-
     42:63,
-
     50:69,
-
     62:81,
-
     74:92
 
 };
@@ -1393,19 +1347,12 @@ const ESCALERAS = {
 const SERPIENTES = {
 
     27:5,
-
     40:3,
-
     43:18,
-
     54:31,
-
     66:45,
-
     76:58,
-
     89:53,
-
     99:41
 
 };
@@ -1414,11 +1361,8 @@ const SERPIENTES = {
 const COLORES = [
 
     "#e53935",
-
     "#1976d2",
-
     "#43a047",
-
     "#8e24aa"
 
 ];
@@ -1433,84 +1377,70 @@ const tablero =
         "tablero"
     );
 
-
 const svgElementos =
     document.getElementById(
         "svgElementos"
     );
-
 
 const fichas =
     document.getElementById(
         "fichas"
     );
 
-
 const estadoConexion =
     document.getElementById(
         "estadoConexion"
     );
-
 
 const nombreJugador =
     document.getElementById(
         "nombreJugador"
     );
 
-
 const btnNombre =
     document.getElementById(
         "btnNombre"
     );
-
 
 const btnDado =
     document.getElementById(
         "btnDado"
     );
 
-
 const btnReiniciar =
     document.getElementById(
         "btnReiniciar"
     );
-
 
 const btnAbandonar =
     document.getElementById(
         "btnAbandonar"
     );
 
-
 const listaJugadores =
     document.getElementById(
         "listaJugadores"
     );
-
 
 const dado3d =
     document.getElementById(
         "dado3d"
     );
 
-
 const resultadoDado =
     document.getElementById(
         "resultadoDado"
     );
-
 
 const victoria =
     document.getElementById(
         "victoria"
     );
 
-
 const textoVictoria =
     document.getElementById(
         "textoVictoria"
     );
-
 
 const btnVictoriaReiniciar =
     document.getElementById(
@@ -1524,17 +1454,12 @@ const btnVictoriaReiniciar =
 
 let socket = null;
 
-
 let estado = {
 
     mi_id:null,
-
     jugadores:{},
-
     turno:null,
-
     ganador:null,
-
     ultimo_dado:null,
 
     ultimo_evento:
@@ -1542,21 +1467,15 @@ let estado = {
 
 };
 
-
 let posicionesVisuales = {};
-
 
 let animando = false;
 
-
 let abandonando = false;
-
 
 let ultimaPosicionGanador = null;
 
-
 let dadoTerminado = true;
-
 
 let resultadoDadoPendiente = null;
 
@@ -1596,6 +1515,8 @@ function escapeHTML(texto){
 
 function crearTablero(){
 
+    // Eliminar casillas anteriores
+
     tablero.querySelectorAll(
         ".casilla"
     ).forEach(
@@ -1604,10 +1525,12 @@ function crearTablero(){
     );
 
 
+    // Crear las 100 casillas
+
     for(
-        let numero = 100;
-        numero >= 1;
-        numero--
+        let numero = 1;
+        numero <= 100;
+        numero++
     ){
 
         const casilla =
@@ -1643,6 +1566,80 @@ function crearTablero(){
         );
 
 
+        // ====================================================
+        // FILA Y COLUMNA
+        // ====================================================
+
+        const indice =
+            numero - 1;
+
+
+        const fila =
+            Math.floor(
+                indice / 10
+            );
+
+
+        const columna =
+            indice % 10;
+
+
+        // La fila 0 está abajo.
+        // CSS empieza arriba.
+
+        const filaVisual =
+            9 - fila;
+
+
+        let columnaVisual;
+
+
+        // ====================================================
+        // ZIGZAG INVERTIDO
+        // ====================================================
+        //
+        // Abajo:
+        //
+        // 10  9  8  7  6  5  4  3  2  1
+        //
+        // 11 12 13 14 15 16 17 18 19 20
+        //
+        // 30 29 28 27 26 25 24 23 22 21
+        //
+        // ...
+        //
+        // Arriba:
+        //
+        // 91 92 93 94 95 96 97 98 99 100
+
+        if(
+            fila % 2 === 0
+        ){
+
+            columnaVisual =
+                9 - columna;
+
+        }
+
+        else{
+
+            columnaVisual =
+                columna;
+
+        }
+
+
+        // Colocar explícitamente
+        // la casilla.
+
+        casilla.style.gridRow =
+            filaVisual + 1;
+
+
+        casilla.style.gridColumn =
+            columnaVisual + 1;
+
+
         tablero.insertBefore(
             casilla,
             svgElementos
@@ -1652,6 +1649,10 @@ function crearTablero(){
 
 }
 
+
+// ============================================================
+// POSICIÓN DE CASILLA
+// ============================================================
 
 function posicionCasilla(numero){
 
@@ -1686,19 +1687,22 @@ function posicionCasilla(numero){
     let columnaVisual;
 
 
+    // MISMA ORIENTACIÓN
+    // QUE crearTablero()
+
     if(
         fila % 2 === 0
     ){
 
         columnaVisual =
-            columna;
+            9 - columna;
 
     }
 
     else{
 
         columnaVisual =
-            9 - columna;
+            columna;
 
     }
 
@@ -1777,9 +1781,12 @@ function dibujarElementos(){
 
     grupoEscaleras.innerHTML = "";
 
-
     grupoSerpientes.innerHTML = "";
 
+
+    // ========================================================
+    // ESCALERAS
+    // ========================================================
 
     for(
         const [desde,hasta]
@@ -2365,7 +2372,7 @@ function obtenerColorJugador(
 
 
 // ============================================================
-// RENDERIZAR JUGADORES
+// RENDERIZAR FICHAS
 // ============================================================
 
 function renderizarFichas(){
@@ -2484,11 +2491,8 @@ function renderizarFichas(){
             const offsets = [
 
                 [0,0],
-
                 [-2.2,-2.2],
-
                 [2.2,2.2],
-
                 [-2.2,2.2]
 
             ];
@@ -2665,20 +2669,11 @@ function renderizarJugadores(){
                 }`;
 
 
-            item.appendChild(
-                color
-            );
+            item.appendChild(color);
 
+            item.appendChild(nombre);
 
-            item.appendChild(
-                nombre
-            );
-
-
-            item.appendChild(
-                casilla
-            );
-
+            item.appendChild(casilla);
 
             listaJugadores.appendChild(
                 item
@@ -2906,9 +2901,7 @@ const ROTACIONES_DADO = {
 };
 
 
-function mostrarCaraDado(
-    numero
-){
+function mostrarCaraDado(numero){
 
     dado3d.style.transform =
         ROTACIONES_DADO[
@@ -2919,20 +2912,15 @@ function mostrarCaraDado(
 }
 
 
-async function animarDado(
-    resultado
-){
+async function animarDado(resultado){
 
     dadoTerminado = false;
 
-
     btnDado.disabled = true;
-
 
     dado3d.classList.add(
         "lanzando"
     );
-
 
     resultadoDado.textContent =
         "🎲 Lanzando...";
@@ -2996,9 +2984,7 @@ async function animarDado(
     );
 
 
-    // IMPORTANTE:
-    // El dado termina completamente antes
-    // de mover la ficha.
+    // El dado termina antes del movimiento.
 
     await dormir(900);
 
@@ -3031,7 +3017,7 @@ async function animarDado(
 
 
 // ============================================================
-// MOVIMIENTO SUAVE
+// MOVIMIENTO
 // ============================================================
 
 function easeInOutCubic(t){
@@ -3095,9 +3081,7 @@ function moverElementoSuave(
             );
 
 
-            function animar(
-                tiempo
-            ){
+            function animar(tiempo){
 
                 const progreso =
                     Math.min(
@@ -3184,10 +3168,6 @@ function moverElementoSuave(
 }
 
 
-// ============================================================
-// MOVIMIENTO CASILLA POR CASILLA
-// ============================================================
-
 async function moverFichaPorCasillas(
     id,
     inicio,
@@ -3245,9 +3225,7 @@ async function moverFichaPorCasillas(
 }
 
 
-async function reboteFicha(
-    id
-){
+async function reboteFicha(id){
 
     const elemento =
         document.getElementById(
@@ -3278,9 +3256,7 @@ async function reboteFicha(
 // MENSAJE
 // ============================================================
 
-function mostrarMensaje(
-    texto
-){
+function mostrarMensaje(texto){
 
     const anterior =
         document.querySelector(
@@ -3312,11 +3288,7 @@ function mostrarMensaje(
 
 
     setTimeout(
-        () => {
-
-            mensaje.remove();
-
-        },
+        () => mensaje.remove(),
         1900
     );
 
@@ -3324,7 +3296,7 @@ function mostrarMensaje(
 
 
 // ============================================================
-// PARTÍCULAS
+// PARTICULAS
 // ============================================================
 
 function crearParticulas(
@@ -3461,7 +3433,7 @@ async function resaltarCasilla(
 
 
 // ============================================================
-// ACTIVAR ESCALERA
+// ESCALERA
 // ============================================================
 
 async function activarEscalera(
@@ -3508,7 +3480,7 @@ async function activarEscalera(
 
 
 // ============================================================
-// ACTIVAR SERPIENTE
+// SERPIENTE
 // ============================================================
 
 async function activarSerpiente(
@@ -3555,7 +3527,7 @@ async function activarSerpiente(
 
 
 // ============================================================
-// ANIMAR MOVIMIENTO
+// ANIMAR MOVIMIENTO DEL JUGADOR
 // ============================================================
 
 async function animarMovimientoJugador(
@@ -3571,23 +3543,14 @@ async function animarMovimientoJugador(
     actualizarBotonDado();
 
 
-    const jugador =
-        obtenerJugador(
-            estado.jugadores,
-            id
-        );
-
-
     let intermedia =
-        Number(
-            posicionAnterior
-        ) +
-        Number(
-            dado
-        );
+        Number(posicionAnterior) +
+        Number(dado);
 
 
-    if(intermedia > 100){
+    if(
+        intermedia > 100
+    ){
 
         intermedia =
             posicionAnterior;
@@ -3595,9 +3558,7 @@ async function animarMovimientoJugador(
     }
 
 
-    // --------------------------------------------------------
-    // MOVIMIENTO NORMAL
-    // --------------------------------------------------------
+    // Movimiento normal
 
     if(
         posicionAnterior !==
@@ -3622,9 +3583,7 @@ async function animarMovimientoJugador(
     }
 
 
-    // --------------------------------------------------------
-    // ESCALERA
-    // --------------------------------------------------------
+    // Escalera
 
     if(
         ESCALERAS[
@@ -3664,16 +3623,12 @@ async function animarMovimientoJugador(
         );
 
 
-        await dormir(
-            300
-        );
+        await dormir(300);
 
     }
 
 
-    // --------------------------------------------------------
-    // SERPIENTE
-    // --------------------------------------------------------
+    // Serpiente
 
     else if(
         SERPIENTES[
@@ -3713,16 +3668,12 @@ async function animarMovimientoJugador(
         );
 
 
-        await dormir(
-            300
-        );
+        await dormir(300);
 
     }
 
 
-    // --------------------------------------------------------
-    // CORRECCIÓN FINAL DEL SERVIDOR
-    // --------------------------------------------------------
+    // Corrección final del servidor
 
     if(
         Number(posicionFinal) !==
@@ -3752,7 +3703,7 @@ async function animarMovimientoJugador(
 
 
 // ============================================================
-// EJECUTAR MOVIMIENTO PENDIENTE
+// MOVIMIENTO PENDIENTE
 // ============================================================
 
 async function ejecutarMovimientoPendiente(
@@ -3784,12 +3735,9 @@ async function ejecutarMovimientoPendiente(
 
     renderizarFichas();
 
-
     renderizarJugadores();
 
-
     actualizarMensajeEstado();
-
 
     actualizarBotonDado();
 
@@ -3861,10 +3809,6 @@ function mostrarVictoria(
 }
 
 
-// ============================================================
-// OCULTAR VICTORIA
-// ============================================================
-
 function ocultarVictoria(){
 
     victoria.classList.add(
@@ -3878,9 +3822,7 @@ function ocultarVictoria(){
 // ENVIAR
 // ============================================================
 
-function enviar(
-    datos
-){
+function enviar(datos){
 
     if(
         !socket ||
@@ -3932,20 +3874,12 @@ async function recibirEstado(
         estado.mi_id;
 
 
-    const jugadoresAnteriores =
-        estado.jugadores ||
-        {};
-
-
     const nuevoJugadorId =
         nuevoEstado.mi_id ??
         nuevoEstado.jugador_id ??
         nuevoEstado.id ??
         miIdAnterior;
 
-
-    // IMPORTANTE:
-    // No perder mi_id al recibir un estado.
 
     estado = {
 
@@ -3970,10 +3904,6 @@ async function recibirEstado(
     };
 
 
-    // --------------------------------------------------------
-    // Si llegó estado con ganador
-    // --------------------------------------------------------
-
     if(
         estado.ganador !== null &&
         estado.ganador !== undefined
@@ -3985,31 +3915,18 @@ async function recibirEstado(
     }
 
 
-    // --------------------------------------------------------
-    // Render básico
-    // --------------------------------------------------------
-
     renderizarJugadores();
-
 
     actualizarMensajeEstado();
 
-
     actualizarBotonDado();
 
-
-    // --------------------------------------------------------
-    // Actualizar fichas
-    // --------------------------------------------------------
 
     const ids =
         Object.keys(
             estado.jugadores
         );
 
-
-    // Si no hay movimiento activo,
-    // colocar fichas nuevas.
 
     if(!animando){
 
@@ -4072,9 +3989,6 @@ async function recibirResultadoDado(
     }
 
 
-    // Actualizamos el turno que vino
-    // del servidor.
-
     if(
         datos.turno !== undefined
     ){
@@ -4085,18 +3999,12 @@ async function recibirResultadoDado(
     }
 
 
-    // --------------------------------------------------------
-    // ANIMACIÓN DEL DADO
-    // --------------------------------------------------------
+    // El dado se anima primero.
 
     animarDado(
         resultado
     );
 
-
-    // --------------------------------------------------------
-    // Preparar movimiento
-    // --------------------------------------------------------
 
     const movimiento = {
 
@@ -4121,10 +4029,8 @@ async function recibirResultadoDado(
     };
 
 
-    // --------------------------------------------------------
-    // El movimiento espera a que termine
-    // completamente el dado.
-    // --------------------------------------------------------
+    // El movimiento queda esperando
+    // hasta que termine el dado.
 
     resultadoDadoPendiente =
         movimiento;
@@ -4210,10 +4116,6 @@ function conectar(){
                 );
 
 
-                // ==========================================
-                // CONEXIÓN
-                // ==========================================
-
                 if(
                     datos.tipo ===
                     "conexion"
@@ -4255,10 +4157,6 @@ function conectar(){
                 }
 
 
-                // ==========================================
-                // ESTADO
-                // ==========================================
-
                 if(
                     datos.tipo ===
                     "estado"
@@ -4272,10 +4170,6 @@ function conectar(){
 
                 }
 
-
-                // ==========================================
-                // RESULTADO DADO
-                // ==========================================
 
                 if(
                     datos.tipo ===
@@ -4291,10 +4185,6 @@ function conectar(){
                 }
 
 
-                // ==========================================
-                // MENSAJE
-                // ==========================================
-
                 if(
                     datos.tipo ===
                     "mensaje"
@@ -4309,10 +4199,6 @@ function conectar(){
 
                 }
 
-
-                // ==========================================
-                // LLENO
-                // ==========================================
 
                 if(
                     datos.tipo ===
@@ -4338,10 +4224,6 @@ function conectar(){
                 }
 
 
-                // ==========================================
-                // ERROR
-                // ==========================================
-
                 if(
                     datos.tipo ===
                     "error"
@@ -4357,10 +4239,6 @@ function conectar(){
 
                 }
 
-
-                // ==========================================
-                // SERVIDOR CERRANDO
-                // ==========================================
 
                 if(
                     datos.tipo ===
@@ -4445,7 +4323,7 @@ function conectar(){
 
 
 // ============================================================
-// BOTÓN NOMBRE
+// NOMBRE
 // ============================================================
 
 btnNombre.onclick = () => {
@@ -4582,9 +4460,7 @@ btnDado.onclick = () => {
 
     animando = true;
 
-
     dadoTerminado = false;
-
 
     resultadoDadoPendiente =
         null;
@@ -4612,15 +4488,11 @@ function reiniciarPartida(){
 
     ocultarVictoria();
 
-
     posicionesVisuales = {};
-
 
     animando = false;
 
-
     dadoTerminado = true;
-
 
     resultadoDadoPendiente =
         null;
@@ -4721,7 +4593,6 @@ dibujarElementos();
 mostrarCaraDado(1);
 
 conectar();
-
 
 </script>
 
