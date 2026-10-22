@@ -4015,6 +4015,17 @@ async function animarMovimientoJugador(
     }
 
 
+    // Iniciar la animación 3D al mismo tiempo que el movimiento del turno.
+    // Se informa la casilla de aterrizaje y la posición final autoritativa del servidor.
+    if (typeof window.animarMovimientoTablero3D === "function") {
+        window.animarMovimientoTablero3D(
+            id,
+            Number(posicionAnterior),
+            Number(intermedia),
+            Number(posicionFinal)
+        );
+    }
+
     // Movimiento normal
 
     if(
@@ -4130,8 +4141,7 @@ async function animarMovimientoJugador(
     }
 
 
-    // Corrección final del servidor
-
+    // Corrección final del servidor en la vista HTML de respaldo.
     if(
         Number(posicionFinal) !==
         Number(intermedia)
@@ -5368,16 +5378,61 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                 positionToken(token, pos, true);
                 token.position.x += token.userData.offsetX || 0;
                 token.position.z += token.userData.offsetZ || 0;
-            } else if (pos !== token.userData.plannedPosition) {
-                const from = Number(token.userData.plannedPosition ?? token.userData.logicalPosition);
-                const path = createMovementPath(from, pos);
-                token.userData.path = path;
-                token.userData.segment = null;
-                token.userData.plannedPosition = pos;
-                if (!path.length) token.userData.logicalPosition = pos;
+            } else {
+                // Las posiciones nuevas se animan desde animarMovimientoTablero3D,
+                // que conoce la casilla de aterrizaje y la transición de escalera/serpiente.
+                // No inferir el recorrido aquí: el estado WebSocket puede llegar antes
+                // que el resultado del dado y provocar que se omita la transición.
+                token.userData.serverPosition = pos;
             }
         }
     }
+
+    // Recorrido explícito de la ficha 3D para que escaleras y serpientes
+    // se activen exactamente en la casilla donde termina el lanzamiento.
+    window.animarMovimientoTablero3D = function(id, desde, aterrizaje, destinoFinal) {
+        const token = tokens.get(String(id));
+        if (!token) return;
+
+        desde = Math.max(1, Math.min(100, Number(desde) || 1));
+        aterrizaje = Math.max(1, Math.min(100, Number(aterrizaje) || desde));
+        destinoFinal = Math.max(1, Math.min(100, Number(destinoFinal) || aterrizaje));
+
+        // Si una actualización de estado llegó antes que el dado, colocar la ficha
+        // en el origen correcto antes de reproducir la animación del turno.
+        const current = Number(token.userData.logicalPosition ?? token.userData.plannedPosition ?? desde);
+        if (current !== desde && (!token.userData.path || token.userData.path.length === 0) && !token.userData.segment) {
+            const p = cellInfo(desde);
+            token.position.set(p.x + (token.userData.offsetX || 0), TILE_TOP, p.z + (token.userData.offsetZ || 0));
+            token.userData.logicalPosition = desde;
+        }
+
+        const path = [];
+        const direction = aterrizaje >= desde ? 1 : -1;
+        if (aterrizaje !== desde) {
+            for (let n = desde + direction; direction > 0 ? n <= aterrizaje : n >= aterrizaje; n += direction) path.push(n);
+        }
+
+        // Si la casilla de aterrizaje inicia una escalera o serpiente, añadir
+        // el destino como un salto visual separado, en lugar de recorrer las casillas intermedias.
+        const transicion = ESCALERAS_3D[aterrizaje] ?? SERPIENTES_3D[aterrizaje];
+        if (transicion !== undefined && Number(transicion) === destinoFinal) {
+            path.push(Number(transicion));
+        } else if (destinoFinal !== aterrizaje) {
+            // Respaldo si el servidor devuelve una posición final distinta a la transición conocida.
+            path.push(destinoFinal);
+        }
+
+        token.userData.path = path;
+        token.userData.segment = null;
+        token.userData.plannedPosition = destinoFinal;
+        token.userData.serverPosition = destinoFinal;
+        if (!path.length) {
+            token.userData.logicalPosition = destinoFinal;
+            const p = cellInfo(destinoFinal);
+            token.position.set(p.x + (token.userData.offsetX || 0), TILE_TOP, p.z + (token.userData.offsetZ || 0));
+        }
+    };
 
     window.actualizarTablero3D = updateGameState;
     if (typeof window.obtenerEstadoJuego3D === 'function') {
