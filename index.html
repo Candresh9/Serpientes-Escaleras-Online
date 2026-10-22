@@ -1557,6 +1557,42 @@ button.accion {
     }
 }
 
+
+
+/* ==========================================================
+   CAPA 3D ISOMÉTRICA (Three.js)
+   La interfaz HTML original se conserva para mantener la lógica.
+   ========================================================== */
+.tablero-contenedor { position: relative; }
+#tablero.modo-oculto-3d { opacity: 0 !important; pointer-events: none !important; }
+#tablero3D {
+    position: absolute;
+    inset: 18px;
+    width: calc(100% - 36px);
+    height: calc(100% - 36px);
+    display: block;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 5;
+    background: linear-gradient(145deg, #eaf4ff, #c7dcf5);
+    box-shadow: inset 0 0 0 1px rgba(28, 55, 86, .14);
+    pointer-events: none;
+    visibility: hidden;
+}
+.tablero-contenedor:has(#tablero3D) { isolation: isolate; }
+@media (max-width: 1050px) {
+    #tablero3D { inset: 18px; width: calc(100% - 36px); height: calc(100% - 36px); }
+}
+@media (max-width: 700px) {
+    #tablero3D { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); border-radius: 8px; }
+}
+@media (max-width: 360px) {
+    #tablero3D { inset: 3px; width: calc(100% - 6px); height: calc(100% - 6px); border-radius: 6px; }
+}
+@media (max-width: 900px) and (orientation: landscape) {
+    #tablero3D { inset: 5px; width: calc(100% - 10px); height: calc(100% - 10px); }
+}
+
 </style>
 
 </head>
@@ -1878,6 +1914,10 @@ let estado = {
         "Conectando al servidor..."
 
 };
+
+// Puente seguro para que la capa Three.js lea el estado real del juego.
+window.obtenerEstadoJuego3D = () => estado;
+
 
 let posicionesVisuales = {};
 
@@ -2935,6 +2975,11 @@ function renderizarFichas(){
 
         }
     );
+
+    // Mantiene sincronizadas las fichas 3D con el estado multijugador.
+    if (typeof window.actualizarTablero3D === "function") {
+        window.actualizarTablero3D(estado);
+    }
 
 }
 
@@ -5006,6 +5051,401 @@ mostrarCaraDado(1);
 
 conectar();
 
+</script>
+
+
+
+<!-- Capa 3D: no reemplaza ni modifica el protocolo WebSocket del servidor. -->
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
+
+(() => {
+    const container = document.querySelector('.tablero-contenedor');
+    if (!container) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.id = 'tablero3D';
+    canvas.setAttribute('aria-label', 'Tablero 3D isométrico de Escaleras y Serpientes');
+    container.appendChild(canvas);
+
+    const ESCALERAS_3D = {4:25, 13:46, 33:49, 42:63, 50:69, 62:81, 74:92};
+    const SERPIENTES_3D = {27:5, 40:3, 43:18, 54:31, 66:45, 76:58, 89:53, 99:41};
+    const COLORES_3D = ['#e53935', '#1976d2', '#43a047', '#8e24aa'];
+    const CELL = 1;
+    const TILE_TOP = 0.10;
+
+    const renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: false});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.8));
+    renderer.setClearColor(0xeaf3ff, 1);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.12;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xeaf3ff);
+    scene.fog = new THREE.Fog(0xeaf3ff, 19, 34);
+
+    const camera = new THREE.OrthographicCamera(-7.15, 7.15, 7.15, -7.15, 0.1, 100);
+    camera.position.set(13, 17, 14);
+    camera.lookAt(0, 0.1, 0);
+
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x7b8da5, 2.0));
+    const sun = new THREE.DirectionalLight(0xffffff, 3.0);
+    sun.position.set(-7, 15, 9);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1024, 1024);
+    sun.shadow.camera.left = -9;
+    sun.shadow.camera.right = 9;
+    sun.shadow.camera.top = 9;
+    sun.shadow.camera.bottom = -9;
+    scene.add(sun);
+
+    const boardGroup = new THREE.Group();
+    const featureGroup = new THREE.Group();
+    const playerGroup = new THREE.Group();
+    scene.add(boardGroup, featureGroup, playerGroup);
+
+    const base = new THREE.Mesh(
+        new THREE.BoxGeometry(10.45, 0.28, 10.45),
+        new THREE.MeshStandardMaterial({color: 0x24466b, roughness: 0.58, metalness: 0.05})
+    );
+    base.position.set(0, -0.13, 0);
+    base.receiveShadow = true;
+    base.castShadow = true;
+    boardGroup.add(base);
+
+    function cellInfo(number) {
+        const n = Math.max(1, Math.min(100, Number(number) || 1));
+        const index = n - 1;
+        const logicalRow = Math.floor(index / 10);
+        const column = index % 10;
+        const visualColumn = logicalRow % 2 === 0 ? 9 - column : column;
+        const visualRow = 9 - logicalRow;
+        return {x: visualColumn - 4.5, z: visualRow - 4.5};
+    }
+
+    function numberTexture(number, color) {
+        const c = document.createElement('canvas');
+        c.width = c.height = 128;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, 128, 128);
+        ctx.fillStyle = 'rgba(255,255,255,0.82)';
+        ctx.beginPath();
+        ctx.roundRect(7, 7, 114, 114, 17);
+        ctx.fill();
+        ctx.fillStyle = color;
+        ctx.font = '900 53px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(String(number), 64, 66);
+        const texture = new THREE.CanvasTexture(c);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.anisotropy = Math.min(renderer.capabilities.getMaxAnisotropy(), 4);
+        return texture;
+    }
+
+    const tileGeometry = new THREE.BoxGeometry(0.96, 0.13, 0.96);
+    for (let number = 1; number <= 100; number++) {
+        const pos = cellInfo(number);
+        const hue = (Math.floor((number - 1) / 10) + number % 3) % 2;
+        const tileColor = hue ? 0xf8d982 : 0xffefbd;
+        const top = new THREE.MeshStandardMaterial({
+            map: numberTexture(number, number % 10 === 0 ? '#9c3c24' : '#26384d'),
+            color: tileColor,
+            roughness: 0.78,
+            metalness: 0.0
+        });
+        const side = new THREE.MeshStandardMaterial({color: 0xe0b95f, roughness: 0.8});
+        const tile = new THREE.Mesh(tileGeometry, [side, side, top, side, side, side]);
+        tile.position.set(pos.x, 0.025, pos.z);
+        tile.receiveShadow = true;
+        tile.castShadow = true;
+        tile.userData.number = number;
+        boardGroup.add(tile);
+    }
+
+    // Borde elevado alrededor del tablero.
+    const edgeMaterial = new THREE.MeshStandardMaterial({color: 0x183958, roughness: 0.48, metalness: 0.12});
+    function addEdge(w, h, d, x, y, z) {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), edgeMaterial);
+        mesh.position.set(x, y, z);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        boardGroup.add(mesh);
+    }
+    addEdge(10.55, 0.22, 0.12, 0, 0.02, -5.22);
+    addEdge(10.55, 0.22, 0.12, 0, 0.02, 5.22);
+    addEdge(0.12, 0.22, 10.4, -5.22, 0.02, 0);
+    addEdge(0.12, 0.22, 10.4, 5.22, 0.02, 0);
+
+    function cylinderBetween(a, b, radius, material, group = featureGroup, radialSegments = 10) {
+        const start = new THREE.Vector3(a.x, a.y, a.z);
+        const end = new THREE.Vector3(b.x, b.y, b.z);
+        const direction = new THREE.Vector3().subVectors(end, start);
+        const mesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(radius, radius, direction.length(), radialSegments),
+            material
+        );
+        mesh.position.copy(start).add(end).multiplyScalar(0.5);
+        mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        group.add(mesh);
+        return mesh;
+    }
+
+    const ladderWood = new THREE.MeshStandardMaterial({color: 0x9b5726, roughness: 0.64});
+    const ladderRung = new THREE.MeshStandardMaterial({color: 0xf1c27a, roughness: 0.55});
+    for (const [fromText, toText] of Object.entries(ESCALERAS_3D)) {
+        const from = cellInfo(Number(fromText));
+        const to = cellInfo(Number(toText));
+        const dx = to.x - from.x;
+        const dz = to.z - from.z;
+        const length = Math.hypot(dx, dz) || 1;
+        const px = -dz / length * 0.17;
+        const pz = dx / length * 0.17;
+        const a = {x: from.x + px, y: 0.27, z: from.z + pz};
+        const b = {x: to.x + px, y: 0.42, z: to.z + pz};
+        const c = {x: from.x - px, y: 0.27, z: from.z - pz};
+        const d = {x: to.x - px, y: 0.42, z: to.z - pz};
+        cylinderBetween(a, b, 0.055, ladderWood);
+        cylinderBetween(c, d, 0.055, ladderWood);
+        const count = Math.max(4, Math.round(length * 2.1));
+        for (let i = 1; i < count; i++) {
+            const t = i / count;
+            cylinderBetween(
+                {x: THREE.MathUtils.lerp(a.x, b.x, t), y: THREE.MathUtils.lerp(a.y, b.y, t), z: THREE.MathUtils.lerp(a.z, b.z, t)},
+                {x: THREE.MathUtils.lerp(c.x, d.x, t), y: THREE.MathUtils.lerp(c.y, d.y, t), z: THREE.MathUtils.lerp(c.z, d.z, t)},
+                0.035, ladderRung, featureGroup, 8
+            );
+        }
+    }
+
+    const snakeColors = [0x27a66b, 0x6b58cf, 0xe45b36, 0x168f9d, 0x8cba38, 0xe5a52e, 0xc44587, 0x4676d7];
+    let snakeIndex = 0;
+    for (const [fromText, toText] of Object.entries(SERPIENTES_3D)) {
+        const from = cellInfo(Number(fromText));
+        const to = cellInfo(Number(toText));
+        const start = new THREE.Vector3(from.x, 0.31, from.z);
+        const end = new THREE.Vector3(to.x, 0.31, to.z);
+        const delta = new THREE.Vector3().subVectors(end, start);
+        const perp = new THREE.Vector3(-delta.z, 0, delta.x).normalize();
+        const points = [];
+        const segments = 28;
+        for (let i = 0; i <= segments; i++) {
+            const t = i / segments;
+            const wave = Math.sin(t * Math.PI * 4 + snakeIndex * 0.6) * 0.28;
+            points.push(new THREE.Vector3(
+                THREE.MathUtils.lerp(start.x, end.x, t) + perp.x * wave,
+                0.31 + Math.sin(t * Math.PI) * 0.18,
+                THREE.MathUtils.lerp(start.z, end.z, t) + perp.z * wave
+            ));
+        }
+        const curve = new THREE.CatmullRomCurve3(points);
+        const color = snakeColors[snakeIndex % snakeColors.length];
+        const body = new THREE.Mesh(
+            new THREE.TubeGeometry(curve, 56, 0.115, 8, false),
+            new THREE.MeshStandardMaterial({color, roughness: 0.48, metalness: 0.02})
+        );
+        body.castShadow = true;
+        featureGroup.add(body);
+        const headPos = points[0];
+        const head = new THREE.Mesh(
+            new THREE.SphereGeometry(0.22, 16, 12),
+            new THREE.MeshStandardMaterial({color, roughness: 0.42})
+        );
+        head.position.copy(headPos);
+        head.scale.set(1.1, 0.82, 1.0);
+        head.castShadow = true;
+        featureGroup.add(head);
+        const eyeMaterial = new THREE.MeshStandardMaterial({color: 0xffffff, roughness: 0.3});
+        const pupilMaterial = new THREE.MeshStandardMaterial({color: 0x18212b, roughness: 0.3});
+        for (const sideSign of [-1, 1]) {
+            const eye = new THREE.Mesh(new THREE.SphereGeometry(0.055, 10, 8), eyeMaterial);
+            eye.position.set(headPos.x + sideSign * 0.085, headPos.y + 0.09, headPos.z + 0.045);
+            featureGroup.add(eye);
+            const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.024, 8, 6), pupilMaterial);
+            pupil.position.set(eye.position.x, eye.position.y + 0.005, eye.position.z + 0.04);
+            featureGroup.add(pupil);
+        }
+        snakeIndex++;
+    }
+
+    const tokens = new Map();
+    function createToken(id, player) {
+        const group = new THREE.Group();
+        const color = player.color || COLORES_3D[(Number(id) - 1 + COLORES_3D.length) % COLORES_3D.length];
+        const material = new THREE.MeshStandardMaterial({color, roughness: 0.34, metalness: 0.08});
+        const gold = new THREE.MeshStandardMaterial({color: 0xffd36a, metalness: 0.25, roughness: 0.28});
+        const basePiece = new THREE.Mesh(new THREE.CylinderGeometry(0.27, 0.31, 0.11, 24), gold);
+        basePiece.position.y = 0.08;
+        basePiece.castShadow = true;
+        group.add(basePiece);
+        const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.16, 0.32, 18), material);
+        stem.position.y = 0.27;
+        stem.castShadow = true;
+        group.add(stem);
+        const head = new THREE.Mesh(new THREE.SphereGeometry(0.205, 20, 16), material);
+        head.position.y = 0.51;
+        head.castShadow = true;
+        group.add(head);
+        const shine = new THREE.Mesh(new THREE.SphereGeometry(0.052, 10, 8), new THREE.MeshBasicMaterial({color: 0xffffff}));
+        shine.position.set(-0.07, 0.58, 0.15);
+        group.add(shine);
+        group.userData.id = String(id);
+        group.userData.logicalPosition = null;
+        group.userData.plannedPosition = null;
+        group.userData.path = [];
+        group.userData.segment = null;
+        group.userData.lastColor = color;
+        playerGroup.add(group);
+        tokens.set(String(id), group);
+        return group;
+    }
+
+    function positionToken(token, number, instant = false) {
+        const p = cellInfo(number);
+        if (instant) {
+            token.position.set(p.x, TILE_TOP, p.z);
+            token.userData.logicalPosition = Number(number);
+            token.userData.plannedPosition = Number(number);
+            token.userData.path = [];
+            token.userData.segment = null;
+        }
+    }
+
+    function createMovementPath(from, to) {
+        from = Number(from) || 1;
+        to = Number(to) || 1;
+        if (from === to) return [];
+        const entries = [...Object.entries(ESCALERAS_3D), ...Object.entries(SERPIENTES_3D)];
+        const jump = entries.find(([start, end]) => Number(end) === to && Number(start) > from && Number(start) - from <= 6);
+        const path = [];
+        if (jump) {
+            const start = Number(jump[0]);
+            for (let n = from + 1; n <= start; n++) path.push(n);
+            path.push(to);
+            return path;
+        }
+        const direction = to > from ? 1 : -1;
+        for (let n = from + direction; direction > 0 ? n <= to : n >= to; n += direction) path.push(n);
+        return path;
+    }
+
+    function updateGameState(state) {
+        if (!state || !state.jugadores) return;
+        const players = state.jugadores;
+        const ids = Object.keys(players);
+        const currentIds = new Set(ids.map(String));
+        for (const [id, token] of tokens.entries()) {
+            if (!currentIds.has(id)) {
+                playerGroup.remove(token);
+                tokens.delete(id);
+            }
+        }
+        const occupied = new Map();
+        for (const id of ids) {
+            const player = players[id] || {};
+            const pos = Math.max(1, Math.min(100, Number(player.posicion ?? player.casilla ?? 1)));
+            const token = tokens.get(String(id)) || createToken(id, player);
+            const wantedColor = player.color || COLORES_3D[(Number(id) - 1 + COLORES_3D.length) % COLORES_3D.length];
+            if (token.userData.lastColor !== wantedColor) {
+                token.userData.lastColor = wantedColor;
+                token.children.forEach(child => {
+                    if (child.material && child.material.color && child !== token.children[0]) child.material.color.set(wantedColor);
+                });
+            }
+            const stack = occupied.get(pos) || 0;
+            occupied.set(pos, stack + 1);
+            const offsets = [[0,0],[-0.2,-0.2],[0.2,0.2],[-0.2,0.2]];
+            const offset = offsets[stack % offsets.length];
+            token.userData.offsetX = offset[0];
+            token.userData.offsetZ = offset[1];
+
+            if (token.userData.logicalPosition === null) {
+                positionToken(token, pos, true);
+                token.position.x += token.userData.offsetX || 0;
+                token.position.z += token.userData.offsetZ || 0;
+            } else if (pos !== token.userData.plannedPosition) {
+                const from = Number(token.userData.plannedPosition ?? token.userData.logicalPosition);
+                const path = createMovementPath(from, pos);
+                token.userData.path = path;
+                token.userData.segment = null;
+                token.userData.plannedPosition = pos;
+                if (!path.length) token.userData.logicalPosition = pos;
+            }
+        }
+    }
+
+    window.actualizarTablero3D = updateGameState;
+    if (typeof window.obtenerEstadoJuego3D === 'function') {
+        updateGameState(window.obtenerEstadoJuego3D());
+    }
+
+    function resize() {
+        const width = Math.max(1, canvas.clientWidth);
+        const height = Math.max(1, canvas.clientHeight);
+        renderer.setSize(width, height, false);
+        const aspect = width / height;
+        const halfHeight = 7.15;
+        camera.left = -halfHeight * aspect;
+        camera.right = halfHeight * aspect;
+        camera.top = halfHeight;
+        camera.bottom = -halfHeight;
+        camera.updateProjectionMatrix();
+    }
+    const resizeObserver = new ResizeObserver(resize);
+    resizeObserver.observe(canvas);
+    window.addEventListener('resize', resize, {passive: true});
+    resize();
+    // Solo ocultar el tablero HTML cuando la escena WebGL ya está preparada.
+    canvas.style.visibility = 'visible';
+    const legacyBoard = document.getElementById('tablero');
+    if (legacyBoard) legacyBoard.classList.add('modo-oculto-3d');
+
+    const clock = new THREE.Clock();
+    function animate() {
+        requestAnimationFrame(animate);
+        const dt = Math.min(clock.getDelta(), 0.05);
+        for (const token of tokens.values()) {
+            const path = token.userData.path;
+            if (path && path.length) {
+                if (!token.userData.segment) {
+                    const nextNumber = path.shift();
+                    const p = cellInfo(nextNumber);
+                    token.userData.segment = {
+                        fromX: token.position.x,
+                        fromZ: token.position.z,
+                        toX: p.x + (token.userData.offsetX || 0),
+                        toZ: p.z + (token.userData.offsetZ || 0),
+                        number: nextNumber,
+                        elapsed: 0,
+                        duration: 0.17
+                    };
+                }
+                const seg = token.userData.segment;
+                seg.elapsed += dt;
+                const t = Math.min(1, seg.elapsed / seg.duration);
+                const eased = t * t * (3 - 2 * t);
+                token.position.x = THREE.MathUtils.lerp(seg.fromX, seg.toX, eased);
+                token.position.z = THREE.MathUtils.lerp(seg.fromZ, seg.toZ, eased);
+                token.position.y = TILE_TOP + Math.sin(t * Math.PI) * 0.19;
+                if (t >= 1) {
+                    token.position.y = TILE_TOP;
+                    token.userData.segment = null;
+                    token.userData.logicalPosition = seg.number;
+                    // El siguiente destino del camino se fija en el próximo frame.
+                }
+            } else {
+                token.position.y = TILE_TOP + Math.sin(performance.now() * 0.002 + Number(token.userData.id)) * 0.012;
+            }
+        }
+        renderer.render(scene, camera);
+    }
+    animate();
+})();
 </script>
 
 </body>
