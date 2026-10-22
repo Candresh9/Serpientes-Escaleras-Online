@@ -3969,7 +3969,8 @@ async function animarMovimientoJugador(
     id,
     posicionAnterior,
     posicionFinalServidor,
-    dado
+    dado,
+    aterrizajeInformado = null
 ){
 
     animando = true;
@@ -3978,11 +3979,14 @@ async function animarMovimientoJugador(
     posicionAnterior = Math.max(1, Math.min(100, Number(posicionAnterior) || 1));
     dado = Math.max(1, Math.min(6, Number(dado) || 1));
 
-    let intermedia = posicionAnterior + dado;
-
-    // En este juego no se avanza más allá de la casilla 100.
-    if (intermedia > 100) {
-        intermedia = posicionAnterior;
+    // Preferir la casilla de aterrizaje calculada por el servidor.
+    // Si el servidor antiguo no la envía, calcularla localmente.
+    let intermedia = Number(aterrizajeInformado);
+    if (!Number.isFinite(intermedia) || intermedia < 1 || intermedia > 100) {
+        intermedia = posicionAnterior + dado;
+        if (intermedia > 100) {
+            intermedia = posicionAnterior;
+        }
     }
 
     // La regla de la casilla de llegada tiene prioridad para la animación.
@@ -4177,6 +4181,10 @@ async function ejecutarMovimientoPendiente(
 
         Number(
             movimiento.dado
+        ),
+
+        Number(
+            movimiento.posicion_intermedia
         )
 
     );
@@ -4480,17 +4488,29 @@ async function recibirResultadoDado(
         datos.casilla
     );
 
-    const aterrizaje = posicionAnterior + resultado;
-    const casillaAterrizaje = aterrizaje > 100 ? posicionAnterior : aterrizaje;
+    const aterrizajeInformado = Number(datos.posicion_intermedia);
+    let aterrizaje = Number.isFinite(aterrizajeInformado) &&
+        aterrizajeInformado >= 1 && aterrizajeInformado <= 100
+        ? aterrizajeInformado
+        : posicionAnterior + resultado;
+
+    // Regla de no pasar de 100, aplicada también para servidores antiguos.
+    if (aterrizajeInformado === undefined || !Number.isFinite(aterrizajeInformado)) {
+        if (aterrizaje > 100) aterrizaje = posicionAnterior;
+    }
+
+    const casillaAterrizaje = aterrizaje;
     const destinoRegla = ESCALERAS[casillaAterrizaje] ?? SERPIENTES[casillaAterrizaje];
+    const finalInformado = Number(datos.posicion_final ?? datos.posicion ?? datos.casilla_final ?? datos.casilla);
 
     const movimiento = {
         jugador_id: jugadorId,
         dado: resultado,
         posicion_anterior: posicionAnterior,
+        posicion_intermedia: casillaAterrizaje,
         posicion: destinoRegla !== undefined
             ? Number(destinoRegla)
-            : (Number.isFinite(posicionInformada) ? posicionInformada : casillaAterrizaje)
+            : (Number.isFinite(finalInformado) ? finalInformado : casillaAterrizaje)
     };
 
     // Secuencia estricta: animar el dado, mostrar el número y después mover la ficha.
