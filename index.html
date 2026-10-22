@@ -5337,6 +5337,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
         group.userData.plannedPosition = null;
         group.userData.path = [];
         group.userData.segment = null;
+        // Transiciones especiales explícitas para animar escaleras y serpientes.
+        group.userData.specialTransitions = [];
         group.userData.lastColor = color;
         playerGroup.add(group);
         tokens.set(String(id), group);
@@ -5351,6 +5353,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
             token.userData.plannedPosition = Number(number);
             token.userData.path = [];
             token.userData.segment = null;
+            token.userData.specialTransitions = [];
         }
     }
 
@@ -5480,11 +5483,19 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
             for (let n = desde + direction; direction > 0 ? n <= aterrizaje : n >= aterrizaje; n += direction) path.push(n);
         }
 
-        // Si la casilla de aterrizaje inicia una escalera o serpiente, añadir
-        // el destino como un salto visual separado, en lugar de recorrer las casillas intermedias.
-        const transicion = ESCALERAS_3D[aterrizaje] ?? SERPIENTES_3D[aterrizaje];
+        // Guardar la transición especial de forma explícita. No depender de
+        // la posición lógica del frame anterior para detectar la escalera/serpiente.
+        token.userData.specialTransitions = [];
+        const destinoEscalera = ESCALERAS_3D[aterrizaje];
+        const destinoSerpiente = SERPIENTES_3D[aterrizaje];
+        const transicion = destinoEscalera ?? destinoSerpiente;
         if (transicion !== undefined && Number(transicion) === destinoFinal) {
             path.push(Number(transicion));
+            token.userData.specialTransitions.push({
+                from: Number(aterrizaje),
+                to: Number(transicion),
+                type: destinoEscalera !== undefined ? 'ladder' : 'snake'
+            });
         } else if (destinoFinal !== aterrizaje) {
             // Respaldo si el servidor devuelve una posición final distinta a la transición conocida.
             path.push(destinoFinal);
@@ -5548,8 +5559,9 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                     const nextNumber = path.shift();
                     const p = cellInfo(nextNumber);
                     const currentNumber = Number(token.userData.logicalPosition || 1);
-                    const ruleDestination = ESCALERAS_3D[currentNumber] ?? SERPIENTES_3D[currentNumber];
-                    const isSnakeOrLadder = Number(ruleDestination) === Number(nextNumber);
+                    const special = (token.userData.specialTransitions || []).find(item =>
+                        Number(item.from) === currentNumber && Number(item.to) === Number(nextNumber)
+                    );
                     token.userData.segment = {
                         fromX: token.position.x,
                         fromZ: token.position.z,
@@ -5557,8 +5569,9 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                         toZ: p.z + (token.userData.offsetZ || 0),
                         number: nextNumber,
                         elapsed: 0,
-                        // El salto de serpiente/escalera debe verse claramente.
-                        duration: isSnakeOrLadder ? 0.85 : 0.20
+                        specialType: special ? special.type : null,
+                        // Los pasos normales son rápidos; la transición especial es lenta y visible.
+                        duration: special ? (special.type === 'ladder' ? 1.25 : 1.10) : 0.24
                     };
                 }
                 const seg = token.userData.segment;
@@ -5567,11 +5580,23 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                 const eased = t * t * (3 - 2 * t);
                 token.position.x = THREE.MathUtils.lerp(seg.fromX, seg.toX, eased);
                 token.position.z = THREE.MathUtils.lerp(seg.fromZ, seg.toZ, eased);
-                token.position.y = TILE_TOP + Math.sin(t * Math.PI) * 0.19;
+                // La escalera levanta la ficha de forma más marcada; la serpiente
+                // la hace deslizar con una curva lateral y un salto más bajo.
+                const arco = seg.specialType === 'ladder' ? 0.78
+                    : seg.specialType === 'snake' ? 0.30 : 0.16;
+                token.position.y = TILE_TOP + Math.sin(t * Math.PI) * arco;
+                if (seg.specialType === 'snake') {
+                    token.position.x += Math.sin(t * Math.PI) * 0.18;
+                }
                 if (t >= 1) {
                     token.position.y = TILE_TOP;
                     token.userData.segment = null;
                     token.userData.logicalPosition = seg.number;
+                    if (seg.specialType) {
+                        token.userData.specialTransitions = (token.userData.specialTransitions || []).filter(item =>
+                            !(Number(item.to) === Number(seg.number))
+                        );
+                    }
                     // El siguiente destino del camino se fija en el próximo frame.
                 }
             } else {
