@@ -1,125 +1,96 @@
-        cerrar=False
-    ):
-
-        if jugador_id is None:
-
-            return
-
-
-        async with self.lock:
-
-            if jugador_id not in self.jugadores:
-
-                return
-
-
-            jugador = self.jugadores[
-                jugador_id
-            ]
-
-
-            nombre = jugador["nombre"]
-
-
-            websocket = self.conexiones.get(
-                jugador_id
-            )
-
-
-            if cerrar and websocket:
-
-                try:
-
-                    await websocket.send(
-                        json.dumps({
-                            "tipo": "servidor_cerrando",
-                            "mensaje": "Has abandonado la partida."
-                        }, ensure_ascii=False)
-                    )
-
-                except Exception:
-
-                    pass
-
-
-            self.jugadores.pop(
-                jugador_id,
-                None
-            )
-
-            self.conexiones.pop(
-                jugador_id,
-                None
-            )
-
-
-            if self.jugadores:
-
-                ids = sorted(
-                    self.jugadores.keys()
-                )
-
-
-                if self.turno == jugador_id:
-
-                    self.turno = ids[0]
-
-
-                if self.ganador == jugador_id:
-
-                    self.ganador = None
-
-
-                self.ultimo_evento = (
-                    f"{nombre} abandonó la partida."
-                )
-
-            else:
-
-                self.turno = None
-
-                self.ganador = None
-
-                self.ultimo_dado = None
-
-                self.ultimo_evento = (
-                    "Esperando jugadores..."
-                )
-
-
-        await self.enviar_estado()
+import asyncio
+import json
+import os
+import random
+import websockets
 
 
 # ============================================================
-# MAIN
+# CONFIGURACIÓN
 # ============================================================
 
-async def main():
+HOST = "0.0.0.0"
+PORT = int(os.environ.get("PORT", 10000))
 
-    juego = JuegoServidor()
-
-
-    print(
-        f"Servidor iniciado en "
-        f"{HOST}:{PORT}"
-    )
+MAX_JUGADORES = 4
 
 
-    async with websockets.serve(
-        juego.conectar,
-        HOST,
-        PORT,
-        ping_interval=20,
-        ping_timeout=20
-    ):
+# ============================================================
+# TABLERO
+# ============================================================
 
-        print(
-            "Servidor WebSocket listo."
-        )
+ESCALERAS = {
+    4: 25,
+    13: 46,
+    33: 49,
+    42: 63,
+    50: 69,
+    62: 81,
+    74: 92
+}
 
-        await asyncio.Future()
+SERPIENTES = {
+    27: 5,
+    40: 3,
+    43: 18,
+    54: 31,
+    66: 45,
+    76: 58,
+    89: 53,
+    99: 41
+}
 
 
-if __name__ == "__main__":
+COLORES = [
+    "#e53935",
+    "#1976d2",
+    "#43a047",
+    "#8e24aa"
+]
 
-    asyncio.run(main())
+
+# ============================================================
+# SERVIDOR DEL JUEGO
+# ============================================================
+
+class JuegoServidor:
+
+    def __init__(self):
+
+        self.jugadores = {}
+
+        self.conexiones = {}
+
+        self.siguiente_id = 1
+
+        self.turno = None
+
+        self.ganador = None
+
+        self.ultimo_dado = None
+
+        self.ultimo_evento = "Esperando jugadores..."
+
+        self.lock = asyncio.Lock()
+
+
+    # ========================================================
+    # CREAR ESTADO
+    # ========================================================
+
+    def obtener_estado(self):
+
+        jugadores_estado = {}
+
+        for jugador_id, jugador in self.jugadores.items():
+
+            jugadores_estado[str(jugador_id)] = {
+                "id": jugador_id,
+                "nombre": jugador["nombre"],
+                "posicion": jugador["posicion"],
+                "casilla": jugador["posicion"],
+                "color": jugador["color"]
+            }
+
+        return {
+            "jugadores": jugadores_estado,
