@@ -3968,29 +3968,33 @@ async function activarSerpiente(
 async function animarMovimientoJugador(
     id,
     posicionAnterior,
-    posicionFinal,
+    posicionFinalServidor,
     dado
 ){
 
     animando = true;
-
-
     actualizarBotonDado();
 
+    posicionAnterior = Math.max(1, Math.min(100, Number(posicionAnterior) || 1));
+    dado = Math.max(1, Math.min(6, Number(dado) || 1));
 
-    let intermedia =
-        Number(posicionAnterior) +
-        Number(dado);
+    let intermedia = posicionAnterior + dado;
 
-
-    if(
-        intermedia > 100
-    ){
-
-        intermedia =
-            posicionAnterior;
-
+    // En este juego no se avanza más allá de la casilla 100.
+    if (intermedia > 100) {
+        intermedia = posicionAnterior;
     }
+
+    // La regla de la casilla de llegada tiene prioridad para la animación.
+    // Así funciona también si el servidor comunica la casilla de aterrizaje
+    // en vez de la casilla posterior a la escalera/serpiente.
+    const destinoRegla = ESCALERAS[intermedia] ?? SERPIENTES[intermedia];
+    const finalServidor = Number(posicionFinalServidor);
+    let posicionFinal = destinoRegla !== undefined
+        ? Number(destinoRegla)
+        : (Number.isFinite(finalServidor) && finalServidor >= 1 && finalServidor <= 100
+            ? finalServidor
+            : intermedia);
 
 
     // Iniciar la animación 3D al mismo tiempo que el movimiento del turno.
@@ -4445,11 +4449,34 @@ async function recibirResultadoDado(
 
 
     // Preparar el movimiento, pero NO mover la ficha todavía.
+    const jugadorId = Number(
+        datos.jugador_id ?? datos.id_jugador ?? datos.id ?? estado.turno
+    );
+    const jugadorActual = obtenerJugador(estado.jugadores, jugadorId);
+    const posicionAnterior = Number(
+        datos.posicion_anterior ??
+        datos.posicion_inicial ??
+        datos.casilla_anterior ??
+        obtenerPosicionJugador(jugadorActual)
+    );
+    const posicionInformada = Number(
+        datos.posicion_final ??
+        datos.posicion ??
+        datos.casilla_final ??
+        datos.casilla
+    );
+
+    const aterrizaje = posicionAnterior + resultado;
+    const casillaAterrizaje = aterrizaje > 100 ? posicionAnterior : aterrizaje;
+    const destinoRegla = ESCALERAS[casillaAterrizaje] ?? SERPIENTES[casillaAterrizaje];
+
     const movimiento = {
-        jugador_id: Number(datos.jugador_id),
+        jugador_id: jugadorId,
         dado: resultado,
-        posicion_anterior: Number(datos.posicion_anterior),
-        posicion: Number(datos.posicion)
+        posicion_anterior: posicionAnterior,
+        posicion: destinoRegla !== undefined
+            ? Number(destinoRegla)
+            : (Number.isFinite(posicionInformada) ? posicionInformada : casillaAterrizaje)
     };
 
     // Secuencia estricta: animar el dado, mostrar el número y después mover la ficha.
@@ -5247,6 +5274,10 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
     }
 
     const tokens = new Map();
+    // Si el resultado del dado llega antes de que la ficha 3D exista,
+    // guardar el movimiento y reproducirlo cuando se cree la ficha.
+    const movimientos3DPendientes = new Map();
+
     function createToken(id, player) {
         const group = new THREE.Group();
         const color = player.color || COLORES_3D[(Number(id) - 1 + COLORES_3D.length) % COLORES_3D.length];
@@ -5312,6 +5343,27 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
         const players = state.jugadores;
         const ids = Object.keys(players);
         const currentIds = new Set(ids.map(String));
+
+        // Detectar un reinicio enviado por el servidor: todos vuelven a la casilla 1.
+        // Sin esto, las fichas 3D conservaban su posición visual anterior.
+        const todosEnInicio = ids.length > 0 && ids.every(id => {
+            const player = players[id] || {};
+            return Number(player.posicion ?? player.casilla ?? 1) === 1;
+        });
+        const habiaAvanceVisual = [...tokens.values()].some(token =>
+            Number(token.userData.logicalPosition || 1) !== 1 ||
+            (token.userData.path && token.userData.path.length > 0) ||
+            Boolean(token.userData.segment)
+        );
+        if (todosEnInicio && habiaAvanceVisual) {
+            for (const token of tokens.values()) {
+                positionToken(token, 1, true);
+                token.position.x += token.userData.offsetX || 0;
+                token.position.z += token.userData.offsetZ || 0;
+                token.userData.serverPosition = 1;
+            }
+            movimientos3DPendientes.clear();
+        }
         for (const [id, token] of tokens.entries()) {
             if (!currentIds.has(id)) {
                 playerGroup.remove(token);
@@ -5342,11 +5394,19 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                 token.position.x += token.userData.offsetX || 0;
                 token.position.z += token.userData.offsetZ || 0;
             } else {
-                // Las posiciones nuevas se animan desde animarMovimientoTablero3D,
-                // que conoce la casilla de aterrizaje y la transición de escalera/serpiente.
-                // No inferir el recorrido aquí: el estado WebSocket puede llegar antes
-                // que el resultado del dado y provocar que se omita la transición.
+                // El servidor mantiene la posición autoritativa; la vista 3D se anima
+                // desde el resultado del dado para no saltarse la transición visual.
                 token.userData.serverPosition = pos;
+            }
+
+            const pendiente = movimientos3DPendientes.get(String(id));
+            if (pendiente && token.userData.logicalPosition !== null) {
+                movimientos3DPendientes.delete(String(id));
+                queueMicrotask(() => {
+                    if (typeof window.animarMovimientoTablero3D === 'function') {
+                        window.animarMovimientoTablero3D(...pendiente);
+                    }
+                });
             }
         }
     }
@@ -5354,12 +5414,22 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
     // Recorrido explícito de la ficha 3D para que escaleras y serpientes
     // se activen exactamente en la casilla donde termina el lanzamiento.
     window.animarMovimientoTablero3D = function(id, desde, aterrizaje, destinoFinal) {
-        const token = tokens.get(String(id));
-        if (!token) return;
-
+        id = String(id);
         desde = Math.max(1, Math.min(100, Number(desde) || 1));
         aterrizaje = Math.max(1, Math.min(100, Number(aterrizaje) || desde));
         destinoFinal = Math.max(1, Math.min(100, Number(destinoFinal) || aterrizaje));
+
+        const token = tokens.get(id);
+        if (!token) {
+            movimientos3DPendientes.set(id, [id, desde, aterrizaje, destinoFinal]);
+            return;
+        }
+
+        // Las reglas visuales de la casilla de llegada tienen prioridad.
+        const destinoRegla = ESCALERAS_3D[aterrizaje] ?? SERPIENTES_3D[aterrizaje];
+        if (destinoRegla !== undefined) {
+            destinoFinal = Number(destinoRegla);
+        }
 
         // Si una actualización de estado llegó antes que el dado, colocar la ficha
         // en el origen correcto antes de reproducir la animación del turno.
@@ -5433,6 +5503,9 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                 if (!token.userData.segment) {
                     const nextNumber = path.shift();
                     const p = cellInfo(nextNumber);
+                    const currentNumber = Number(token.userData.logicalPosition || 1);
+                    const ruleDestination = ESCALERAS_3D[currentNumber] ?? SERPIENTES_3D[currentNumber];
+                    const isSnakeOrLadder = Number(ruleDestination) === Number(nextNumber);
                     token.userData.segment = {
                         fromX: token.position.x,
                         fromZ: token.position.z,
@@ -5440,7 +5513,8 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
                         toZ: p.z + (token.userData.offsetZ || 0),
                         number: nextNumber,
                         elapsed: 0,
-                        duration: 0.17
+                        // El salto de serpiente/escalera debe verse claramente.
+                        duration: isSnakeOrLadder ? 0.85 : 0.20
                     };
                 }
                 const seg = token.userData.segment;
