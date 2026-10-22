@@ -4453,11 +4453,25 @@ async function recibirResultadoDado(
         datos.jugador_id ?? datos.id_jugador ?? datos.id ?? estado.turno
     );
     const jugadorActual = obtenerJugador(estado.jugadores, jugadorId);
-    const posicionAnterior = Number(
+
+    // El servidor puede enviar primero el estado actualizado y después el dado.
+    // En ese caso, la posición del estado ya es el destino y no el origen.
+    // Para animar desde la casilla correcta, priorizar la posición lógica que
+    // la ficha 3D todavía muestra; luego usar la posición visual HTML y al final
+    // los datos del servidor como último recurso.
+    const posicionVisual3D = typeof window.obtenerPosicionVisual3D === "function"
+        ? window.obtenerPosicionVisual3D(jugadorId)
+        : null;
+    const posicionAnteriorInformada =
         datos.posicion_anterior ??
         datos.posicion_inicial ??
-        datos.casilla_anterior ??
-        obtenerPosicionJugador(jugadorActual)
+        datos.casilla_anterior;
+    const posicionAnterior = Number(
+        posicionAnteriorInformada !== undefined && posicionAnteriorInformada !== null
+            ? posicionAnteriorInformada
+            : (posicionVisual3D !== null && posicionVisual3D !== undefined
+                ? posicionVisual3D
+                : (posicionesVisuales[jugadorId] ?? obtenerPosicionJugador(jugadorActual)))
     );
     const posicionInformada = Number(
         datos.posicion_final ??
@@ -5468,6 +5482,16 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.m
     };
 
     window.actualizarTablero3D = updateGameState;
+
+    // Devuelve la posición lógica animada de la ficha, no la posición más
+    // reciente del servidor, que puede adelantarse a la animación del dado.
+    window.obtenerPosicionVisual3D = function(id) {
+        const token = tokens.get(String(id));
+        if (!token) return null;
+        const position = token.userData.logicalPosition ?? token.userData.plannedPosition;
+        return Number.isFinite(Number(position)) ? Number(position) : null;
+    };
+
     if (typeof window.obtenerEstadoJuego3D === 'function') {
         updateGameState(window.obtenerEstadoJuego3D());
     }
