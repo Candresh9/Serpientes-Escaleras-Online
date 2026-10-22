@@ -3441,33 +3441,11 @@ async function animarDado(resultado){
     );
 
 
-    // El dado termina antes del movimiento.
-
+    // Mantener visible el resultado antes de permitir el movimiento de la ficha.
+    // La ficha se mueve desde recibirResultadoDado(), después de que esta promesa termine.
     await dormir(900);
 
-
     dadoTerminado = true;
-
-
-    if(
-        resultadoDadoPendiente
-    ){
-
-        const movimiento =
-            resultadoDadoPendiente;
-
-
-        resultadoDadoPendiente =
-            null;
-
-
-        await ejecutarMovimientoPendiente(
-            movimiento
-        );
-
-    }
-
-
     actualizarBotonDado();
 
 }
@@ -4466,42 +4444,27 @@ async function recibirResultadoDado(
     }
 
 
-    // El dado se anima primero.
-
-    animarDado(
-        resultado
-    );
-
-
+    // Preparar el movimiento, pero NO mover la ficha todavía.
     const movimiento = {
-
-        jugador_id:
-            Number(
-                datos.jugador_id
-            ),
-
-        dado:
-            resultado,
-
-        posicion_anterior:
-            Number(
-                datos.posicion_anterior
-            ),
-
-        posicion:
-            Number(
-                datos.posicion
-            )
-
+        jugador_id: Number(datos.jugador_id),
+        dado: resultado,
+        posicion_anterior: Number(datos.posicion_anterior),
+        posicion: Number(datos.posicion)
     };
 
+    // Secuencia estricta: animar el dado, mostrar el número y después mover la ficha.
+    resultadoDadoPendiente = movimiento;
+    await animarDado(resultado);
 
-    // El movimiento queda esperando
-    // hasta que termine el dado.
+    // Una pequeña pausa permite leer el resultado antes de que comience el recorrido.
+    await dormir(350);
 
-    resultadoDadoPendiente =
-        movimiento;
+    const movimientoConfirmado = resultadoDadoPendiente;
+    resultadoDadoPendiente = null;
 
+    if (movimientoConfirmado) {
+        await ejecutarMovimientoPendiente(movimientoConfirmado);
+    }
 }
 
 
