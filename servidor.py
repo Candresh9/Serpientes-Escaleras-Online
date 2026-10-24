@@ -49,7 +49,8 @@ class JuegoServidor:
         try:
             await websocket.send(texto)
             return True
-        except (websockets.exceptions.ConnectionClosed, Exception):
+        except Exception as error:
+            print(f"Error al enviar mensaje: {error}")
             return False
 
     async def enviar_todos(self, mensaje):
