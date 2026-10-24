@@ -4182,8 +4182,14 @@ async function animarMovimientoJugador(
     // Preferir la casilla de aterrizaje calculada por el servidor.
     // Si el servidor antiguo no la envía, calcularla localmente.
     let intermedia = Number(aterrizajeInformado);
-    if (!Number.isFinite(intermedia) || intermedia < 1 || intermedia > 100) {
+
+    if (
+        !Number.isFinite(intermedia) ||
+        intermedia < 1 ||
+        intermedia > 100
+    ) {
         intermedia = posicionAnterior + dado;
+    
         if (intermedia > 100) {
             intermedia = posicionAnterior;
         }
