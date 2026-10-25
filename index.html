@@ -4179,21 +4179,16 @@ async function animarMovimientoJugador(
     posicionAnterior = Math.max(1, Math.min(100, Number(posicionAnterior) || 1));
     dado = Math.max(1, Math.min(6, Number(dado) || 1));
 
-    // Preferir la casilla de aterrizaje calculada por el servidor.
-    // Si el servidor antiguo no la envía, calcularla localmente.
-    let intermedia = Number(aterrizajeInformado);
+    // Calcular el aterrizaje usando el origen real de la animación y el dado.
+    // Evita el desfase si el servidor envía una posición intermedia desactualizada.
+    let intermedia = posicionAnterior + dado;
 
-    if (
-        !Number.isFinite(intermedia) ||
-        intermedia < 1 ||
-        intermedia > 100
-    ) {
-        intermedia = posicionAnterior + dado;
-    
-        if (intermedia > 100) {
-            intermedia = posicionAnterior;
-        }
+    // No se puede sobrepasar la casilla 100: si el dado excede, no se mueve.
+    if (intermedia > 100) {
+        intermedia = posicionAnterior;
     }
+
+    intermedia = Math.max(1, Math.min(100, intermedia));
 
     // La regla de la casilla de llegada tiene prioridad para la animación.
     // Así funciona también si el servidor comunica la casilla de aterrizaje
@@ -4694,16 +4689,18 @@ async function recibirResultadoDado(
         datos.casilla
     );
 
-    const aterrizajeInformado = Number(datos.posicion_intermedia);
-    let aterrizaje = Number.isFinite(aterrizajeInformado) &&
-        aterrizajeInformado >= 1 && aterrizajeInformado <= 100
-        ? aterrizajeInformado
-        : posicionAnterior + resultado;
+    // La casilla recorrida se calcula con el origen visual y el resultado
+    // real del dado. No confiar ciegamente en posicion_intermedia del servidor:
+    // si llega desfasada, la ficha terminaría una casilla antes.
+    let aterrizaje = posicionAnterior + resultado;
 
-    // Regla de no pasar de 100, aplicada también para servidores antiguos.
-    if (aterrizajeInformado === undefined || !Number.isFinite(aterrizajeInformado)) {
-        if (aterrizaje > 100) aterrizaje = posicionAnterior;
+    // Regla del tablero: se necesita el número exacto para llegar a 100.
+    // Si el lanzamiento sobrepasa 100, la ficha permanece en su casilla.
+    if (aterrizaje > 100) {
+        aterrizaje = posicionAnterior;
     }
+
+    aterrizaje = Math.max(1, Math.min(100, aterrizaje));
 
     const casillaAterrizaje = aterrizaje;
     const destinoRegla = ESCALERAS[casillaAterrizaje] ?? SERPIENTES[casillaAterrizaje];
