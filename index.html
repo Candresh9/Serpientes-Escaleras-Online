@@ -4172,187 +4172,75 @@ async function animarMovimientoJugador(
     dado,
     aterrizajeInformado = null
 ){
-
+    if (animando) return;
     animando = true;
     actualizarBotonDado();
 
-    posicionAnterior = Math.max(1, Math.min(100, Number(posicionAnterior) || 1));
-    dado = Math.max(1, Math.min(6, Number(dado) || 1));
+    try {
+        id = Number(id);
+        posicionAnterior = Number(posicionAnterior);
+        dado = Number(dado);
+        const finalServidor = Number(posicionFinalServidor);
 
-    // Calcular el aterrizaje usando el origen real de la animación y el dado.
-    // Evita el desfase si el servidor envía una posición intermedia desactualizada.
-    let intermedia = posicionAnterior + dado;
+        if (!Number.isFinite(posicionAnterior)) {
+            posicionAnterior = Number(posicionesVisuales[id] ?? 1);
+        }
+        posicionAnterior = Math.max(1, Math.min(100, posicionAnterior));
+        dado = Math.max(1, Math.min(6, Number.isFinite(dado) ? dado : 1));
 
-    // No se puede sobrepasar la casilla 100: si el dado excede, no se mueve.
-    if (intermedia > 100) {
-        intermedia = posicionAnterior;
-    }
+        // La casilla de aterrizaje se calcula desde el origen real y el dado.
+        // Solo se queda quieto si el movimiento supera 100.
+        let intermedia = posicionAnterior + dado;
+        if (intermedia > 100) intermedia = posicionAnterior;
+        intermedia = Math.max(1, Math.min(100, intermedia));
 
-    intermedia = Math.max(1, Math.min(100, intermedia));
-
-    // La regla de la casilla de llegada tiene prioridad para la animación.
-    // Así funciona también si el servidor comunica la casilla de aterrizaje
-    // en vez de la casilla posterior a la escalera/serpiente.
-    const destinoRegla = ESCALERAS[intermedia] ?? SERPIENTES[intermedia];
-    const finalServidor = Number(posicionFinalServidor);
-    let posicionFinal = destinoRegla !== undefined
-        ? Number(destinoRegla)
-        : (Number.isFinite(finalServidor) && finalServidor >= 1 && finalServidor <= 100
+        // El servidor manda la posición definitiva. Las reglas locales solo se
+        // usan como respaldo cuando el dato del servidor no es válido.
+        const destinoRegla = ESCALERAS[intermedia] ?? SERPIENTES[intermedia];
+        let posicionFinal = Number.isFinite(finalServidor) && finalServidor >= 1 && finalServidor <= 100
             ? finalServidor
-            : intermedia);
+            : (destinoRegla !== undefined ? Number(destinoRegla) : intermedia);
+        if (destinoRegla !== undefined) posicionFinal = Number(destinoRegla);
 
+        posicionesVisuales[id] = posicionAnterior;
 
-    // Iniciar la animación 3D al mismo tiempo que el movimiento del turno.
-    // Se informa la casilla de aterrizaje y la posición final autoritativa del servidor.
-    if (typeof window.animarMovimientoTablero3D === "function") {
-        window.animarMovimientoTablero3D(
-            id,
-            Number(posicionAnterior),
-            Number(intermedia),
-            Number(posicionFinal)
-        );
+        // Ordenar el movimiento 3D con las mismas posiciones que la ficha HTML.
+        if (typeof window.animarMovimientoTablero3D === 'function') {
+            window.animarMovimientoTablero3D(id, posicionAnterior, intermedia, posicionFinal);
+        }
+
+        // Primero recorrer todas las casillas normales, una por una.
+        if (posicionAnterior !== intermedia) {
+            await moverFichaPorCasillas(id, posicionAnterior, intermedia, 330);
+        } else {
+            await reboteFicha(id);
+        }
+
+        // Después aplicar exactamente una transición especial, si corresponde.
+        if (destinoRegla !== undefined) {
+            const destino = Number(destinoRegla);
+            await resaltarCasilla(intermedia, 850);
+            if (ESCALERAS[intermedia] !== undefined) {
+                await activarEscalera(intermedia, destino);
+                await moverElementoSuave(id, intermedia, destino, 1500);
+                crearParticulas(destino, 35);
+            } else {
+                await activarSerpiente(intermedia, destino);
+                await moverElementoSuave(id, intermedia, destino, 1700);
+                crearParticulas(destino, 30);
+            }
+            await dormir(300);
+            posicionFinal = destino;
+        } else if (posicionFinal !== intermedia) {
+            // Solo corregir al destino del servidor si no se activó escalera/serpiente.
+            await moverElementoSuave(id, intermedia, posicionFinal, 500);
+        }
+
+        posicionesVisuales[id] = Number(posicionFinal);
+    } finally {
+        animando = false;
+        actualizarBotonDado();
     }
-
-    // Movimiento normal
-
-    if(
-        posicionAnterior !==
-        intermedia
-    ){
-
-        await moverFichaPorCasillas(
-            id,
-            Number(posicionAnterior),
-            Number(intermedia),
-            330
-        );
-
-    }
-
-    else{
-
-        await reboteFicha(
-            id
-        );
-
-    }
-
-
-    // Escalera
-
-    if(
-        ESCALERAS[
-            intermedia
-        ]
-    ){
-
-        const destino =
-            ESCALERAS[
-                intermedia
-            ];
-
-
-        await resaltarCasilla(
-            intermedia,
-            850
-        );
-
-
-        await activarEscalera(
-            intermedia,
-            destino
-        );
-
-
-        await moverElementoSuave(
-            id,
-            intermedia,
-            destino,
-            1500
-        );
-
-
-        crearParticulas(
-            destino,
-            35
-        );
-
-
-        await dormir(300);
-
-    }
-
-
-    // Serpiente
-
-    else if(
-        SERPIENTES[
-            intermedia
-        ]
-    ){
-
-        const destino =
-            SERPIENTES[
-                intermedia
-            ];
-
-
-        await resaltarCasilla(
-            intermedia,
-            850
-        );
-
-
-        await activarSerpiente(
-            intermedia,
-            destino
-        );
-
-
-        await moverElementoSuave(
-            id,
-            intermedia,
-            destino,
-            1700
-        );
-
-
-        crearParticulas(
-            destino,
-            30
-        );
-
-
-        await dormir(300);
-
-    }
-
-
-    // Corrección final del servidor en la vista HTML de respaldo.
-    if(
-        Number(posicionFinal) !==
-        Number(intermedia)
-    ){
-
-        await moverElementoSuave(
-            id,
-            intermedia,
-            Number(posicionFinal),
-            500
-        );
-
-    }
-
-
-    posicionesVisuales[id] =
-        Number(posicionFinal);
-
-
-    animando = false;
-
-
-    actualizarBotonDado();
-
 }
 
 
