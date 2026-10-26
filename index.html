@@ -1659,6 +1659,7 @@ button.accion:hover:not(:disabled) {
 }
 #btnDado { background: linear-gradient(135deg, #ffe879, #ffad35 70%, #ff8a28); color: #1b2340; }
 #btnReiniciar { background: linear-gradient(135deg, #36d6a0, #119c83); color: #071d25; }
+#btnReiniciar[hidden] { display: none !important; }
 #btnAbandonar { background: linear-gradient(135deg, #ff777f, #e83b60); color: white; }
 .jugadores { margin-top: 20px; }
 .jugadores h3 { margin-bottom: 13px; }
@@ -1956,8 +1957,10 @@ input, select, textarea {
             <button
                 id="btnReiniciar"
                 class="accion"
+                hidden
+                disabled
             >
-                🔄 REINICIAR PARTIDA
+                🔄 SOLICITAR REINICIO
             </button>
 
 
@@ -3964,6 +3967,8 @@ async function ejecutarMovimientoPendiente(
 
     actualizarBotonDado();
 
+    actualizarBotonReinicio();
+
 
     if(
         estado.ganador !== null &&
@@ -4750,47 +4755,62 @@ btnDado.onclick = () => {
 
 
 // ============================================================
-// REINICIAR
+// REINICIO POR CONSENSO DE TODOS LOS JUGADORES
 // ============================================================
 
-function reiniciarPartida(){
+function actualizarBotonReinicio(){
+    if (!btnReiniciar) return;
 
-    ocultarVictoria();
+    const ids = Object.keys(estado.jugadores || {}).map(Number).sort((a,b)=>a-b);
+    const lider = ids.length ? ids[0] : null;
+    const esLider = Number(estado.mi_id) === Number(lider);
+    const termino = estado.ganador !== null && estado.ganador !== undefined;
+    const solicitado = Boolean(estado.reinicio_solicitado);
+    const votos = (estado.votos_reinicio || []).map(Number);
+    const yaAcepto = votos.includes(Number(estado.mi_id));
 
-    posicionesVisuales = {};
+    // El reinicio solo se puede proponer después de terminar la partida.
+    btnReiniciar.hidden = !termino;
+    btnReiniciar.disabled = !termino || !socket || socket.readyState !== WebSocket.OPEN;
 
-    animando = false;
-    movimientoEnCurso = false;
+    if (!termino) {
+        btnReiniciar.textContent = "🔄 REINICIAR PARTIDA";
+        return;
+    }
 
-    dadoTerminado = true;
-
-    resultadoDadoPendiente =
-        null;
-
-
-    mostrarCaraDado(1);
-
-
-    resultadoDado.textContent =
-        "🎲 Esperando...";
-
-
-    enviar({
-
-        tipo:
-            "reiniciar"
-
-    });
-
+    if (!solicitado) {
+        btnReiniciar.textContent = esLider ? "🔄 SOLICITAR REINICIO" : "⏳ ESPERANDO AL JUGADOR 1";
+        btnReiniciar.disabled = !esLider || !socket || socket.readyState !== WebSocket.OPEN;
+    } else if (yaAcepto) {
+        btnReiniciar.textContent = `✅ ACEPTADO (${votos.length}/${ids.length})`;
+        btnReiniciar.disabled = true;
+    } else {
+        btnReiniciar.textContent = `👍 ACEPTAR REINICIO (${votos.length}/${ids.length})`;
+        btnReiniciar.disabled = !socket || socket.readyState !== WebSocket.OPEN;
+    }
 }
 
+function reiniciarPartida(){
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+    if (estado.ganador === null || estado.ganador === undefined) return;
 
-btnReiniciar.onclick =
-    reiniciarPartida;
+    const ids = Object.keys(estado.jugadores || {}).map(Number).sort((a,b)=>a-b);
+    const lider = ids.length ? ids[0] : null;
+    const esLider = Number(estado.mi_id) === Number(lider);
+    const solicitado = Boolean(estado.reinicio_solicitado);
+    const votos = (estado.votos_reinicio || []).map(Number);
+    const yaAcepto = votos.includes(Number(estado.mi_id));
 
+    if (!solicitado) {
+        if (!esLider) return;
+        enviar({ tipo: "solicitar_reinicio" });
+    } else if (!yaAcepto) {
+        enviar({ tipo: "aceptar_reinicio" });
+    }
+}
 
-btnVictoriaReiniciar.onclick =
-    reiniciarPartida;
+btnReiniciar.onclick = reiniciarPartida;
+btnVictoriaReiniciar.onclick = reiniciarPartida;
 
 
 // ============================================================
