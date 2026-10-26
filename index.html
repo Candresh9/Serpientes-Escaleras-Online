@@ -1,0 +1,4875 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>🐍 Escaleras y Serpientes</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    margin:0;
+
+    min-height:100vh;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #ffffff,
+            #dcecff 45%,
+            #c7d8eb
+        );
+
+    color:#141414;
+}
+
+
+.app{
+
+    width:min(
+        1450px,
+        96%
+    );
+
+    margin:auto;
+
+    padding:
+        25px 0 35px;
+}
+
+
+.titulo{
+
+    text-align:center;
+
+    font-size:
+        clamp(
+            28px,
+            4vw,
+            48px
+        );
+
+    font-weight:900;
+
+    margin:
+        5px 0 25px;
+
+    color:#172b4d;
+
+    text-shadow:
+        0 4px 8px
+        rgba(0,0,0,.15);
+}
+
+
+.juego{
+
+    display:grid;
+
+    grid-template-columns:
+        minmax(
+            650px,
+            1fr
+        )
+        340px;
+
+    gap:25px;
+
+    align-items:start;
+}
+
+
+.tablero-contenedor{
+
+    position:relative;
+
+    background:white;
+
+    padding:18px;
+
+    border-radius:24px;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.15);
+}
+
+
+#tablero{
+
+    position:relative;
+
+    width:100%;
+
+    aspect-ratio:1;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(10,1fr);
+
+    grid-template-rows:
+        repeat(10,1fr);
+
+    overflow:hidden;
+
+    border:
+        4px solid #171717;
+
+    border-radius:14px;
+
+    background:#fff;
+}
+
+
+.casilla{
+
+    position:relative;
+
+    border:
+        1px solid
+        rgba(0,0,0,.18);
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:flex-start;
+
+    padding:5px;
+
+    font-weight:bold;
+
+    font-size:
+        clamp(
+            10px,
+            1.2vw,
+            15px
+        );
+}
+
+
+.casilla:nth-child(odd){
+
+    background:#fff;
+
+}
+
+
+.casilla:nth-child(even){
+
+    background:#f0f6ff;
+
+}
+
+
+.numero{
+
+    position:absolute;
+
+    top:4px;
+
+    left:5px;
+
+    opacity:.65;
+}
+
+
+#svgElementos{
+
+    position:absolute;
+
+    inset:0;
+
+    width:100%;
+
+    height:100%;
+
+    pointer-events:none;
+
+    z-index:5;
+}
+
+
+#fichas{
+
+    position:absolute;
+
+    inset:0;
+
+    pointer-events:none;
+
+    z-index:20;
+}
+
+
+.pieza{
+
+    position:absolute;
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:50%;
+
+    border:
+        4px solid white;
+
+    box-shadow:
+        0 4px 9px
+        rgba(0,0,0,.35);
+
+    transform:
+        translate(-50%,-50%);
+
+    transition:
+        box-shadow .25s,
+        transform .25s;
+
+    z-index:30;
+}
+
+
+.pieza.mia{
+
+    box-shadow:
+        0 0 0 4px #ffd600,
+        0 5px 12px
+        rgba(0,0,0,.35);
+}
+
+
+.pieza.moviendo{
+
+    transform:
+        translate(-50%,-50%)
+        scale(1.18);
+
+    z-index:100;
+}
+
+
+.pieza.rebote{
+
+    animation:
+        rebote .45s
+        ease;
+}
+
+
+@keyframes rebote{
+
+    0%{
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+    }
+
+    50%{
+        transform:
+            translate(-50%,-50%)
+            scale(1.3);
+    }
+
+    100%{
+        transform:
+            translate(-50%,-50%)
+            scale(1);
+    }
+}
+
+
+.resaltado-casilla{
+
+    position:absolute;
+
+    width:8%;
+
+    height:8%;
+
+    transform:
+        translate(-50%,-50%);
+
+    border:
+        5px solid #ffd600;
+
+    border-radius:50%;
+
+    box-shadow:
+        0 0 25px
+        rgba(255,214,0,.95);
+
+    animation:
+        resaltarCasilla
+        .8s infinite alternate;
+
+    z-index:15;
+
+    pointer-events:none;
+}
+
+
+@keyframes resaltarCasilla{
+
+    from{
+        opacity:.45;
+        transform:
+            translate(-50%,-50%)
+            scale(.85);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            scale(1.1);
+    }
+}
+
+
+/* ==========================================================
+   PANEL
+   ========================================================== */
+
+.panel{
+
+    background:white;
+
+    border-radius:24px;
+
+    padding:22px;
+
+    box-shadow:
+        0 15px 40px
+        rgba(0,0,0,.15);
+
+    min-height:600px;
+}
+
+
+.panel h2{
+
+    margin:
+        0 0 18px;
+
+    text-align:center;
+
+    color:#172b4d;
+}
+
+
+.estado{
+
+    padding:12px;
+
+    border-radius:12px;
+
+    text-align:center;
+
+    font-weight:800;
+
+    background:#edf6ff;
+
+    border:
+        2px solid #90caf9;
+
+    margin-bottom:15px;
+
+    transition:
+        .25s;
+}
+
+
+.nombre-box{
+
+    display:flex;
+
+    gap:8px;
+
+    margin-bottom:15px;
+}
+
+
+.nombre-box input{
+
+    flex:1;
+
+    min-width:0;
+
+    padding:11px;
+
+    border:
+        2px solid #ddd;
+
+    border-radius:10px;
+
+    font-size:15px;
+}
+
+
+.nombre-box button{
+
+    border:none;
+
+    border-radius:10px;
+
+    background:#1976d2;
+
+    color:white;
+
+    font-weight:bold;
+
+    padding:
+        0 15px;
+
+    cursor:pointer;
+}
+
+
+.dado-contenedor{
+
+    height:150px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    perspective:700px;
+}
+
+
+.dado-3d{
+
+    width:85px;
+
+    height:85px;
+
+    position:relative;
+
+    transform-style:preserve-3d;
+
+    transition:
+        transform .5s;
+
+}
+
+
+.cara{
+
+    position:absolute;
+
+    width:85px;
+
+    height:85px;
+
+    border-radius:14px;
+
+    background:#fff;
+
+    border:
+        4px solid #222;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:38px;
+
+    font-weight:900;
+
+    box-shadow:
+        inset 0 0 15px
+        rgba(0,0,0,.08);
+}
+
+
+.cara1{
+    transform:
+        rotateY(0deg)
+        translateZ(42.5px);
+}
+
+.cara2{
+    transform:
+        rotateY(90deg)
+        translateZ(42.5px);
+}
+
+.cara3{
+    transform:
+        rotateY(180deg)
+        translateZ(42.5px);
+}
+
+.cara4{
+    transform:
+        rotateY(-90deg)
+        translateZ(42.5px);
+}
+
+.cara5{
+    transform:
+        rotateX(90deg)
+        translateZ(42.5px);
+}
+
+.cara6{
+    transform:
+        rotateX(-90deg)
+        translateZ(42.5px);
+}
+
+
+.dado-3d.lanzando{
+
+    animation:
+        dadoSacudida
+        .18s
+        infinite;
+}
+
+
+@keyframes dadoSacudida{
+
+    0%{
+        transform:
+            rotateX(0)
+            rotateY(0)
+            rotateZ(0)
+            scale(1);
+    }
+
+    50%{
+        transform:
+            rotateX(180deg)
+            rotateY(180deg)
+            rotateZ(90deg)
+            scale(1.08);
+    }
+
+    100%{
+        transform:
+            rotateX(360deg)
+            rotateY(360deg)
+            rotateZ(180deg)
+            scale(1);
+    }
+}
+
+
+.resultado{
+
+    text-align:center;
+
+    min-height:32px;
+
+    font-weight:900;
+
+    font-size:20px;
+
+    margin-bottom:12px;
+}
+
+
+.mensaje-efecto{
+
+    animation:
+        efectoTexto
+        .55s
+        ease;
+}
+
+
+@keyframes efectoTexto{
+
+    0%{
+        transform:scale(.8);
+        opacity:.2;
+    }
+
+    60%{
+        transform:scale(1.18);
+        opacity:1;
+    }
+
+    100%{
+        transform:scale(1);
+    }
+}
+
+
+button.accion{
+
+    width:100%;
+
+    border:none;
+
+    border-radius:13px;
+
+    padding:15px;
+
+    font-size:16px;
+
+    font-weight:900;
+
+    cursor:pointer;
+
+    margin-bottom:10px;
+
+    transition:
+        transform .15s,
+        opacity .15s,
+        box-shadow .15s;
+}
+
+
+button.accion:hover:not(:disabled){
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 7px 15px
+        rgba(0,0,0,.18);
+}
+
+
+button.accion:active:not(:disabled){
+
+    transform:
+        translateY(1px);
+}
+
+
+button.accion:disabled{
+
+    opacity:.45;
+
+    cursor:not-allowed;
+}
+
+
+#btnDado{
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffca28,
+            #ff9800
+        );
+
+    color:#171717;
+}
+
+
+#btnReiniciar{
+
+    background:#43a047;
+
+    color:white;
+}
+
+
+#btnAbandonar{
+
+    background:#e53935;
+
+    color:white;
+}
+
+
+.jugadores{
+
+    margin-top:15px;
+}
+
+
+.jugadores h3{
+
+    margin:
+        0 0 10px;
+}
+
+
+.jugador{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:9px;
+
+    padding:9px;
+
+    border-radius:10px;
+
+    margin-bottom:7px;
+
+    background:#f4f6f8;
+
+    border:
+        2px solid transparent;
+
+    transition:
+        .25s;
+}
+
+
+.jugador.turno{
+
+    border:
+        3px solid #ffd600;
+
+    background:#fff8d6;
+
+    box-shadow:
+        0 3px 9px
+        rgba(255,214,0,.3);
+}
+
+
+.jugador .color{
+
+    width:18px;
+
+    height:18px;
+
+    border-radius:50%;
+
+    border:
+        2px solid white;
+
+    box-shadow:
+        0 1px 4px
+        rgba(0,0,0,.3);
+}
+
+
+.jugador .nombre{
+
+    flex:1;
+
+    font-weight:bold;
+}
+
+
+.jugador .casilla{
+
+    position:static;
+
+    padding:0;
+
+    font-size:13px;
+
+    opacity:.7;
+}
+
+
+/* ==========================================================
+   MENSAJES
+   ========================================================== */
+
+.mensaje-flotante{
+
+    position:fixed;
+
+    left:50%;
+
+    top:35%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:500;
+
+    background:
+        rgba(20,20,20,.92);
+
+    color:white;
+
+    padding:
+        18px 28px;
+
+    border-radius:18px;
+
+    font-size:24px;
+
+    font-weight:900;
+
+    text-align:center;
+
+    pointer-events:none;
+
+    animation:
+        mensajeEntrada
+        1.8s
+        forwards;
+}
+
+
+@keyframes mensajeEntrada{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            scale(.7);
+    }
+
+    15%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            scale(1.05);
+    }
+
+    75%{
+        opacity:1;
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-65%)
+            scale(1);
+    }
+}
+
+
+/* ==========================================================
+   PARTICULAS
+   ========================================================== */
+
+.particula{
+
+    position:absolute;
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+
+    background:#ffd600;
+
+    pointer-events:none;
+
+    z-index:200;
+
+    animation:
+        particulaVuelo
+        1s
+        ease-out
+        forwards;
+}
+
+
+@keyframes particulaVuelo{
+
+    from{
+
+        opacity:1;
+
+        transform:
+            translate(0,0)
+            scale(1);
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:
+            translate(
+                var(--dx),
+                var(--dy)
+            )
+            scale(.2);
+    }
+}
+
+
+/* ==========================================================
+   VICTORIA
+   ========================================================== */
+
+.victoria{
+
+    position:fixed;
+
+    inset:0;
+
+    z-index:1000;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:
+        rgba(0,0,0,.7);
+
+    backdrop-filter:
+        blur(5px);
+}
+
+
+.victoria.oculto{
+
+    display:none;
+}
+
+
+.victoria-box{
+
+    width:min(
+        500px,
+        90%
+    );
+
+    background:white;
+
+    border-radius:28px;
+
+    padding:40px;
+
+    text-align:center;
+
+    box-shadow:
+        0 25px 80px
+        rgba(0,0,0,.4);
+
+    animation:
+        victoriaEntrada
+        .7s
+        ease;
+}
+
+
+@keyframes victoriaEntrada{
+
+    from{
+        opacity:0;
+        transform:
+            scale(.5)
+            rotate(-5deg);
+    }
+
+    to{
+        opacity:1;
+        transform:
+            scale(1)
+            rotate(0);
+    }
+}
+
+
+.trofeo{
+
+    font-size:85px;
+
+    animation:
+        trofeo
+        1s
+        infinite alternate;
+}
+
+
+@keyframes trofeo{
+
+    from{
+        transform:
+            translateY(0)
+            rotate(-5deg);
+    }
+
+    to{
+        transform:
+            translateY(-12px)
+            rotate(5deg);
+    }
+}
+
+
+.victoria h1{
+
+    margin:
+        10px 0;
+
+    color:#ff9800;
+
+    font-size:38px;
+}
+
+
+.victoria p{
+
+    font-size:19px;
+
+    font-weight:bold;
+}
+
+
+/* ==========================================================
+   ESCALERAS / SERPIENTES ACTIVAS
+   ========================================================== */
+
+.escalera-activa{
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            #00ff66
+        );
+
+    animation:
+        escaleraGlow
+        .7s
+        infinite alternate;
+}
+
+
+@keyframes escaleraGlow{
+
+    from{
+        opacity:.6;
+    }
+
+    to{
+        opacity:1;
+    }
+}
+
+
+.serpiente-activa{
+
+    filter:
+        drop-shadow(
+            0 0 8px
+            #ff3333
+        );
+
+    animation:
+        serpienteGlow
+        .7s
+        infinite alternate;
+}
+
+
+@keyframes serpienteGlow{
+
+    from{
+        opacity:.6;
+    }
+
+    to{
+        opacity:1;
+    }
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media(max-width:1050px){
+
+    .juego{
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+    .panel{
+
+        width:min(
+            700px,
+            100%
+        );
+
+        margin:auto;
+    }
+
+}
+
+
+@media(max-width:700px){
+
+    .app{
+
+        width:97%;
+    }
+
+    .tablero-contenedor{
+
+        padding:8px;
+    }
+
+    .pieza{
+
+        width:27px;
+
+        height:27px;
+
+        border-width:3px;
+    }
+
+    .panel{
+
+        padding:15px;
+    }
+
+}
+
+
+/* ==========================================================
+   MEJORAS RESPONSIVE PARA MÓVILES Y TABLETAS
+   Se mantienen intactos el juego y la conexión multijugador.
+   ========================================================== */
+
+html {
+    width: 100%;
+    min-height: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button,
+input {
+    font: inherit;
+}
+
+button {
+    touch-action: manipulation;
+}
+
+.app {
+    width: min(1450px, 96%);
+}
+
+.tablero-contenedor,
+.panel {
+    min-width: 0;
+}
+
+#tablero {
+    isolation: isolate;
+    touch-action: manipulation;
+}
+
+.casilla {
+    min-width: 0;
+    min-height: 0;
+    padding: clamp(1px, .35vw, 5px);
+}
+
+.numero {
+    z-index: 2;
+    font-size: clamp(8px, 1.15vw, 15px);
+    line-height: 1;
+    pointer-events: none;
+}
+
+#svgElementos,
+#fichas {
+    overflow: hidden;
+}
+
+.pieza {
+    max-width: 36px;
+    max-height: 36px;
+}
+
+.nombre-box input {
+    min-height: 46px;
+}
+
+.nombre-box button {
+    min-width: 52px;
+    min-height: 46px;
+}
+
+button.accion {
+    min-height: 48px;
+    touch-action: manipulation;
+}
+
+@media (max-width: 1050px) {
+    .app {
+        width: min(900px, 96%);
+        padding-top: 18px;
+    }
+
+    .juego {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    .tablero-contenedor {
+        width: 100%;
+        max-width: 760px;
+        margin-inline: auto;
+    }
+
+    .panel {
+        width: 100%;
+        max-width: 760px;
+        min-height: 0;
+        margin-inline: auto;
+    }
+
+    .numero {
+        font-size: clamp(9px, 1.4vw, 14px);
+    }
+}
+
+@media (max-width: 700px) {
+    body {
+        min-height: 100dvh;
+    }
+
+    .app {
+        width: 100%;
+        padding: 12px 8px 24px;
+    }
+
+    .titulo {
+        font-size: clamp(23px, 6.5vw, 34px);
+        line-height: 1.12;
+        margin: 4px 0 14px;
+        padding-inline: 4px;
+        overflow-wrap: anywhere;
+    }
+
+    .juego {
+        gap: 12px;
+    }
+
+    .tablero-contenedor {
+        padding: 5px;
+        border-radius: 14px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .13);
+    }
+
+    #tablero {
+        width: 100%;
+        border-width: 2px;
+        border-radius: 9px;
+    }
+
+    .casilla {
+        border-width: .5px;
+        padding: 1px;
+    }
+
+    .numero {
+        top: 2px;
+        left: 2px;
+        font-size: clamp(7px, 2.25vw, 11px);
+        font-weight: 800;
+    }
+
+    .pieza {
+        width: clamp(15px, 5.8vw, 25px);
+        height: clamp(15px, 5.8vw, 25px);
+        border-width: 2px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, .32);
+    }
+
+    .pieza.mia {
+        box-shadow: 0 0 0 2px #ffd600, 0 2px 5px rgba(0, 0, 0, .3);
+    }
+
+    .resaltado-casilla {
+        border-width: 3px;
+        box-shadow: 0 0 12px rgba(255, 214, 0, .9);
+    }
+
+    .panel {
+        padding: 14px;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, .12);
+    }
+
+    .panel h2 {
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .estado {
+        padding: 10px 8px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .nombre-box {
+        gap: 7px;
+        margin-bottom: 8px;
+    }
+
+    .nombre-box input {
+        width: 0;
+        min-width: 0;
+        flex: 1;
+        padding: 10px;
+        font-size: 16px;
+    }
+
+    .nombre-box button {
+        min-width: 54px;
+        padding-inline: 12px;
+    }
+
+    .dado-contenedor {
+        height: 112px;
+        perspective: 600px;
+    }
+
+    .dado-3d {
+        width: 66px;
+        height: 66px;
+    }
+
+    .cara {
+        width: 66px;
+        height: 66px;
+        border-width: 3px;
+        border-radius: 11px;
+        font-size: 30px;
+    }
+
+    .cara1 { transform: rotateY(0deg) translateZ(33px); }
+    .cara2 { transform: rotateY(90deg) translateZ(33px); }
+    .cara3 { transform: rotateY(180deg) translateZ(33px); }
+    .cara4 { transform: rotateY(-90deg) translateZ(33px); }
+    .cara5 { transform: rotateX(90deg) translateZ(33px); }
+    .cara6 { transform: rotateX(-90deg) translateZ(33px); }
+
+    .resultado {
+        min-height: 28px;
+        margin-bottom: 8px;
+        font-size: 18px;
+    }
+
+    button.accion {
+        padding: 13px 10px;
+        margin-bottom: 8px;
+        border-radius: 11px;
+        font-size: 15px;
+    }
+
+    .jugadores {
+        margin-top: 12px;
+    }
+
+    .jugadores h3 {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+
+    #listaJugadores {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    .jugador {
+        min-width: 0;
+        gap: 6px;
+        padding: 8px 6px;
+        margin: 0;
+        border-radius: 9px;
+        border-width: 2px;
+    }
+
+    .jugador.turno {
+        border-width: 2px;
+    }
+
+    .jugador .color {
+        flex: 0 0 13px;
+        width: 13px;
+        height: 13px;
+    }
+
+    .jugador .nombre {
+        min-width: 0;
+        font-size: 12px;
+        overflow-wrap: anywhere;
+    }
+
+    .jugador .casilla {
+        flex: 0 0 auto;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .mensaje-flotante {
+        top: 25%;
+        width: calc(100% - 28px);
+        max-width: 420px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        font-size: clamp(17px, 4.5vw, 22px);
+    }
+
+    .victoria-box {
+        width: calc(100% - 28px);
+        max-width: 440px;
+        padding: 25px 18px;
+        border-radius: 20px;
+    }
+
+    .trofeo {
+        font-size: 65px;
+    }
+
+    .victoria h1 {
+        font-size: clamp(27px, 8vw, 36px);
+    }
+
+    .victoria p {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 360px) {
+    .app {
+        padding-inline: 5px;
+    }
+
+    .tablero-contenedor {
+        padding: 3px;
+    }
+
+    .numero {
+        top: 1px;
+        left: 1px;
+        font-size: 7px;
+    }
+
+    .panel {
+        padding: 11px;
+    }
+
+    #listaJugadores {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .jugador .nombre {
+        font-size: 13px;
+    }
+
+    .jugador .casilla {
+        font-size: 11px;
+    }
+}
+
+/* En móviles horizontales se aprovecha mejor el espacio disponible. */
+@media (max-width: 900px) and (orientation: landscape) {
+    .app {
+        width: min(1100px, 98%);
+        padding-top: 8px;
+    }
+
+    .titulo {
+        font-size: clamp(22px, 4vw, 30px);
+        margin-bottom: 10px;
+    }
+
+    .juego {
+        grid-template-columns: minmax(0, 1.15fr) minmax(260px, .85fr);
+        align-items: start;
+        gap: 10px;
+    }
+
+    .tablero-contenedor {
+        padding: 5px;
+    }
+
+    .panel {
+        padding: 12px;
+    }
+
+    .dado-contenedor {
+        height: 85px;
+    }
+
+    .dado-3d {
+        transform-origin: center;
+        scale: .8;
+    }
+
+    .panel h2 {
+        margin-bottom: 8px;
+    }
+
+    button.accion {
+        padding: 10px;
+        min-height: 42px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+
+
+
+
+/* ==========================================================
+   REDISEÑO VISUAL — solo CSS, sin modificar reglas del juego
+   ========================================================== */
+:root {
+    --ui-ink: #f4f7ff;
+    --ui-muted: #a9b8d4;
+    --ui-panel: rgba(17, 28, 53, .92);
+    --ui-border: rgba(151, 180, 235, .20);
+    --ui-cyan: #4de3ff;
+    --ui-violet: #8c7bff;
+}
+
+html { min-height: 100%; background: #080f20; }
+body {
+    min-height: 100vh;
+    color: var(--ui-ink);
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(57, 111, 255, .26), transparent 34%),
+        radial-gradient(ellipse at 88% 18%, rgba(139, 76, 255, .20), transparent 30%),
+        radial-gradient(ellipse at 50% 100%, rgba(24, 194, 204, .10), transparent 42%),
+        #080f20;
+}
+.app {
+    width: min(1540px, 96%);
+    padding: 30px 0 42px;
+}
+.titulo {
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 28px;
+    padding: 15px 28px;
+    border: 1px solid rgba(110, 215, 255, .25);
+    border-radius: 18px;
+    color: #f7fbff;
+    background: linear-gradient(110deg, rgba(21, 39, 75, .92), rgba(35, 31, 77, .90));
+    box-shadow: 0 12px 36px rgba(0, 0, 0, .26), inset 0 1px rgba(255,255,255,.08);
+    text-shadow: 0 0 22px rgba(77, 227, 255, .28);
+    letter-spacing: .035em;
+}
+.juego {
+    grid-template-columns: minmax(0, 1fr) minmax(285px, 340px);
+    gap: 22px;
+    align-items: stretch;
+}
+.tablero-contenedor {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(22, 35, 64, .96), rgba(12, 22, 43, .96));
+    box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.06);
+}
+#tablero {
+    border: 3px solid #263a60;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.28);
+}
+.panel {
+    min-width: 0;
+    min-height: 100%;
+    padding: 22px;
+    border: 1px solid var(--ui-border);
+    border-radius: 24px;
+    color: var(--ui-ink);
+    background: var(--ui-panel);
+    box-shadow: 0 24px 60px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.06);
+    backdrop-filter: blur(16px);
+}
+.panel h2 {
+    padding-bottom: 13px;
+    border-bottom: 1px solid var(--ui-border);
+    color: #f5f8ff;
+    font-size: 1.28rem;
+    letter-spacing: .02em;
+}
+.panel h3, .jugadores h3 { color: #dce8ff; }
+.estado {
+    color: #e9f7ff;
+    border: 1px solid rgba(77, 227, 255, .22);
+    background: linear-gradient(110deg, rgba(27, 76, 113, .52), rgba(49, 48, 112, .45));
+    box-shadow: inset 0 1px rgba(255,255,255,.05);
+}
+button.accion {
+    min-height: 48px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 14px;
+    box-shadow: 0 7px 18px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.2);
+    letter-spacing: .035em;
+    transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+button.accion:hover:not(:disabled) {
+    transform: translateY(-3px);
+    filter: brightness(1.08);
+    box-shadow: 0 12px 25px rgba(0,0,0,.26), 0 0 18px rgba(77,227,255,.10);
+}
+#btnDado { background: linear-gradient(135deg, #ffe879, #ffad35 70%, #ff8a28); color: #1b2340; }
+#btnReiniciar { background: linear-gradient(135deg, #36d6a0, #119c83); color: #071d25; }
+#btnAbandonar { background: linear-gradient(135deg, #ff777f, #e83b60); color: white; }
+.jugadores { margin-top: 20px; }
+.jugadores h3 { margin-bottom: 13px; }
+.jugador {
+    padding: 11px 12px;
+    border: 1px solid rgba(155, 180, 230, .12);
+    border-radius: 13px;
+    color: #eaf0ff;
+    background: rgba(255,255,255,.045);
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.jugador.turno {
+    border: 1px solid rgba(255, 220, 94, .85);
+    background: linear-gradient(100deg, rgba(255, 206, 75, .17), rgba(255,255,255,.045));
+    box-shadow: 0 0 0 1px rgba(255,220,94,.10), 0 7px 20px rgba(0,0,0,.12);
+    transform: translateX(2px);
+}
+.jugador .nombre { color: #f4f7ff; }
+.jugador .casilla { color: var(--ui-muted); opacity: 1; }
+.dado-contenedor { filter: drop-shadow(0 10px 18px rgba(0,0,0,.25)); }
+input, select, textarea {
+    max-width: 100%;
+    border-radius: 10px;
+}
+*:focus-visible { outline: 3px solid var(--ui-cyan); outline-offset: 3px; }
+
+@media (max-width: 1050px) {
+    .juego { grid-template-columns: minmax(0, 1fr) minmax(260px, 310px); gap: 14px; }
+    .panel { padding: 17px; }
+    .tablero-contenedor { padding: 10px; }
+}
+@media (max-width: 760px) {
+    .app { width: min(100% - 20px, 680px); padding-top: 18px; }
+    .titulo { padding: 13px 15px; margin-bottom: 17px; border-radius: 15px; }
+    .juego { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+    .tablero-contenedor { padding: 8px; border-radius: 17px; }
+    .panel { min-height: 0; padding: 17px; border-radius: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    button.accion, .jugador { transition: none; }
+}
+
+
+
+/* CORRECCIÓN DE LEGIBILIDAD: números de casillas y capas del tablero */
+#tablero {
+    position: relative !important;
+    color: #14213d !important;
+}
+#tablero .casilla {
+    color: #14213d !important;
+    overflow: visible;
+}
+#tablero .numero {
+    position: absolute !important;
+    top: 3px !important;
+    left: 4px !important;
+    z-index: 30 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    min-height: 18px;
+    padding: 2px 4px !important;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, .94) !important;
+    color: #101828 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: clamp(10px, 1.05vw, 14px) !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+    text-shadow: none !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, .22);
+    pointer-events: none !important;
+}
+#svgElementos {
+    z-index: 10 !important;
+    pointer-events: none !important;
+}
+#fichas {
+    z-index: 20 !important;
+    pointer-events: none !important;
+}
+@media (max-width: 500px) {
+    #tablero .numero {
+        top: 1px !important;
+        left: 1px !important;
+        min-width: 14px;
+        min-height: 14px;
+        padding: 1px 2px !important;
+        font-size: 9px !important;
+        border-radius: 4px;
+    }
+}
+
+
+/* FIX FINAL: contraste fuerte para los números del tablero */
+#tablero .casilla > .numero {
+    display: flex !important;
+    position: absolute !important;
+    top: 3px !important;
+    left: 3px !important;
+    z-index: 9999 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    padding: 2px 4px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: clamp(11px, 1.05vw, 15px) !important;
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+    text-shadow: none !important;
+    border: 1px solid #64748b !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.35) !important;
+    pointer-events: none !important;
+}
+#tablero .casilla { position: relative !important; }
+@media (max-width: 600px) {
+    #tablero .casilla > .numero {
+        top: 1px !important; left: 1px !important;
+        min-width: 15px !important; min-height: 15px !important;
+        padding: 1px 2px !important; font-size: 9px !important;
+        border-radius: 3px !important;
+    }
+}
+
+
+
+/* AJUSTE DE CONTRASTE: dado blanco con número negro y turno legible */
+.dado-3d .cara,
+.dado-3d .cara * {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    text-shadow: none !important;
+    border-color: #222222 !important;
+    opacity: 1 !important;
+}
+.dado-3d .cara {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 4px solid #222222 !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,.08), 0 2px 5px rgba(0,0,0,.15) !important;
+}
+.resultado, #resultadoDado {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8) !important;
+}
+.estado, #estadoConexion {
+    color: #102033 !important;
+    -webkit-text-fill-color: #102033 !important;
+    font-weight: 900 !important;
+    text-shadow: none !important;
+}
+.jugador.turno, .jugador.turno .nombre, .jugador.turno .casilla,
+.jugador.turno * {
+    color: #172033 !important;
+    -webkit-text-fill-color: #172033 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+.jugador .nombre, .jugador .casilla {
+    color: #f4f7ff !important;
+    -webkit-text-fill-color: #f4f7ff !important;
+    opacity: 1 !important;
+}
+.jugador.turno .nombre, .jugador.turno .casilla {
+    color: #172033 !important;
+    -webkit-text-fill-color: #172033 !important;
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+<div class="app">
+
+    <h1 class="titulo">
+        🐍 ESCALERAS Y SERPIENTES 🪜
+    </h1>
+
+    <div class="juego">
+
+        <div class="tablero-contenedor">
+
+            <div id="tablero">
+
+                <div id="svgElementos"></div>
+
+                <div id="fichas"></div>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel">
+
+            <h2>
+                🎮 Partida
+            </h2>
+
+            <div
+                id="estadoConexion"
+                class="estado"
+            >
+                ⏳ Conectando...
+            </div>
+
+
+            <div class="nombre-box">
+
+                <input
+                    id="nombreJugador"
+                    type="text"
+                    maxlength="18"
+                    placeholder="Tu nombre"
+                >
+
+                <button id="btnNombre">
+                    OK
+                </button>
+
+            </div>
+
+
+            <div class="dado-contenedor">
+
+                <div
+                    id="dado3d"
+                    class="dado-3d"
+                >
+
+                    <div class="cara cara1">
+                        1
+                    </div>
+
+                    <div class="cara cara2">
+                        2
+                    </div>
+
+                    <div class="cara cara3">
+                        3
+                    </div>
+
+                    <div class="cara cara4">
+                        4
+                    </div>
+
+                    <div class="cara cara5">
+                        5
+                    </div>
+
+                    <div class="cara cara6">
+                        6
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="resultadoDado"
+                class="resultado"
+            >
+                🎲 Esperando...
+            </div>
+
+
+            <button
+                id="btnDado"
+                class="accion"
+                disabled
+            >
+                🎲 LANZAR DADO
+            </button>
+
+
+            <button
+                id="btnReiniciar"
+                class="accion"
+            >
+                🔄 REINICIAR PARTIDA
+            </button>
+
+
+            <button
+                id="btnAbandonar"
+                class="accion"
+            >
+                🚪 ABANDONAR
+            </button>
+
+
+            <div class="jugadores">
+
+                <h3>
+                    👥 Jugadores
+                </h3>
+
+                <div id="listaJugadores"></div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<div
+    id="victoria"
+    class="victoria oculto"
+>
+
+    <div class="victoria-box">
+
+        <div class="trofeo">
+            🏆
+        </div>
+
+        <h1>
+            ¡VICTORIA!
+        </h1>
+
+        <p id="textoVictoria">
+            ¡Has ganado!
+        </p>
+
+        <button
+            id="btnVictoriaReiniciar"
+            class="accion"
+            style="background:#43a047;color:white;"
+        >
+            🔄 JUGAR DE NUEVO
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+// ============================================================
+// CONFIGURACIÓN
+// ============================================================
+
+const SERVER_URL =
+    "wss://serpientes-escaleras-phl7.onrender.com";
+
+
+const ESCALERAS = {
+
+    4:25,
+    13:46,
+    33:49,
+    42:63,
+    50:69,
+    62:81,
+    74:92
+
+};
+
+
+const SERPIENTES = {
+
+    27:5,
+    40:3,
+    43:18,
+    54:31,
+    66:45,
+    76:58,
+    89:53,
+    99:41
+
+};
+
+
+const COLORES = [
+
+    "#e53935",
+    "#1976d2",
+    "#43a047",
+    "#8e24aa"
+
+];
+
+
+// ============================================================
+// DOM
+// ============================================================
+
+const tablero =
+    document.getElementById(
+        "tablero"
+    );
+
+const svgElementos =
+    document.getElementById(
+        "svgElementos"
+    );
+
+const fichas =
+    document.getElementById(
+        "fichas"
+    );
+
+const estadoConexion =
+    document.getElementById(
+        "estadoConexion"
+    );
+
+const nombreJugador =
+    document.getElementById(
+        "nombreJugador"
+    );
+
+const btnNombre =
+    document.getElementById(
+        "btnNombre"
+    );
+
+const btnDado =
+    document.getElementById(
+        "btnDado"
+    );
+
+const btnReiniciar =
+    document.getElementById(
+        "btnReiniciar"
+    );
+
+const btnAbandonar =
+    document.getElementById(
+        "btnAbandonar"
+    );
+
+const listaJugadores =
+    document.getElementById(
+        "listaJugadores"
+    );
+
+const dado3d =
+    document.getElementById(
+        "dado3d"
+    );
+
+const resultadoDado =
+    document.getElementById(
+        "resultadoDado"
+    );
+
+const victoria =
+    document.getElementById(
+        "victoria"
+    );
+
+const textoVictoria =
+    document.getElementById(
+        "textoVictoria"
+    );
+
+const btnVictoriaReiniciar =
+    document.getElementById(
+        "btnVictoriaReiniciar"
+    );
+
+
+// ============================================================
+// ESTADO
+// ============================================================
+
+let socket = null;
+
+let estado = {
+
+    mi_id:null,
+    jugadores:{},
+    turno:null,
+    ganador:null,
+    ultimo_dado:null,
+
+    ultimo_evento:
+        "Conectando al servidor..."
+
+};
+
+
+let posicionesVisuales = {};
+
+let animando = false;
+
+// Bloqueo independiente para impedir movimientos simultáneos sin cancelar
+// la animación que inició el jugador activo.
+let movimientoEnCurso = false;
+
+let abandonando = false;
+
+let ultimaPosicionGanador = null;
+
+let dadoTerminado = true;
+
+let resultadoDadoPendiente = null;
+
+
+// ============================================================
+// UTILIDADES
+// ============================================================
+
+function dormir(ms){
+
+    return new Promise(
+        resolver =>
+            setTimeout(
+                resolver,
+                ms
+            )
+    );
+
+}
+
+
+function escapeHTML(texto){
+
+    return String(texto)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+
+}
+
+
+// ============================================================
+// TABLERO
+// ============================================================
+
+function crearTablero(){
+
+    // Eliminar casillas anteriores
+
+    tablero.querySelectorAll(
+        ".casilla"
+    ).forEach(
+        elemento =>
+            elemento.remove()
+    );
+
+
+    // Crear las 100 casillas
+
+    for(
+        let numero = 1;
+        numero <= 100;
+        numero++
+    ){
+
+        const casilla =
+            document.createElement(
+                "div"
+            );
+
+
+        casilla.className =
+            "casilla";
+
+
+        casilla.dataset.numero =
+            numero;
+
+
+        const numeroElemento =
+            document.createElement(
+                "span"
+            );
+
+
+        numeroElemento.className =
+            "numero";
+
+
+        numeroElemento.textContent =
+            numero;
+
+
+        casilla.appendChild(
+            numeroElemento
+        );
+
+
+        // ====================================================
+        // FILA Y COLUMNA
+        // ====================================================
+
+        const indice =
+            numero - 1;
+
+
+        const fila =
+            Math.floor(
+                indice / 10
+            );
+
+
+        const columna =
+            indice % 10;
+
+
+        // La fila 0 está abajo.
+        // CSS empieza arriba.
+
+        const filaVisual =
+            9 - fila;
+
+
+        let columnaVisual;
+
+
+        // ====================================================
+        // ZIGZAG INVERTIDO
+        // ====================================================
+        //
+        // Abajo:
+        //
+        // 10  9  8  7  6  5  4  3  2  1
+        //
+        // 11 12 13 14 15 16 17 18 19 20
+        //
+        // 30 29 28 27 26 25 24 23 22 21
+        //
+        // ...
+        //
+        // Arriba:
+        //
+        // 91 92 93 94 95 96 97 98 99 100
+
+        if(
+            fila % 2 === 0
+        ){
+
+            columnaVisual =
+                9 - columna;
+
+        }
+
+        else{
+
+            columnaVisual =
+                columna;
+
+        }
+
+
+        // Colocar explícitamente
+        // la casilla.
+
+        casilla.style.gridRow =
+            filaVisual + 1;
+
+
+        casilla.style.gridColumn =
+            columnaVisual + 1;
+
+
+        tablero.insertBefore(
+            casilla,
+            svgElementos
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// POSICIÓN DE CASILLA
+// ============================================================
+
+function posicionCasilla(numero){
+
+    numero =
+        Math.max(
+            1,
+            Math.min(
+                100,
+                Number(numero)
+            )
+        );
+
+
+    const indice =
+        numero - 1;
+
+
+    const fila =
+        Math.floor(
+            indice / 10
+        );
+
+
+    const columna =
+        indice % 10;
+
+
+    const filaVisual =
+        9 - fila;
+
+
+    let columnaVisual;
+
+
+    // MISMA ORIENTACIÓN
+    // QUE crearTablero()
+
+    if(
+        fila % 2 === 0
+    ){
+
+        columnaVisual =
+            9 - columna;
+
+    }
+
+    else{
+
+        columnaVisual =
+            columna;
+
+    }
+
+
+    return {
+
+        x:
+            columnaVisual * 10 + 5,
+
+        y:
+            filaVisual * 10 + 5
+
+    };
+
+}
+
+
+function centroCasilla(numero){
+
+    return posicionCasilla(
+        numero
+    );
+
+}
+
+
+// ============================================================
+// SVG
+// ============================================================
+
+function crearSVG(){
+
+    svgElementos.innerHTML = `
+
+        <svg
+            id="svgTablero"
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            width="100%"
+            height="100%"
+        >
+
+            <g id="grupoEscaleras"></g>
+
+            <g id="grupoSerpientes"></g>
+
+        </svg>
+
+    `;
+
+}
+
+
+function dibujarElementos(){
+    const svg = document.getElementById("svgTablero");
+    if (!svg) return;
+
+    const grupoEscaleras = document.getElementById("grupoEscaleras");
+    const grupoSerpientes = document.getElementById("grupoSerpientes");
+    if (!grupoEscaleras || !grupoSerpientes) return;
+    grupoEscaleras.innerHTML = "";
+    grupoSerpientes.innerHTML = "";
+
+    const NS = "http://www.w3.org/2000/svg";
+    const crear = (tag, attrs = {}) => {
+        const el = document.createElementNS(NS, tag);
+        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+        return el;
+    };
+    const agregar = (grupo, tag, attrs) => {
+        const el = crear(tag, attrs);
+        grupo.appendChild(el);
+        return el;
+    };
+
+    // Definiciones visuales: madera para las escaleras y escamas para las serpientes.
+    let defs = svg.querySelector("defs#decoracionTablero");
+    if (!defs) {
+        defs = crear("defs", { id: "decoracionTablero" });
+        defs.innerHTML = `
+            <linearGradient id="maderaEscalera" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#7c3f16"/>
+                <stop offset="45%" stop-color="#f4bd62"/>
+                <stop offset="70%" stop-color="#d58a36"/>
+                <stop offset="100%" stop-color="#6f3514"/>
+            </linearGradient>
+            <linearGradient id="cuerpoSerpiente" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#b9ff76"/>
+                <stop offset="45%" stop-color="#39c96b"/>
+                <stop offset="100%" stop-color="#087a50"/>
+            </linearGradient>
+            <linearGradient id="vientreSerpiente" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#f8e8a4"/>
+                <stop offset="100%" stop-color="#d6c06b"/>
+            </linearGradient>
+            <filter id="sombraElementosTablero" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="0.65" result="blur"/>
+                <feOffset dx="0.35" dy="0.65" result="offset"/>
+                <feComponentTransfer><feFuncA type="linear" slope="0.42"/></feComponentTransfer>
+                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>`;
+        svg.insertBefore(defs, svg.firstChild);
+    }
+
+    // ESCALERAS: carriles con volumen, brillo y peldaños redondeados.
+    for (const [desde, hasta] of Object.entries(ESCALERAS)) {
+        const a = centroCasilla(Number(desde));
+        const b = centroCasilla(Number(hasta));
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const longitud = Math.hypot(dx, dy) || 1;
+        const nx = -dy / longitud, ny = dx / longitud;
+        const offset = 1.55;
+        const p1 = { x: a.x + nx * offset, y: a.y + ny * offset };
+        const p2 = { x: b.x + nx * offset, y: b.y + ny * offset };
+        const q1 = { x: a.x - nx * offset, y: a.y - ny * offset };
+        const q2 = { x: b.x - nx * offset, y: b.y - ny * offset };
+        const carril = (u, v) => {
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"#65330f", "stroke-width":"2.55", "stroke-linecap":"round", filter:"url(#sombraElementosTablero)" });
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"url(#maderaEscalera)", "stroke-width":"1.8", "stroke-linecap":"round" });
+            agregar(grupoEscaleras, "line", { x1:u.x-0.22, y1:u.y-0.12, x2:v.x-0.22, y2:v.y-0.12,
+                stroke:"#ffe0a0", "stroke-opacity":".8", "stroke-width":".35", "stroke-linecap":"round" });
+        };
+        carril(p1, p2);
+        carril(q1, q2);
+
+        const cantidad = Math.max(4, Math.floor(longitud / 4.4));
+        for (let i = 1; i < cantidad; i++) {
+            const t = i / cantidad;
+            const cx = a.x + dx*t, cy = a.y + dy*t;
+            const u = { x: cx + nx*2.05, y: cy + ny*2.05 };
+            const v = { x: cx - nx*2.05, y: cy - ny*2.05 };
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"#69340f", "stroke-width":"1.25", "stroke-linecap":"round", filter:"url(#sombraElementosTablero)" });
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"#f6c36d", "stroke-width":".78", "stroke-linecap":"round" });
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y-.18, x2:v.x, y2:v.y-.18,
+                stroke:"#fff0c7", "stroke-opacity":".7", "stroke-width":".2" });
+        }
+        // Marcas discretas de inicio y llegada para identificar los extremos.
+        [a,b].forEach((pt, idx) => agregar(grupoEscaleras, "circle", {
+            cx:pt.x, cy:pt.y, r:"1.05", fill: idx ? "#ffe4a3" : "#9a531e",
+            stroke:"#fff3d0", "stroke-width":".35"
+        }));
+    }
+
+    // SERPIENTES: sombra, contorno, cuerpo brillante, vientre y ojos.
+    for (const [desde, hasta] of Object.entries(SERPIENTES)) {
+        const a = centroCasilla(Number(desde));
+        const b = centroCasilla(Number(hasta));
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const longitud = Math.hypot(dx, dy) || 1;
+        const nx = -dy / longitud, ny = dx / longitud;
+        const pasos = Math.max(12, Math.floor(longitud * 2.2));
+        const puntos = [];
+        for (let i = 0; i <= pasos; i++) {
+            const t = i / pasos;
+            const curva = Math.sin(t * Math.PI * 3.2) * Math.min(3.0, longitud * 0.085);
+            puntos.push({ x: a.x + dx*t + nx*curva, y: a.y + dy*t + ny*curva });
+        }
+        const coords = puntos.map(pt => `${pt.x},${pt.y}`).join(" ");
+        // Cola fina que se ensancha gradualmente hacia la cabeza.
+        agregar(grupoSerpientes, "polyline", { points:coords, fill:"none", stroke:"#063f31",
+            "stroke-width":"3.25", "stroke-linecap":"round", "stroke-linejoin":"round", filter:"url(#sombraElementosTablero)" });
+        agregar(grupoSerpientes, "polyline", { points:coords, fill:"none", stroke:"url(#cuerpoSerpiente)",
+            "stroke-width":"2.65", "stroke-linecap":"round", "stroke-linejoin":"round" });
+        agregar(grupoSerpientes, "polyline", { points:coords, fill:"none", stroke:"#d9ff9e",
+            "stroke-opacity":".7", "stroke-width":".62", "stroke-linecap":"round", "stroke-linejoin":"round" });
+
+        // Pequeñas marcas decorativas de escamas, sin tapar los números.
+        for (let i = 2; i < pasos - 1; i += Math.max(3, Math.floor(pasos / 7))) {
+            const pt = puntos[i];
+            agregar(grupoSerpientes, "circle", { cx:pt.x, cy:pt.y, r:".48", fill:"#e7ffb5", "fill-opacity":".85" });
+        }
+
+        // Cabeza con ojos y lengua en dirección al tramo de la serpiente.
+        const siguiente = puntos[Math.min(2, puntos.length - 1)];
+        const ang = Math.atan2(siguiente.y - a.y, siguiente.x - a.x) * 180 / Math.PI;
+        const cabeza = agregar(grupoSerpientes, "g", { transform:`translate(${a.x} ${a.y}) rotate(${ang})` });
+        agregar(cabeza, "ellipse", { cx:"0", cy:"0", rx:"2.05", ry:"1.65", fill:"#087a50", stroke:"#064632", "stroke-width":".42" });
+        agregar(cabeza, "ellipse", { cx:".2", cy:"-.25", rx:"1.25", ry:".68", fill:"#75e878", "fill-opacity":".75" });
+        agregar(cabeza, "circle", { cx:".78", cy:"-.65", r:".38", fill:"#fff7d6" });
+        agregar(cabeza, "circle", { cx:".88", cy:"-.65", r:".19", fill:"#15251b" });
+        agregar(cabeza, "circle", { cx:".78", cy:".62", r:".38", fill:"#fff7d6" });
+        agregar(cabeza, "circle", { cx:".88", cy:".62", r:".19", fill:"#15251b" });
+        agregar(cabeza, "path", { d:"M 1.65 0.05 L 2.55 0.05 L 2.95 -0.35 M 2.55 0.05 L 2.95 0.42",
+            fill:"none", stroke:"#ff6676", "stroke-width":".32", "stroke-linecap":"round" });
+        agregar(grupoSerpientes, "circle", { cx:b.x, cy:b.y, r:".82", fill:"#f8e8a4", stroke:"#986c2e", "stroke-width":".3" });
+    }
+}
+
+// ============================================================
+// JUGADORES
+// ============================================================
+
+function obtenerJugador(
+    jugadores,
+    id
+){
+
+    if(!jugadores)
+        return null;
+
+
+    return (
+        jugadores[id] ||
+        jugadores[String(id)] ||
+        null
+    );
+
+}
+
+
+function obtenerNombreJugador(
+    jugador,
+    id
+){
+
+    if(
+        jugador &&
+        jugador.nombre
+    ){
+
+        return jugador.nombre;
+
+    }
+
+
+    return `Jugador ${id}`;
+
+}
+
+
+function obtenerPosicionJugador(
+    jugador
+){
+
+    if(!jugador)
+        return 1;
+
+
+    if(
+        jugador.posicion !== undefined
+    ){
+
+        return Number(
+            jugador.posicion
+        );
+
+    }
+
+
+    if(
+        jugador.casilla !== undefined
+    ){
+
+        return Number(
+            jugador.casilla
+        );
+
+    }
+
+
+    return 1;
+
+}
+
+
+function obtenerColorJugador(
+    jugador,
+    id
+){
+
+    if(
+        jugador &&
+        jugador.color
+    ){
+
+        return jugador.color;
+
+    }
+
+
+    return COLORES[
+        (Number(id)-1)
+        %
+        COLORES.length
+    ];
+
+}
+
+
+// ============================================================
+// RENDERIZAR FICHAS
+// ============================================================
+
+function renderizarFichas(){
+
+    fichas.innerHTML = "";
+
+
+    const jugadores =
+        estado.jugadores || {};
+
+
+    const ids =
+        Object.keys(
+            jugadores
+        );
+
+
+    const gruposCasilla = {};
+
+
+    ids.forEach(
+        id => {
+
+            const jugador =
+                jugadores[id];
+
+
+            const posicion =
+                obtenerPosicionJugador(
+                    jugador
+                );
+
+
+            if(
+                !gruposCasilla[posicion]
+            ){
+
+                gruposCasilla[posicion] =
+                    [];
+
+            }
+
+
+            gruposCasilla[posicion].push(
+                id
+            );
+
+        }
+    );
+
+
+    ids.forEach(
+        id => {
+
+            const jugador =
+                jugadores[id];
+
+
+            const posicion =
+                obtenerPosicionJugador(
+                    jugador
+                );
+
+
+            const p =
+                posicionCasilla(
+                    posicion
+                );
+
+
+            const ficha =
+                document.createElement(
+                    "div"
+                );
+
+
+            ficha.className =
+                "pieza";
+
+
+            if(
+                Number(id) ===
+                Number(estado.mi_id)
+            ){
+
+                ficha.classList.add(
+                    "mia"
+                );
+
+            }
+
+
+            ficha.id =
+                `pieza-${id}`;
+
+
+            ficha.style.background =
+                obtenerColorJugador(
+                    jugador,
+                    id
+                );
+
+
+            const grupo =
+                gruposCasilla[
+                    posicion
+                ];
+
+
+            const indice =
+                grupo.indexOf(
+                    id
+                );
+
+
+            const offsets = [
+
+                [0,0],
+                [-2.2,-2.2],
+                [2.2,2.2],
+                [-2.2,2.2]
+
+            ];
+
+
+            const offset =
+                offsets[
+                    indice %
+                    offsets.length
+                ];
+
+
+            ficha.style.left =
+                `${p.x + offset[0]}%`;
+
+
+            ficha.style.top =
+                `${p.y + offset[1]}%`;
+
+
+            fichas.appendChild(
+                ficha
+            );
+
+
+            posicionesVisuales[id] =
+                posicion;
+
+        }
+    );
+
+    // Mantiene sincronizadas las fichas 3D con el estado multijugador.
+    if (typeof window.actualizarTablero3D === "function") {
+        window.actualizarTablero3D(estado);
+    }
+
+}
+
+
+// ============================================================
+// RENDERIZAR LISTA
+// ============================================================
+
+function renderizarJugadores(){
+
+    listaJugadores.innerHTML = "";
+
+
+    const jugadores =
+        estado.jugadores || {};
+
+
+    const ids =
+        Object.keys(
+            jugadores
+        ).sort(
+            (a,b) =>
+                Number(a) -
+                Number(b)
+        );
+
+
+    if(ids.length === 0){
+
+        listaJugadores.innerHTML =
+            "<div style='opacity:.6'>Esperando jugadores...</div>";
+
+        return;
+
+    }
+
+
+    ids.forEach(
+        id => {
+
+            const jugador =
+                jugadores[id];
+
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "jugador";
+
+
+            if(
+                Number(id) ===
+                Number(estado.turno)
+            ){
+
+                item.classList.add(
+                    "turno"
+                );
+
+                item.style.border =
+                    "3px solid #ffd600";
+
+                item.style.background =
+                    "#fff8d6";
+
+            }
+
+
+            const color =
+                document.createElement(
+                    "span"
+                );
+
+
+            color.className =
+                "color";
+
+
+            color.style.background =
+                obtenerColorJugador(
+                    jugador,
+                    id
+                );
+
+
+            const nombre =
+                document.createElement(
+                    "span"
+                );
+
+
+            nombre.className =
+                "nombre";
+
+
+            nombre.textContent =
+                obtenerNombreJugador(
+                    jugador,
+                    id
+                );
+
+
+            if(
+                Number(id) ===
+                Number(estado.turno)
+            ){
+
+                nombre.textContent +=
+                    " 🎲 TURNO";
+
+            }
+
+
+            if(
+                Number(id) ===
+                Number(estado.mi_id)
+            ){
+
+                nombre.textContent +=
+                    " ⭐";
+
+            }
+
+
+            const casilla =
+                document.createElement(
+                    "span"
+                );
+
+
+            casilla.className =
+                "casilla";
+
+
+            casilla.textContent =
+                `Casilla ${
+                    obtenerPosicionJugador(
+                        jugador
+                    )
+                }`;
+
+
+            item.appendChild(color);
+
+            item.appendChild(nombre);
+
+            item.appendChild(casilla);
+
+            listaJugadores.appendChild(
+                item
+            );
+
+        }
+    );
+
+}
+
+
+// ============================================================
+// ESTADO / TURNOS
+// ============================================================
+
+function actualizarMensajeEstado(){
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        estadoConexion.textContent =
+            "🏆 Partida terminada";
+
+
+        estadoConexion.style.background =
+            "#fff8e1";
+
+
+        estadoConexion.style.borderColor =
+            "#ffca28";
+
+
+        return;
+
+    }
+
+
+    if(
+        !estado.jugadores ||
+        Object.keys(
+            estado.jugadores
+        ).length === 0
+    ){
+
+        estadoConexion.textContent =
+            "⏳ Esperando jugadores...";
+
+
+        estadoConexion.style.background =
+            "#edf6ff";
+
+
+        estadoConexion.style.borderColor =
+            "#90caf9";
+
+
+        return;
+
+    }
+
+
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        estadoConexion.textContent =
+            "⏳ Preparando turno...";
+
+        return;
+
+    }
+
+
+    const jugadorTurno =
+        obtenerJugador(
+            estado.jugadores,
+            estado.turno
+        );
+
+
+    const nombre =
+        obtenerNombreJugador(
+            jugadorTurno,
+            estado.turno
+        );
+
+
+    if(
+        Number(estado.turno) ===
+        Number(estado.mi_id)
+    ){
+
+        estadoConexion.textContent =
+            "🟢 ¡ES TU TURNO! 🎲";
+
+
+        estadoConexion.style.background =
+            "#e8f5e9";
+
+
+        estadoConexion.style.borderColor =
+            "#81c784";
+
+    }
+
+    else{
+
+        estadoConexion.textContent =
+            `🔵 Turno de ${nombre} 🎲`;
+
+
+        estadoConexion.style.background =
+            "#edf6ff";
+
+
+        estadoConexion.style.borderColor =
+            "#90caf9";
+
+    }
+
+}
+
+
+// ============================================================
+// BOTÓN DADO
+// ============================================================
+
+function actualizarBotonDado(){
+
+    if(
+        !socket ||
+        socket.readyState !== WebSocket.OPEN
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(animando){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.mi_id === null ||
+        estado.mi_id === undefined
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        btnDado.disabled = true;
+
+        return;
+
+    }
+
+
+    btnDado.disabled =
+        Number(
+            estado.turno
+        ) !==
+        Number(
+            estado.mi_id
+        );
+
+}
+
+
+// ============================================================
+// DADO
+// ============================================================
+
+const ROTACIONES_DADO = {
+
+    1:
+        "rotateX(0deg) rotateY(0deg) rotateZ(0deg)",
+
+    2:
+        "rotateX(0deg) rotateY(-90deg) rotateZ(0deg)",
+
+    3:
+        "rotateX(0deg) rotateY(180deg) rotateZ(0deg)",
+
+    4:
+        "rotateX(0deg) rotateY(90deg) rotateZ(0deg)",
+
+    5:
+        "rotateX(-90deg) rotateY(0deg) rotateZ(0deg)",
+
+    6:
+        "rotateX(90deg) rotateY(0deg) rotateZ(0deg)"
+
+};
+
+
+function mostrarCaraDado(numero){
+
+    dado3d.style.transform =
+        ROTACIONES_DADO[
+            numero
+        ] ||
+        ROTACIONES_DADO[1];
+
+}
+
+
+async function animarDado(resultado){
+
+    dadoTerminado = false;
+
+    btnDado.disabled = true;
+
+    dado3d.classList.add(
+        "lanzando"
+    );
+
+    resultadoDado.textContent =
+        "🎲 Lanzando...";
+
+
+    resultadoDado.classList.remove(
+        "mensaje-efecto"
+    );
+
+
+    const rondas = 20;
+
+
+    for(
+        let i=0;
+        i<rondas;
+        i++
+    ){
+
+        const cara =
+            1 +
+            Math.floor(
+                Math.random()*6
+            );
+
+
+        mostrarCaraDado(
+            cara
+        );
+
+
+        await dormir(100);
+
+    }
+
+
+    dado3d.classList.remove(
+        "lanzando"
+    );
+
+
+    mostrarCaraDado(
+        Number(resultado)
+    );
+
+
+    resultadoDado.textContent =
+        `🎲 Salió ${resultado}`;
+
+
+    resultadoDado.classList.remove(
+        "mensaje-efecto"
+    );
+
+
+    void resultadoDado.offsetWidth;
+
+
+    resultadoDado.classList.add(
+        "mensaje-efecto"
+    );
+
+
+    // Mantener visible el resultado antes de permitir el movimiento de la ficha.
+    // La ficha se mueve desde recibirResultadoDado(), después de que esta promesa termine.
+    await dormir(900);
+
+    dadoTerminado = true;
+    actualizarBotonDado();
+
+}
+
+
+// ============================================================
+// MOVIMIENTO
+// ============================================================
+
+function easeInOutCubic(t){
+
+    return t < .5
+
+        ? 4*t*t*t
+
+        : 1 -
+          Math.pow(
+              -2*t+2,
+              3
+          ) / 2;
+
+}
+
+
+function moverElementoSuave(
+    id,
+    desde,
+    hasta,
+    duracion=450
+){
+
+    return new Promise(
+        resolver => {
+
+            const elemento =
+                document.getElementById(
+                    `pieza-${id}`
+                );
+
+
+            if(!elemento){
+
+                resolver();
+
+                return;
+
+            }
+
+
+            const inicio =
+                posicionCasilla(
+                    desde
+                );
+
+
+            const fin =
+                posicionCasilla(
+                    hasta
+                );
+
+
+            const comienzo =
+                performance.now();
+
+
+            elemento.classList.add(
+                "moviendo"
+            );
+
+
+            function animar(tiempo){
+
+                const progreso =
+                    Math.min(
+                        1,
+                        (
+                            tiempo -
+                            comienzo
+                        ) /
+                        duracion
+                    );
+
+
+                const suave =
+                    easeInOutCubic(
+                        progreso
+                    );
+
+
+                const x =
+                    inicio.x +
+                    (
+                        fin.x -
+                        inicio.x
+                    ) *
+                    suave;
+
+
+                const y =
+                    inicio.y +
+                    (
+                        fin.y -
+                        inicio.y
+                    ) *
+                    suave;
+
+
+                elemento.style.left =
+                    `${x}%`;
+
+
+                elemento.style.top =
+                    `${y}%`;
+
+
+                if(
+                    progreso < 1
+                ){
+
+                    requestAnimationFrame(
+                        animar
+                    );
+
+                }
+
+                else{
+
+                    elemento.style.left =
+                        `${fin.x}%`;
+
+
+                    elemento.style.top =
+                        `${fin.y}%`;
+
+
+                    elemento.classList.remove(
+                        "moviendo"
+                    );
+
+
+                    resolver();
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                animar
+            );
+
+        }
+    );
+
+}
+
+
+async function moverFichaPorCasillas(
+    id,
+    inicio,
+    final,
+    velocidad=360
+){
+
+    if(
+        inicio === final
+    ){
+
+        await reboteFicha(
+            id
+        );
+
+        return;
+
+    }
+
+
+    const paso =
+        final > inicio
+            ? 1
+            : -1;
+
+
+    let actual =
+        inicio;
+
+
+    while(
+        actual !== final
+    ){
+
+        const siguiente =
+            actual + paso;
+
+
+        await moverElementoSuave(
+            id,
+            actual,
+            siguiente,
+            velocidad
+        );
+
+
+        actual =
+            siguiente;
+
+
+        await dormir(60);
+
+    }
+
+}
+
+
+async function reboteFicha(id){
+
+    const elemento =
+        document.getElementById(
+            `pieza-${id}`
+        );
+
+
+    if(!elemento)
+        return;
+
+
+    elemento.classList.add(
+        "rebote"
+    );
+
+
+    await dormir(450);
+
+
+    elemento.classList.remove(
+        "rebote"
+    );
+
+}
+
+
+// ============================================================
+// MENSAJE
+// ============================================================
+
+function mostrarMensaje(texto){
+
+    const anterior =
+        document.querySelector(
+            ".mensaje-flotante"
+        );
+
+
+    if(anterior)
+        anterior.remove();
+
+
+    const mensaje =
+        document.createElement(
+            "div"
+        );
+
+
+    mensaje.className =
+        "mensaje-flotante";
+
+
+    mensaje.textContent =
+        texto;
+
+
+    document.body.appendChild(
+        mensaje
+    );
+
+
+    setTimeout(
+        () => mensaje.remove(),
+        1900
+    );
+
+}
+
+
+// ============================================================
+// PARTICULAS
+// ============================================================
+
+function crearParticulas(
+    numeroCasilla,
+    cantidad=25
+){
+
+    const posicion =
+        posicionCasilla(
+            numeroCasilla
+        );
+
+
+    for(
+        let i=0;
+        i<cantidad;
+        i++
+    ){
+
+        const particula =
+            document.createElement(
+                "div"
+            );
+
+
+        particula.className =
+            "particula";
+
+
+        particula.style.left =
+            `${posicion.x}%`;
+
+
+        particula.style.top =
+            `${posicion.y}%`;
+
+
+        const angulo =
+            Math.random() *
+            Math.PI *
+            2;
+
+
+        const distancia =
+            30 +
+            Math.random() *
+            120;
+
+
+        particula.style.setProperty(
+            "--dx",
+            `${Math.cos(angulo)*distancia}px`
+        );
+
+
+        particula.style.setProperty(
+            "--dy",
+            `${Math.sin(angulo)*distancia}px`
+        );
+
+
+        fichas.appendChild(
+            particula
+        );
+
+
+        setTimeout(
+            () =>
+                particula.remove(),
+            1100
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// RESALTAR CASILLA
+// ============================================================
+
+async function resaltarCasilla(
+    numero,
+    duracion=1000
+){
+
+    const existente =
+        document.querySelector(
+            ".resaltado-casilla"
+        );
+
+
+    if(existente)
+        existente.remove();
+
+
+    const p =
+        posicionCasilla(
+            numero
+        );
+
+
+    const elemento =
+        document.createElement(
+            "div"
+        );
+
+
+    elemento.className =
+        "resaltado-casilla";
+
+
+    elemento.style.left =
+        `${p.x}%`;
+
+
+    elemento.style.top =
+        `${p.y}%`;
+
+
+    fichas.appendChild(
+        elemento
+    );
+
+
+    await dormir(
+        duracion
+    );
+
+
+    elemento.remove();
+
+}
+
+
+// ============================================================
+// ESCALERA
+// ============================================================
+
+async function activarEscalera(
+    desde,
+    hasta
+){
+
+    const grupo =
+        document.getElementById(
+            "grupoEscaleras"
+        );
+
+
+    if(!grupo)
+        return;
+
+
+    grupo.classList.add(
+        "escalera-activa"
+    );
+
+
+    mostrarMensaje(
+        `🪜 ¡ESCALERA! ${desde} → ${hasta}`
+    );
+
+
+    crearParticulas(
+        desde,
+        30
+    );
+
+
+    await dormir(
+        900
+    );
+
+
+    grupo.classList.remove(
+        "escalera-activa"
+    );
+
+}
+
+
+// ============================================================
+// SERPIENTE
+// ============================================================
+
+async function activarSerpiente(
+    desde,
+    hasta
+){
+
+    const grupo =
+        document.getElementById(
+            "grupoSerpientes"
+        );
+
+
+    if(!grupo)
+        return;
+
+
+    grupo.classList.add(
+        "serpiente-activa"
+    );
+
+
+    mostrarMensaje(
+        `🐍 ¡SERPIENTE! ${desde} → ${hasta}`
+    );
+
+
+    crearParticulas(
+        desde,
+        25
+    );
+
+
+    await dormir(
+        900
+    );
+
+
+    grupo.classList.remove(
+        "serpiente-activa"
+    );
+
+}
+
+
+// ============================================================
+// ANIMAR MOVIMIENTO DEL JUGADOR
+// ============================================================
+
+async function animarMovimientoJugador(
+    id,
+    posicionAnterior,
+    posicionFinalServidor,
+    dado,
+    aterrizajeInformado = null
+){
+    if (movimientoEnCurso) return;
+    movimientoEnCurso = true;
+    animando = true;
+    actualizarBotonDado();
+
+    try {
+        id = Number(id);
+        posicionAnterior = Number(posicionAnterior);
+        dado = Number(dado);
+        const finalServidor = Number(posicionFinalServidor);
+
+        if (!Number.isFinite(posicionAnterior)) {
+            posicionAnterior = Number(posicionesVisuales[id] ?? 1);
+        }
+        posicionAnterior = Math.max(1, Math.min(100, posicionAnterior));
+        dado = Math.max(1, Math.min(6, Number.isFinite(dado) ? dado : 1));
+
+        // La casilla de aterrizaje se calcula desde el origen real y el dado.
+        // Solo se queda quieto si el movimiento supera 100.
+        let intermedia = posicionAnterior + dado;
+        if (intermedia > 100) intermedia = posicionAnterior;
+        intermedia = Math.max(1, Math.min(100, intermedia));
+
+        // El servidor manda la posición definitiva. Las reglas locales solo se
+        // usan como respaldo cuando el dato del servidor no es válido.
+        const destinoRegla = ESCALERAS[intermedia] ?? SERPIENTES[intermedia];
+        let posicionFinal = Number.isFinite(finalServidor) && finalServidor >= 1 && finalServidor <= 100
+            ? finalServidor
+            : (destinoRegla !== undefined ? Number(destinoRegla) : intermedia);
+        if (destinoRegla !== undefined) posicionFinal = Number(destinoRegla);
+
+        posicionesVisuales[id] = posicionAnterior;
+
+        // Ordenar el movimiento 3D con las mismas posiciones que la ficha HTML.
+        if (typeof window.animarMovimientoTablero3D === 'function') {
+            window.animarMovimientoTablero3D(id, posicionAnterior, intermedia, posicionFinal);
+        }
+
+        // Primero recorrer todas las casillas normales, una por una.
+        if (posicionAnterior !== intermedia) {
+            await moverFichaPorCasillas(id, posicionAnterior, intermedia, 330);
+        } else {
+            await reboteFicha(id);
+        }
+
+        // Después aplicar exactamente una transición especial, si corresponde.
+        if (destinoRegla !== undefined) {
+            const destino = Number(destinoRegla);
+            await resaltarCasilla(intermedia, 850);
+            if (ESCALERAS[intermedia] !== undefined) {
+                await activarEscalera(intermedia, destino);
+                await moverElementoSuave(id, intermedia, destino, 1500);
+                crearParticulas(destino, 35);
+            } else {
+                await activarSerpiente(intermedia, destino);
+                await moverElementoSuave(id, intermedia, destino, 1700);
+                crearParticulas(destino, 30);
+            }
+            await dormir(300);
+            posicionFinal = destino;
+        } else if (posicionFinal !== intermedia) {
+            // Solo corregir al destino del servidor si no se activó escalera/serpiente.
+            await moverElementoSuave(id, intermedia, posicionFinal, 500);
+        }
+
+        posicionesVisuales[id] = Number(posicionFinal);
+    } finally {
+        movimientoEnCurso = false;
+        animando = false;
+        actualizarBotonDado();
+    }
+}
+
+
+// ============================================================
+// MOVIMIENTO PENDIENTE
+// ============================================================
+
+async function ejecutarMovimientoPendiente(
+    movimiento
+){
+
+    if(!movimiento)
+        return;
+
+
+    await animarMovimientoJugador(
+
+        movimiento.jugador_id,
+
+        Number(
+            movimiento.posicion_anterior
+        ),
+
+        Number(
+            movimiento.posicion
+        ),
+
+        Number(
+            movimiento.dado
+        ),
+
+        Number(
+            movimiento.posicion_intermedia
+        )
+
+    );
+
+
+    renderizarFichas();
+
+    renderizarJugadores();
+
+    actualizarMensajeEstado();
+
+    actualizarBotonDado();
+
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        mostrarVictoria(
+            estado.ganador
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// VICTORIA
+// ============================================================
+
+function mostrarVictoria(
+    ganadorId
+){
+
+    const jugador =
+        obtenerJugador(
+            estado.jugadores,
+            ganadorId
+        );
+
+
+    const nombre =
+        obtenerNombreJugador(
+            jugador,
+            ganadorId
+        );
+
+
+    if(
+        Number(ganadorId) ===
+        Number(estado.mi_id)
+    ){
+
+        textoVictoria.textContent =
+            `🎉 ¡${nombre}, has ganado!`;
+
+    }
+
+    else{
+
+        textoVictoria.textContent =
+            `🏆 ¡${nombre} ganó la partida!`;
+
+    }
+
+
+    victoria.classList.remove(
+        "oculto"
+    );
+
+
+    crearParticulas(
+        100,
+        70
+    );
+
+}
+
+
+function ocultarVictoria(){
+
+    victoria.classList.add(
+        "oculto"
+    );
+
+}
+
+
+// ============================================================
+// ENVIAR
+// ============================================================
+
+function enviar(datos){
+
+    if(
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ){
+
+        return false;
+
+    }
+
+
+    try{
+
+        socket.send(
+            JSON.stringify(
+                datos
+            )
+        );
+
+
+        return true;
+
+    }
+
+    catch(error){
+
+        console.error(
+            error
+        );
+
+
+        return false;
+
+    }
+
+}
+
+
+// ============================================================
+// RECIBIR ESTADO
+// ============================================================
+
+async function recibirEstado(
+    nuevoEstado
+){
+
+    const miIdAnterior =
+        estado.mi_id;
+
+
+    const nuevoJugadorId =
+        nuevoEstado.mi_id ??
+        nuevoEstado.jugador_id ??
+        nuevoEstado.id ??
+        miIdAnterior;
+
+
+    estado = {
+
+        ...estado,
+
+        ...nuevoEstado,
+
+        mi_id:
+            nuevoJugadorId,
+
+        turno:
+            nuevoEstado.turno ??
+            nuevoEstado.jugador_turno ??
+            nuevoEstado.turno_actual ??
+            estado.turno,
+
+        jugadores:
+            nuevoEstado.jugadores ??
+            estado.jugadores ??
+            {}
+
+    };
+
+
+    if(
+        estado.ganador !== null &&
+        estado.ganador !== undefined
+    ){
+
+        ultimaPosicionGanador =
+            estado.ganador;
+
+    }
+
+
+    renderizarJugadores();
+
+    actualizarMensajeEstado();
+
+    actualizarBotonDado();
+
+
+    const ids =
+        Object.keys(
+            estado.jugadores
+        );
+
+
+    if(!animando){
+
+        ids.forEach(
+            id => {
+
+                const jugador =
+                    estado.jugadores[id];
+
+
+                const nuevaPosicion =
+                    obtenerPosicionJugador(
+                        jugador
+                    );
+
+
+                if(
+                    !posicionesVisuales[id]
+                ){
+
+                    posicionesVisuales[id] =
+                        nuevaPosicion;
+
+                }
+
+            }
+        );
+
+    }
+
+
+    // El servidor puede enviar el estado final inmediatamente después del dado.
+    // No redibujar las fichas mientras se muestra el dado o se anima el recorrido,
+    // porque eso las teletransportaría directamente a la casilla final.
+    if (!animando && !movimientoEnCurso && !resultadoDadoPendiente) {
+        renderizarFichas();
+    }
+
+}
+
+
+// ============================================================
+// RESULTADO DEL DADO
+// ============================================================
+
+async function recibirResultadoDado(
+    datos
+){
+    // Bloquear el lanzamiento en TODOS los clientes desde que llega el resultado,
+    // no solo en el navegador del jugador que lanzó el dado.
+    if (resultadoDadoPendiente || movimientoEnCurso) return;
+    animando = true;
+    actualizarBotonDado();
+
+    const resultado =
+        Number(
+            datos.dado ??
+            datos.ultimo_dado
+        );
+
+
+    if(
+        !Number.isFinite(
+            resultado
+        )
+    ){
+
+        return;
+
+    }
+
+
+    if(
+        datos.turno !== undefined
+    ){
+
+        estado.turno =
+            datos.turno;
+
+    }
+
+
+    // Preparar el movimiento, pero NO mover la ficha todavía.
+    const jugadorId = Number(
+        datos.jugador_id ?? datos.id_jugador ?? datos.id ?? estado.turno
+    );
+    const jugadorActual = obtenerJugador(estado.jugadores, jugadorId);
+
+    // El servidor puede enviar primero el estado actualizado y después el dado.
+    // En ese caso, la posición del estado ya es el destino y no el origen.
+    // Para animar desde la casilla correcta, priorizar la posición lógica que
+    // la ficha 3D todavía muestra; luego usar la posición visual HTML y al final
+    // los datos del servidor como último recurso.
+    const posicionVisual3D = typeof window.obtenerPosicionVisual3D === "function"
+        ? window.obtenerPosicionVisual3D(jugadorId)
+        : null;
+    const posicionAnteriorInformada =
+        datos.posicion_anterior ??
+        datos.posicion_inicial ??
+        datos.casilla_anterior;
+    const posicionAnterior = Number(
+        posicionAnteriorInformada !== undefined && posicionAnteriorInformada !== null
+            ? posicionAnteriorInformada
+            : (posicionVisual3D !== null && posicionVisual3D !== undefined
+                ? posicionVisual3D
+                : (posicionesVisuales[jugadorId] ?? obtenerPosicionJugador(jugadorActual)))
+    );
+    const posicionInformada = Number(
+        datos.posicion_final ??
+        datos.posicion ??
+        datos.casilla_final ??
+        datos.casilla
+    );
+
+    // La casilla recorrida se calcula con el origen visual y el resultado
+    // real del dado. No confiar ciegamente en posicion_intermedia del servidor:
+    // si llega desfasada, la ficha terminaría una casilla antes.
+    let aterrizaje = posicionAnterior + resultado;
+
+    // Regla del tablero: se necesita el número exacto para llegar a 100.
+    // Si el lanzamiento sobrepasa 100, la ficha permanece en su casilla.
+    if (aterrizaje > 100) {
+        aterrizaje = posicionAnterior;
+    }
+
+    aterrizaje = Math.max(1, Math.min(100, aterrizaje));
+
+    const casillaAterrizaje = aterrizaje;
+    const destinoRegla = ESCALERAS[casillaAterrizaje] ?? SERPIENTES[casillaAterrizaje];
+    const finalInformado = Number(datos.posicion_final ?? datos.posicion ?? datos.casilla_final ?? datos.casilla);
+
+    const movimiento = {
+        jugador_id: jugadorId,
+        dado: resultado,
+        posicion_anterior: posicionAnterior,
+        posicion_intermedia: casillaAterrizaje,
+        posicion: destinoRegla !== undefined
+            ? Number(destinoRegla)
+            : (Number.isFinite(finalInformado) ? finalInformado : casillaAterrizaje)
+    };
+
+    // Secuencia estricta: animar el dado, mostrar el número y después mover la ficha.
+    resultadoDadoPendiente = movimiento;
+    await animarDado(resultado);
+
+    // Una pequeña pausa permite leer el resultado antes de que comience el recorrido.
+    await dormir(350);
+
+    const movimientoConfirmado = resultadoDadoPendiente;
+    resultadoDadoPendiente = null;
+
+    if (movimientoConfirmado) {
+        await ejecutarMovimientoPendiente(movimientoConfirmado);
+    }
+}
+
+
+// ============================================================
+// CONEXIÓN WEBSOCKET
+// ============================================================
+
+function conectar(){
+
+    estadoConexion.textContent =
+        "🟡 Conectando al servidor...";
+
+
+    estadoConexion.style.background =
+        "#fff8e1";
+
+
+    estadoConexion.style.borderColor =
+        "#ffca28";
+
+
+    try{
+
+        socket =
+            new WebSocket(
+                SERVER_URL
+            );
+
+    }
+
+    catch(error){
+
+        estadoConexion.textContent =
+            "🔴 Error creando conexión";
+
+        return;
+
+    }
+
+
+    socket.onopen = () => {
+
+        console.log(
+            "WebSocket conectado"
+        );
+
+
+        estadoConexion.textContent =
+            "🟢 Conectado. Esperando jugadores...";
+
+
+        estadoConexion.style.background =
+            "#e8f5e9";
+
+
+        estadoConexion.style.borderColor =
+            "#81c784";
+
+
+        actualizarBotonDado();
+
+    };
+
+
+    socket.onmessage =
+        async evento => {
+
+            try{
+
+                const datos =
+                    JSON.parse(
+                        evento.data
+                    );
+
+
+                console.log(
+                    "Servidor:",
+                    datos
+                );
+
+
+                if(
+                    datos.tipo ===
+                    "conexion"
+                ){
+
+                    estado = {
+
+                        ...estado,
+
+                        ...datos,
+
+                        mi_id:
+                            datos.mi_id ??
+                            datos.jugador_id ??
+                            estado.mi_id,
+
+                        turno:
+                            datos.turno ??
+                            estado.turno,
+
+                        jugadores:
+                            datos.jugadores ??
+                            estado.jugadores ??
+                            {}
+
+                    };
+
+
+                    renderizarJugadores();
+
+                    renderizarFichas();
+
+                    actualizarMensajeEstado();
+
+                    actualizarBotonDado();
+
+                    return;
+
+                }
+
+
+                if(
+                    datos.tipo ===
+                    "estado"
+                ){
+
+                    await recibirEstado(
+                        datos
+                    );
+
+                    return;
+
+                }
+
+
+                if(
+                    datos.tipo ===
+                    "resultado_dado"
+                ){
+
+                    await recibirResultadoDado(
+                        datos
+                    );
+
+                    return;
+
+                }
+
+
+                if(
+                    datos.tipo ===
+                    "mensaje"
+                ){
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        ""
+                    );
+
+                    return;
+
+                }
+
+
+                if(
+                    datos.tipo ===
+                    "lleno"
+                ){
+
+                    estadoConexion.textContent =
+                        "🔴 Servidor lleno";
+
+
+                    btnDado.disabled =
+                        true;
+
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "Servidor lleno."
+                    );
+
+
+                    return;
+
+                }
+
+
+                if(
+                    datos.tipo ===
+                    "error"
+                ){
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "Error del servidor."
+                    );
+
+
+                    return;
+
+                }
+
+
+                if(
+                    datos.tipo ===
+                    "servidor_cerrando"
+                ){
+
+                    mostrarMensaje(
+                        datos.mensaje ||
+                        "Conexión cerrada."
+                    );
+
+
+                    return;
+
+                }
+
+            }
+
+            catch(error){
+
+                console.error(
+                    "Error procesando mensaje:",
+                    error
+                );
+
+            }
+
+        };
+
+
+    socket.onerror = error => {
+
+        console.error(
+            "WebSocket error:",
+            error
+        );
+
+
+        estadoConexion.textContent =
+            "🔴 Error de conexión";
+
+
+        estadoConexion.style.background =
+            "#ffebee";
+
+
+        estadoConexion.style.borderColor =
+            "#ef9a9a";
+
+
+        btnDado.disabled =
+            true;
+
+    };
+
+
+    socket.onclose = () => {
+
+        console.log(
+            "WebSocket cerrado"
+        );
+
+
+        estadoConexion.textContent =
+            "🔴 Desconectado";
+
+
+        estadoConexion.style.background =
+            "#ffebee";
+
+
+        estadoConexion.style.borderColor =
+            "#ef9a9a";
+
+
+        btnDado.disabled =
+            true;
+
+    };
+
+}
+
+
+// ============================================================
+// NOMBRE
+// ============================================================
+
+btnNombre.onclick = () => {
+
+    const nombre =
+        nombreJugador.value.trim();
+
+
+    if(!nombre){
+
+        mostrarMensaje(
+            "Escribe tu nombre."
+        );
+
+        return;
+
+    }
+
+
+    enviar({
+
+        tipo:"nombre",
+
+        nombre:nombre
+
+    });
+
+
+    nombreJugador.blur();
+
+};
+
+
+nombreJugador.addEventListener(
+    "keydown",
+    evento => {
+
+        if(
+            evento.key ===
+            "Enter"
+        ){
+
+            btnNombre.click();
+
+        }
+
+    }
+);
+
+
+// ============================================================
+// BOTÓN DADO
+// ============================================================
+
+btnDado.onclick = () => {
+
+    if(animando)
+        return;
+
+
+    if(
+        !socket ||
+        socket.readyState !==
+        WebSocket.OPEN
+    ){
+
+        mostrarMensaje(
+            "No estás conectado."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        estado.mi_id === null ||
+        estado.mi_id === undefined
+    ){
+
+        mostrarMensaje(
+            "Esperando identificación..."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        estado.turno === null ||
+        estado.turno === undefined
+    ){
+
+        mostrarMensaje(
+            "Todavía no hay turno."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        Number(
+            estado.turno
+        ) !==
+        Number(
+            estado.mi_id
+        )
+    ){
+
+        const jugador =
+            obtenerJugador(
+                estado.jugadores,
+                estado.turno
+            );
+
+
+        mostrarMensaje(
+            `Es turno de ${
+                obtenerNombreJugador(
+                    jugador,
+                    estado.turno
+                )
+            }`
+        );
+
+
+        return;
+
+    }
+
+
+    animando = true;
+
+    dadoTerminado = false;
+
+    resultadoDadoPendiente =
+        null;
+
+
+    btnDado.disabled =
+        true;
+
+
+    enviar({
+
+        tipo:
+            "lanzar_dado"
+
+    });
+
+};
+
+
+// ============================================================
+// REINICIAR
+// ============================================================
+
+function reiniciarPartida(){
+
+    ocultarVictoria();
+
+    posicionesVisuales = {};
+
+    animando = false;
+    movimientoEnCurso = false;
+
+    dadoTerminado = true;
+
+    resultadoDadoPendiente =
+        null;
+
+
+    mostrarCaraDado(1);
+
+
+    resultadoDado.textContent =
+        "🎲 Esperando...";
+
+
+    enviar({
+
+        tipo:
+            "reiniciar"
+
+    });
+
+}
+
+
+btnReiniciar.onclick =
+    reiniciarPartida;
+
+
+btnVictoriaReiniciar.onclick =
+    reiniciarPartida;
+
+
+// ============================================================
+// ABANDONAR
+// ============================================================
+
+btnAbandonar.onclick = () => {
+
+    if(!abandonando){
+
+        abandonando = true;
+
+
+        btnAbandonar.textContent =
+            "⚠️ CONFIRMAR ABANDONO";
+
+
+        return;
+
+    }
+
+
+    enviar({
+
+        tipo:
+            "abandonar"
+
+    });
+
+
+    abandonando = false;
+
+
+    btnAbandonar.textContent =
+        "🚪 ABANDONAR";
+
+
+    btnDado.disabled =
+        true;
+
+};
+
+
+// ============================================================
+// PING
+// ============================================================
+
+setInterval(
+    () => {
+
+        enviar({
+            tipo:"ping"
+        });
+
+    },
+    15000
+);
+
+
+// ============================================================
+// INICIO
+// ============================================================
+
+crearTablero();
+
+crearSVG();
+
+dibujarElementos();
+
+mostrarCaraDado(1);
+
+conectar();
+
+</script>
+
+
+
+
+
+</body>
+
+</html>
