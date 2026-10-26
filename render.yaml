@@ -1,7 +1,6 @@
 services:
   - type: web
-    name: serpientes-escaleras
+    name: serpientes-escaleras-online
     runtime: python
     buildCommand: pip install -r requirements.txt
     startCommand: python servidor.py
-
