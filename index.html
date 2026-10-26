@@ -4149,6 +4149,8 @@ async function recibirEstado(
 
     actualizarBotonDado();
 
+    actualizarBotonReinicio();
+
 
     const ids =
         Object.keys(
@@ -4768,10 +4770,12 @@ function actualizarBotonReinicio(){
     const solicitado = Boolean(estado.reinicio_solicitado);
     const votos = (estado.votos_reinicio || []).map(Number);
     const yaAcepto = votos.includes(Number(estado.mi_id));
+    const conectado = Boolean(socket && socket.readyState === WebSocket.OPEN);
 
-    // El reinicio solo se puede proponer después de terminar la partida.
-    btnReiniciar.hidden = !termino;
-    btnReiniciar.disabled = !termino || !socket || socket.readyState !== WebSocket.OPEN;
+    // Antes de iniciar la votación, el botón solo se muestra al primer jugador.
+    // Una vez propuesta, todos los demás lo ven para aceptar.
+    btnReiniciar.hidden = !termino || (!esLider && !solicitado);
+    btnReiniciar.disabled = !termino || !conectado;
 
     if (!termino) {
         btnReiniciar.textContent = "🔄 REINICIAR PARTIDA";
@@ -4779,14 +4783,14 @@ function actualizarBotonReinicio(){
     }
 
     if (!solicitado) {
-        btnReiniciar.textContent = esLider ? "🔄 SOLICITAR REINICIO" : "⏳ ESPERANDO AL JUGADOR 1";
-        btnReiniciar.disabled = !esLider || !socket || socket.readyState !== WebSocket.OPEN;
+        btnReiniciar.textContent = "🔄 SOLICITAR REINICIO";
+        btnReiniciar.disabled = !esLider || !conectado;
     } else if (yaAcepto) {
         btnReiniciar.textContent = `✅ ACEPTADO (${votos.length}/${ids.length})`;
         btnReiniciar.disabled = true;
     } else {
         btnReiniciar.textContent = `👍 ACEPTAR REINICIO (${votos.length}/${ids.length})`;
-        btnReiniciar.disabled = !socket || socket.readyState !== WebSocket.OPEN;
+        btnReiniciar.disabled = !conectado;
     }
 }
 
