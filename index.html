@@ -484,7 +484,7 @@ body{
 
     border-radius:14px;
 
-    background:#000000;
+    background:#fff;
 
     border:
         4px solid #222;
@@ -727,7 +727,7 @@ button.accion:disabled{
 
     margin-bottom:7px;
 
-    background:#000000;
+    background:#f4f6f8;
 
     border:
         2px solid transparent;
@@ -1793,6 +1793,53 @@ input, select, textarea {
         padding: 1px 2px !important; font-size: 9px !important;
         border-radius: 3px !important;
     }
+}
+
+
+
+/* AJUSTE DE CONTRASTE: dado blanco con número negro y turno legible */
+.dado-3d .cara,
+.dado-3d .cara * {
+    background-color: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    text-shadow: none !important;
+    border-color: #222222 !important;
+    opacity: 1 !important;
+}
+.dado-3d .cara {
+    background: #ffffff !important;
+    color: #111827 !important;
+    border: 4px solid #222222 !important;
+    box-shadow: inset 0 0 10px rgba(0,0,0,.08), 0 2px 5px rgba(0,0,0,.15) !important;
+}
+.resultado, #resultadoDado {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,.8) !important;
+}
+.estado, #estadoConexion {
+    color: #102033 !important;
+    -webkit-text-fill-color: #102033 !important;
+    font-weight: 900 !important;
+    text-shadow: none !important;
+}
+.jugador.turno, .jugador.turno .nombre, .jugador.turno .casilla,
+.jugador.turno * {
+    color: #172033 !important;
+    -webkit-text-fill-color: #172033 !important;
+    text-shadow: none !important;
+    opacity: 1 !important;
+}
+.jugador .nombre, .jugador .casilla {
+    color: #f4f7ff !important;
+    -webkit-text-fill-color: #f4f7ff !important;
+    opacity: 1 !important;
+}
+.jugador.turno .nombre, .jugador.turno .casilla {
+    color: #172033 !important;
+    -webkit-text-fill-color: #172033 !important;
 }
 
 </style>
@@ -3059,7 +3106,7 @@ function actualizarMensajeEstado(){
 
 
         estadoConexion.style.background =
-            "#000000";
+            "#e8f5e9";
 
 
         estadoConexion.style.borderColor =
