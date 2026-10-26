@@ -1756,6 +1756,45 @@ input, select, textarea {
     }
 }
 
+
+/* FIX FINAL: contraste fuerte para los números del tablero */
+#tablero .casilla > .numero {
+    display: flex !important;
+    position: absolute !important;
+    top: 3px !important;
+    left: 3px !important;
+    z-index: 9999 !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 20px !important;
+    min-height: 20px !important;
+    padding: 2px 4px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+    font-size: clamp(11px, 1.05vw, 15px) !important;
+    font-weight: 900 !important;
+    line-height: 1.1 !important;
+    text-shadow: none !important;
+    border: 1px solid #64748b !important;
+    border-radius: 4px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,.35) !important;
+    pointer-events: none !important;
+}
+#tablero .casilla { position: relative !important; }
+@media (max-width: 600px) {
+    #tablero .casilla > .numero {
+        top: 1px !important; left: 1px !important;
+        min-width: 15px !important; min-height: 15px !important;
+        padding: 1px 2px !important; font-size: 9px !important;
+        border-radius: 3px !important;
+    }
+}
+
 </style>
 
 </head>
