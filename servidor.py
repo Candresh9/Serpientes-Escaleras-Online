@@ -71,6 +71,10 @@ class JuegoServidor:
 
         self.ultimo_evento = "Esperando jugadores..."
 
+        # Votación de reinicio: solo el primer jugador conectado puede iniciarla.
+        self.reinicio_solicitado = False
+        self.votos_reinicio = set()
+
         self.lock = asyncio.Lock()
 
 
@@ -104,6 +108,10 @@ class JuegoServidor:
             "dado": self.ultimo_dado,
 
             "ultimo_evento": self.ultimo_evento,
+
+            "reinicio_solicitado": self.reinicio_solicitado,
+            "votos_reinicio": sorted(self.votos_reinicio),
+            "lider_reinicio": min(self.jugadores) if self.jugadores else None,
 
             "escaleras": ESCALERAS,
 
@@ -382,9 +390,16 @@ class JuegoServidor:
         # REINICIAR
         # ====================================================
 
-        if tipo == "reiniciar":
+        if tipo == "solicitar_reinicio":
 
-            await self.reiniciar()
+            await self.solicitar_reinicio(jugador_id)
+
+            return
+
+
+        if tipo == "aceptar_reinicio":
+
+            await self.aceptar_reinicio(jugador_id)
 
             return
 
@@ -624,41 +639,78 @@ class JuegoServidor:
 
 
     # ========================================================
-    # REINICIAR
+    # VOTACIÓN Y REINICIO DE PARTIDA
     # ========================================================
+
+    async def solicitar_reinicio(self, jugador_id):
+
+        async with self.lock:
+            if jugador_id not in self.jugadores or not self.jugadores:
+                return
+
+            # El primer jugador conectado (ID más bajo) es quien puede iniciar.
+            if jugador_id != min(self.jugadores):
+                return
+
+            # La votación solo se habilita cuando ya hay ganador.
+            if self.ganador is None:
+                return
+
+            self.reinicio_solicitado = True
+            self.votos_reinicio = {jugador_id}
+            nombre = self.jugadores[jugador_id]["nombre"]
+            self.ultimo_evento = f"{nombre} propone reiniciar. Los demás jugadores deben aceptar."
+
+            reiniciar_ahora = self._todos_aceptaron_reinicio()
+
+        if reiniciar_ahora:
+            await self.reiniciar()
+        else:
+            await self.enviar_estado()
+
+
+    async def aceptar_reinicio(self, jugador_id):
+
+        async with self.lock:
+            if jugador_id not in self.jugadores or not self.reinicio_solicitado:
+                return
+
+            self.votos_reinicio.add(jugador_id)
+            nombre = self.jugadores[jugador_id]["nombre"]
+            total = len(self.jugadores)
+            votos = len(self.votos_reinicio.intersection(self.jugadores.keys()))
+            self.ultimo_evento = f"{nombre} aceptó reiniciar ({votos}/{total})."
+            reiniciar_ahora = self._todos_aceptaron_reinicio()
+
+        if reiniciar_ahora:
+            await self.reiniciar()
+        else:
+            await self.enviar_estado()
+
+
+    def _todos_aceptaron_reinicio(self):
+        return bool(self.jugadores) and self.reinicio_solicitado and all(
+            jugador_id in self.votos_reinicio for jugador_id in self.jugadores
+        )
+
 
     async def reiniciar(self):
 
         async with self.lock:
-
             if not self.jugadores:
-
                 return
 
-
             for jugador in self.jugadores.values():
-
                 jugador["posicion"] = 1
 
-
             self.ganador = None
-
             self.ultimo_dado = None
+            self.votos_reinicio.clear()
+            self.reinicio_solicitado = False
 
-            ids = sorted(
-                self.jugadores.keys()
-            )
-
-
-            if ids:
-
-                self.turno = ids[0]
-
-
-            self.ultimo_evento = (
-                "🔄 La partida fue reiniciada."
-            )
-
+            ids = sorted(self.jugadores.keys())
+            self.turno = ids[0] if ids else None
+            self.ultimo_evento = "🔄 Todos aceptaron. ¡La nueva partida comienza ahora!"
 
         await self.enviar_estado()
 
@@ -718,6 +770,15 @@ class JuegoServidor:
                 jugador_id,
                 None
             )
+
+            era_lider_reinicio = bool(self.jugadores) and jugador_id == min(self.jugadores)
+            self.votos_reinicio.discard(jugador_id)
+            if not self.jugadores or not self.reinicio_solicitado or era_lider_reinicio:
+                self.votos_reinicio.clear()
+                self.reinicio_solicitado = False
+            elif self._todos_aceptaron_reinicio():
+                # La comprobación final se realiza después de liberar el bloqueo.
+                pass
 
             self.conexiones.pop(
                 jugador_id,
