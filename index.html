@@ -1559,6 +1559,148 @@ button.accion {
 
 
 
+
+
+/* ==========================================================
+   REDISEÑO VISUAL — solo CSS, sin modificar reglas del juego
+   ========================================================== */
+:root {
+    --ui-ink: #f4f7ff;
+    --ui-muted: #a9b8d4;
+    --ui-panel: rgba(17, 28, 53, .92);
+    --ui-border: rgba(151, 180, 235, .20);
+    --ui-cyan: #4de3ff;
+    --ui-violet: #8c7bff;
+}
+
+html { min-height: 100%; background: #080f20; }
+body {
+    min-height: 100vh;
+    color: var(--ui-ink);
+    background:
+        radial-gradient(ellipse at 12% 8%, rgba(57, 111, 255, .26), transparent 34%),
+        radial-gradient(ellipse at 88% 18%, rgba(139, 76, 255, .20), transparent 30%),
+        radial-gradient(ellipse at 50% 100%, rgba(24, 194, 204, .10), transparent 42%),
+        #080f20;
+}
+.app {
+    width: min(1540px, 96%);
+    padding: 30px 0 42px;
+}
+.titulo {
+    position: relative;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 auto 28px;
+    padding: 15px 28px;
+    border: 1px solid rgba(110, 215, 255, .25);
+    border-radius: 18px;
+    color: #f7fbff;
+    background: linear-gradient(110deg, rgba(21, 39, 75, .92), rgba(35, 31, 77, .90));
+    box-shadow: 0 12px 36px rgba(0, 0, 0, .26), inset 0 1px rgba(255,255,255,.08);
+    text-shadow: 0 0 22px rgba(77, 227, 255, .28);
+    letter-spacing: .035em;
+}
+.juego {
+    grid-template-columns: minmax(0, 1fr) minmax(285px, 340px);
+    gap: 22px;
+    align-items: stretch;
+}
+.tablero-contenedor {
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--ui-border);
+    border-radius: 24px;
+    background: linear-gradient(145deg, rgba(22, 35, 64, .96), rgba(12, 22, 43, .96));
+    box-shadow: 0 24px 60px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.06);
+}
+#tablero {
+    border: 3px solid #263a60;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.28), inset 0 0 0 1px rgba(255,255,255,.28);
+}
+.panel {
+    min-width: 0;
+    min-height: 100%;
+    padding: 22px;
+    border: 1px solid var(--ui-border);
+    border-radius: 24px;
+    color: var(--ui-ink);
+    background: var(--ui-panel);
+    box-shadow: 0 24px 60px rgba(0,0,0,.32), inset 0 1px rgba(255,255,255,.06);
+    backdrop-filter: blur(16px);
+}
+.panel h2 {
+    padding-bottom: 13px;
+    border-bottom: 1px solid var(--ui-border);
+    color: #f5f8ff;
+    font-size: 1.28rem;
+    letter-spacing: .02em;
+}
+.panel h3, .jugadores h3 { color: #dce8ff; }
+.estado {
+    color: #e9f7ff;
+    border: 1px solid rgba(77, 227, 255, .22);
+    background: linear-gradient(110deg, rgba(27, 76, 113, .52), rgba(49, 48, 112, .45));
+    box-shadow: inset 0 1px rgba(255,255,255,.05);
+}
+button.accion {
+    min-height: 48px;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 14px;
+    box-shadow: 0 7px 18px rgba(0,0,0,.18), inset 0 1px rgba(255,255,255,.2);
+    letter-spacing: .035em;
+    transition: transform .18s ease, filter .18s ease, box-shadow .18s ease;
+}
+button.accion:hover:not(:disabled) {
+    transform: translateY(-3px);
+    filter: brightness(1.08);
+    box-shadow: 0 12px 25px rgba(0,0,0,.26), 0 0 18px rgba(77,227,255,.10);
+}
+#btnDado { background: linear-gradient(135deg, #ffe879, #ffad35 70%, #ff8a28); color: #1b2340; }
+#btnReiniciar { background: linear-gradient(135deg, #36d6a0, #119c83); color: #071d25; }
+#btnAbandonar { background: linear-gradient(135deg, #ff777f, #e83b60); color: white; }
+.jugadores { margin-top: 20px; }
+.jugadores h3 { margin-bottom: 13px; }
+.jugador {
+    padding: 11px 12px;
+    border: 1px solid rgba(155, 180, 230, .12);
+    border-radius: 13px;
+    color: #eaf0ff;
+    background: rgba(255,255,255,.045);
+    transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+.jugador.turno {
+    border: 1px solid rgba(255, 220, 94, .85);
+    background: linear-gradient(100deg, rgba(255, 206, 75, .17), rgba(255,255,255,.045));
+    box-shadow: 0 0 0 1px rgba(255,220,94,.10), 0 7px 20px rgba(0,0,0,.12);
+    transform: translateX(2px);
+}
+.jugador .nombre { color: #f4f7ff; }
+.jugador .casilla { color: var(--ui-muted); opacity: 1; }
+.dado-contenedor { filter: drop-shadow(0 10px 18px rgba(0,0,0,.25)); }
+input, select, textarea {
+    max-width: 100%;
+    border-radius: 10px;
+}
+*:focus-visible { outline: 3px solid var(--ui-cyan); outline-offset: 3px; }
+
+@media (max-width: 1050px) {
+    .juego { grid-template-columns: minmax(0, 1fr) minmax(260px, 310px); gap: 14px; }
+    .panel { padding: 17px; }
+    .tablero-contenedor { padding: 10px; }
+}
+@media (max-width: 760px) {
+    .app { width: min(100% - 20px, 680px); padding-top: 18px; }
+    .titulo { padding: 13px 15px; margin-bottom: 17px; border-radius: 15px; }
+    .juego { grid-template-columns: minmax(0, 1fr); gap: 15px; }
+    .tablero-contenedor { padding: 8px; border-radius: 17px; }
+    .panel { min-height: 0; padding: 17px; border-radius: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    button.accion, .jugador { transition: none; }
+}
+
 </style>
 
 </head>
@@ -2176,518 +2318,143 @@ function crearSVG(){
 
 
 function dibujarElementos(){
+    const svg = document.getElementById("svgTablero");
+    if (!svg) return;
 
-    const svg =
-        document.getElementById(
-            "svgTablero"
-        );
-
-
-    if(!svg) return;
-
-
-    const grupoEscaleras =
-        document.getElementById(
-            "grupoEscaleras"
-        );
-
-
-    const grupoSerpientes =
-        document.getElementById(
-            "grupoSerpientes"
-        );
-
-
+    const grupoEscaleras = document.getElementById("grupoEscaleras");
+    const grupoSerpientes = document.getElementById("grupoSerpientes");
+    if (!grupoEscaleras || !grupoSerpientes) return;
     grupoEscaleras.innerHTML = "";
-
     grupoSerpientes.innerHTML = "";
 
-
-    // ========================================================
-    // ESCALERAS
-    // ========================================================
-
-    for(
-        const [desde,hasta]
-        of Object.entries(
-            ESCALERAS
-        )
-    ){
-
-        const a =
-            centroCasilla(
-                Number(desde)
-            );
-
-
-        const b =
-            centroCasilla(
-                Number(hasta)
-            );
-
-
-        const dx =
-            b.x - a.x;
-
-
-        const dy =
-            b.y - a.y;
-
-
-        const longitud =
-            Math.sqrt(
-                dx*dx + dy*dy
-            );
-
-
-        const angulo =
-            Math.atan2(
-                dy,
-                dx
-            ) *
-            180 /
-            Math.PI;
-
-
-        const x1 =
-            a.x -
-            1.5 *
-            Math.sin(
-                angulo *
-                Math.PI /
-                180
-            );
-
-
-        const y1 =
-            a.y +
-            1.5 *
-            Math.cos(
-                angulo *
-                Math.PI /
-                180
-            );
-
-
-        const x2 =
-            b.x -
-            1.5 *
-            Math.sin(
-                angulo *
-                Math.PI /
-                180
-            );
-
-
-        const y2 =
-            b.y +
-            1.5 *
-            Math.cos(
-                angulo *
-                Math.PI /
-                180
-            );
-
-
-        const rail1 =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "line"
-            );
-
-
-        rail1.setAttribute(
-            "x1",
-            x1
-        );
-
-        rail1.setAttribute(
-            "y1",
-            y1
-        );
-
-        rail1.setAttribute(
-            "x2",
-            x2
-        );
-
-        rail1.setAttribute(
-            "y2",
-            y2
-        );
-
-        rail1.setAttribute(
-            "stroke",
-            "#1eaa4d"
-        );
-
-        rail1.setAttribute(
-            "stroke-width",
-            "1.5"
-        );
-
-        rail1.setAttribute(
-            "stroke-linecap",
-            "round"
-        );
-
-
-        const rail2 =
-            rail1.cloneNode();
-
-
-        rail2.setAttribute(
-            "x1",
-            a.x +
-            1.5 *
-            Math.sin(
-                angulo *
-                Math.PI /
-                180
-            )
-        );
-
-
-        rail2.setAttribute(
-            "y1",
-            a.y -
-            1.5 *
-            Math.cos(
-                angulo *
-                Math.PI /
-                180
-            )
-        );
-
-
-        rail2.setAttribute(
-            "x2",
-            b.x +
-            1.5 *
-            Math.sin(
-                angulo *
-                Math.PI /
-                180
-            )
-        );
-
-
-        rail2.setAttribute(
-            "y2",
-            b.y -
-            1.5 *
-            Math.cos(
-                angulo *
-                Math.PI /
-                180
-            )
-        );
-
-
-        grupoEscaleras.appendChild(
-            rail1
-        );
-
-        grupoEscaleras.appendChild(
-            rail2
-        );
-
-
-        const cantidadEscalones =
-            Math.max(
-                3,
-                Math.floor(
-                    longitud / 5
-                )
-            );
-
-
-        for(
-            let i = 1;
-            i < cantidadEscalones;
-            i++
-        ){
-
-            const t =
-                i /
-                cantidadEscalones;
-
-
-            const cx =
-                a.x +
-                dx * t;
-
-
-            const cy =
-                a.y +
-                dy * t;
-
-
-            const rung =
-                document.createElementNS(
-                    "http://www.w3.org/2000/svg",
-                    "line"
-                );
-
-
-            rung.setAttribute(
-                "x1",
-                cx -
-                2.5 *
-                Math.sin(
-                    angulo *
-                    Math.PI /
-                    180
-                )
-            );
-
-
-            rung.setAttribute(
-                "y1",
-                cy +
-                2.5 *
-                Math.cos(
-                    angulo *
-                    Math.PI /
-                    180
-                )
-            );
-
-
-            rung.setAttribute(
-                "x2",
-                cx +
-                2.5 *
-                Math.sin(
-                    angulo *
-                    Math.PI /
-                    180
-                )
-            );
-
-
-            rung.setAttribute(
-                "y2",
-                cy -
-                2.5 *
-                Math.cos(
-                    angulo *
-                    Math.PI /
-                    180
-                )
-            );
-
-
-            rung.setAttribute(
-                "stroke",
-                "#27b957"
-            );
-
-
-            rung.setAttribute(
-                "stroke-width",
-                "1"
-            );
-
-
-            grupoEscaleras.appendChild(
-                rung
-            );
-
-        }
-
+    const NS = "http://www.w3.org/2000/svg";
+    const crear = (tag, attrs = {}) => {
+        const el = document.createElementNS(NS, tag);
+        Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+        return el;
+    };
+    const agregar = (grupo, tag, attrs) => {
+        const el = crear(tag, attrs);
+        grupo.appendChild(el);
+        return el;
+    };
+
+    // Definiciones visuales: madera para las escaleras y escamas para las serpientes.
+    let defs = svg.querySelector("defs#decoracionTablero");
+    if (!defs) {
+        defs = crear("defs", { id: "decoracionTablero" });
+        defs.innerHTML = `
+            <linearGradient id="maderaEscalera" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#7c3f16"/>
+                <stop offset="45%" stop-color="#f4bd62"/>
+                <stop offset="70%" stop-color="#d58a36"/>
+                <stop offset="100%" stop-color="#6f3514"/>
+            </linearGradient>
+            <linearGradient id="cuerpoSerpiente" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#b9ff76"/>
+                <stop offset="45%" stop-color="#39c96b"/>
+                <stop offset="100%" stop-color="#087a50"/>
+            </linearGradient>
+            <linearGradient id="vientreSerpiente" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="#f8e8a4"/>
+                <stop offset="100%" stop-color="#d6c06b"/>
+            </linearGradient>
+            <filter id="sombraElementosTablero" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur in="SourceAlpha" stdDeviation="0.65" result="blur"/>
+                <feOffset dx="0.35" dy="0.65" result="offset"/>
+                <feComponentTransfer><feFuncA type="linear" slope="0.42"/></feComponentTransfer>
+                <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>`;
+        svg.insertBefore(defs, svg.firstChild);
     }
 
+    // ESCALERAS: carriles con volumen, brillo y peldaños redondeados.
+    for (const [desde, hasta] of Object.entries(ESCALERAS)) {
+        const a = centroCasilla(Number(desde));
+        const b = centroCasilla(Number(hasta));
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const longitud = Math.hypot(dx, dy) || 1;
+        const nx = -dy / longitud, ny = dx / longitud;
+        const offset = 1.55;
+        const p1 = { x: a.x + nx * offset, y: a.y + ny * offset };
+        const p2 = { x: b.x + nx * offset, y: b.y + ny * offset };
+        const q1 = { x: a.x - nx * offset, y: a.y - ny * offset };
+        const q2 = { x: b.x - nx * offset, y: b.y - ny * offset };
+        const carril = (u, v) => {
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"#65330f", "stroke-width":"2.55", "stroke-linecap":"round", filter:"url(#sombraElementosTablero)" });
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"url(#maderaEscalera)", "stroke-width":"1.8", "stroke-linecap":"round" });
+            agregar(grupoEscaleras, "line", { x1:u.x-0.22, y1:u.y-0.12, x2:v.x-0.22, y2:v.y-0.12,
+                stroke:"#ffe0a0", "stroke-opacity":".8", "stroke-width":".35", "stroke-linecap":"round" });
+        };
+        carril(p1, p2);
+        carril(q1, q2);
 
-    // ========================================================
-    // SERPIENTES
-    // ========================================================
+        const cantidad = Math.max(4, Math.floor(longitud / 4.4));
+        for (let i = 1; i < cantidad; i++) {
+            const t = i / cantidad;
+            const cx = a.x + dx*t, cy = a.y + dy*t;
+            const u = { x: cx + nx*2.05, y: cy + ny*2.05 };
+            const v = { x: cx - nx*2.05, y: cy - ny*2.05 };
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"#69340f", "stroke-width":"1.25", "stroke-linecap":"round", filter:"url(#sombraElementosTablero)" });
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y, x2:v.x, y2:v.y,
+                stroke:"#f6c36d", "stroke-width":".78", "stroke-linecap":"round" });
+            agregar(grupoEscaleras, "line", { x1:u.x, y1:u.y-.18, x2:v.x, y2:v.y-.18,
+                stroke:"#fff0c7", "stroke-opacity":".7", "stroke-width":".2" });
+        }
+        // Marcas discretas de inicio y llegada para identificar los extremos.
+        [a,b].forEach((pt, idx) => agregar(grupoEscaleras, "circle", {
+            cx:pt.x, cy:pt.y, r:"1.05", fill: idx ? "#ffe4a3" : "#9a531e",
+            stroke:"#fff3d0", "stroke-width":".35"
+        }));
+    }
 
-    for(
-        const [desde,hasta]
-        of Object.entries(
-            SERPIENTES
-        )
-    ){
-
-        const a =
-            centroCasilla(
-                Number(desde)
-            );
-
-
-        const b =
-            centroCasilla(
-                Number(hasta)
-            );
-
-
-        const dx =
-            b.x - a.x;
-
-
-        const dy =
-            b.y - a.y;
-
-
-        const longitud =
-            Math.sqrt(
-                dx*dx + dy*dy
-            );
-
-
-        const normalX =
-            -dy /
-            Math.max(
-                longitud,
-                1
-            );
-
-
-        const normalY =
-            dx /
-            Math.max(
-                longitud,
-                1
-            );
-
-
+    // SERPIENTES: sombra, contorno, cuerpo brillante, vientre y ojos.
+    for (const [desde, hasta] of Object.entries(SERPIENTES)) {
+        const a = centroCasilla(Number(desde));
+        const b = centroCasilla(Number(hasta));
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const longitud = Math.hypot(dx, dy) || 1;
+        const nx = -dy / longitud, ny = dx / longitud;
+        const pasos = Math.max(12, Math.floor(longitud * 2.2));
         const puntos = [];
+        for (let i = 0; i <= pasos; i++) {
+            const t = i / pasos;
+            const curva = Math.sin(t * Math.PI * 3.2) * Math.min(3.0, longitud * 0.085);
+            puntos.push({ x: a.x + dx*t + nx*curva, y: a.y + dy*t + ny*curva });
+        }
+        const coords = puntos.map(pt => `${pt.x},${pt.y}`).join(" ");
+        // Cola fina que se ensancha gradualmente hacia la cabeza.
+        agregar(grupoSerpientes, "polyline", { points:coords, fill:"none", stroke:"#063f31",
+            "stroke-width":"3.25", "stroke-linecap":"round", "stroke-linejoin":"round", filter:"url(#sombraElementosTablero)" });
+        agregar(grupoSerpientes, "polyline", { points:coords, fill:"none", stroke:"url(#cuerpoSerpiente)",
+            "stroke-width":"2.65", "stroke-linecap":"round", "stroke-linejoin":"round" });
+        agregar(grupoSerpientes, "polyline", { points:coords, fill:"none", stroke:"#d9ff9e",
+            "stroke-opacity":".7", "stroke-width":".62", "stroke-linecap":"round", "stroke-linejoin":"round" });
 
-
-        const pasos =
-            Math.max(
-                8,
-                Math.floor(
-                    longitud / 3
-                )
-            );
-
-
-        for(
-            let i=0;
-            i<=pasos;
-            i++
-        ){
-
-            const t =
-                i /
-                pasos;
-
-
-            const curva =
-                Math.sin(
-                    t *
-                    Math.PI *
-                    4
-                ) *
-                2.5;
-
-
-            puntos.push(
-
-                `${
-                    a.x +
-                    dx*t +
-                    normalX*curva
-                },${
-                    a.y +
-                    dy*t +
-                    normalY*curva
-                }`
-
-            );
-
+        // Pequeñas marcas decorativas de escamas, sin tapar los números.
+        for (let i = 2; i < pasos - 1; i += Math.max(3, Math.floor(pasos / 7))) {
+            const pt = puntos[i];
+            agregar(grupoSerpientes, "circle", { cx:pt.x, cy:pt.y, r:".48", fill:"#e7ffb5", "fill-opacity":".85" });
         }
 
-
-        const cuerpo =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "polyline"
-            );
-
-
-        cuerpo.setAttribute(
-            "points",
-            puntos.join(" ")
-        );
-
-
-        cuerpo.setAttribute(
-            "fill",
-            "none"
-        );
-
-
-        cuerpo.setAttribute(
-            "stroke",
-            "#d23232"
-        );
-
-
-        cuerpo.setAttribute(
-            "stroke-width",
-            "3"
-        );
-
-
-        cuerpo.setAttribute(
-            "stroke-linecap",
-            "round"
-        );
-
-
-        cuerpo.setAttribute(
-            "stroke-linejoin",
-            "round"
-        );
-
-
-        grupoSerpientes.appendChild(
-            cuerpo
-        );
-
-
-        const cabeza =
-            document.createElementNS(
-                "http://www.w3.org/2000/svg",
-                "circle"
-            );
-
-
-        cabeza.setAttribute(
-            "cx",
-            a.x
-        );
-
-
-        cabeza.setAttribute(
-            "cy",
-            a.y
-        );
-
-
-        cabeza.setAttribute(
-            "r",
-            "2.5"
-        );
-
-
-        cabeza.setAttribute(
-            "fill",
-            "#a51f1f"
-        );
-
-
-        grupoSerpientes.appendChild(
-            cabeza
-        );
-
+        // Cabeza con ojos y lengua en dirección al tramo de la serpiente.
+        const siguiente = puntos[Math.min(2, puntos.length - 1)];
+        const ang = Math.atan2(siguiente.y - a.y, siguiente.x - a.x) * 180 / Math.PI;
+        const cabeza = agregar(grupoSerpientes, "g", { transform:`translate(${a.x} ${a.y}) rotate(${ang})` });
+        agregar(cabeza, "ellipse", { cx:"0", cy:"0", rx:"2.05", ry:"1.65", fill:"#087a50", stroke:"#064632", "stroke-width":".42" });
+        agregar(cabeza, "ellipse", { cx:".2", cy:"-.25", rx:"1.25", ry:".68", fill:"#75e878", "fill-opacity":".75" });
+        agregar(cabeza, "circle", { cx:".78", cy:"-.65", r:".38", fill:"#fff7d6" });
+        agregar(cabeza, "circle", { cx:".88", cy:"-.65", r:".19", fill:"#15251b" });
+        agregar(cabeza, "circle", { cx:".78", cy:".62", r:".38", fill:"#fff7d6" });
+        agregar(cabeza, "circle", { cx:".88", cy:".62", r:".19", fill:"#15251b" });
+        agregar(cabeza, "path", { d:"M 1.65 0.05 L 2.55 0.05 L 2.95 -0.35 M 2.55 0.05 L 2.95 0.42",
+            fill:"none", stroke:"#ff6676", "stroke-width":".32", "stroke-linecap":"round" });
+        agregar(grupoSerpientes, "circle", { cx:b.x, cy:b.y, r:".82", fill:"#f8e8a4", stroke:"#986c2e", "stroke-width":".3" });
     }
-
 }
-
 
 // ============================================================
 // JUGADORES
