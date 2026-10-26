@@ -4,15 +4,16 @@ import threading
 import json
 import math
 import websockets
-
+import os
 
 # ============================================================
 # CONFIGURACIÓN
 # ============================================================
 
-SERVER_IP = "192.168.18.43"
-PORT = 10000
-SERVER_URL = f"ws://{SERVER_IP}:{PORT}"
+SERVER_URL = os.getenv(
+    "SERVER_URL",
+    "wss://TU-SERVICIO.onrender.com"
+)
 
 ANCHO = 1100
 ALTO = 760
