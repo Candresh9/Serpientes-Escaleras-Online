@@ -1886,6 +1886,10 @@ let posicionesVisuales = {};
 
 let animando = false;
 
+// Bloqueo independiente para impedir movimientos simultáneos sin cancelar
+// la animación que inició el jugador activo.
+let movimientoEnCurso = false;
+
 let abandonando = false;
 
 let ultimaPosicionGanador = null;
@@ -3935,7 +3939,8 @@ async function animarMovimientoJugador(
     dado,
     aterrizajeInformado = null
 ){
-    if (animando) return;
+    if (movimientoEnCurso) return;
+    movimientoEnCurso = true;
     animando = true;
     actualizarBotonDado();
 
@@ -4001,6 +4006,7 @@ async function animarMovimientoJugador(
 
         posicionesVisuales[id] = Number(posicionFinal);
     } finally {
+        movimientoEnCurso = false;
         animando = false;
         actualizarBotonDado();
     }
@@ -4267,7 +4273,12 @@ async function recibirEstado(
     }
 
 
-    renderizarFichas();
+    // El servidor puede enviar el estado final inmediatamente después del dado.
+    // No redibujar las fichas mientras se muestra el dado o se anima el recorrido,
+    // porque eso las teletransportaría directamente a la casilla final.
+    if (!animando && !movimientoEnCurso && !resultadoDadoPendiente) {
+        renderizarFichas();
+    }
 
 }
 
@@ -4279,6 +4290,11 @@ async function recibirEstado(
 async function recibirResultadoDado(
     datos
 ){
+    // Bloquear el lanzamiento en TODOS los clientes desde que llega el resultado,
+    // no solo en el navegador del jugador que lanzó el dado.
+    if (resultadoDadoPendiente || movimientoEnCurso) return;
+    animando = true;
+    actualizarBotonDado();
 
     const resultado =
         Number(
@@ -4836,6 +4852,7 @@ function reiniciarPartida(){
     posicionesVisuales = {};
 
     animando = false;
+    movimientoEnCurso = false;
 
     dadoTerminado = true;
 
