@@ -1846,14 +1846,39 @@ input, select, textarea {
 
 
 <style>
-/* Capa de presentación 3D: el DOM y la lógica multijugador originales permanecen intactos. */
-#tablero { display:block !important; overflow:visible !important; background:transparent !important;
-  border:0 !important; border-radius:0 !important; isolation:isolate; }
-#tablero3DCanvas { position:absolute; inset:0; width:100%; height:100%; display:block;
-  border-radius:12px; z-index:1; outline:none; }
-#tablero > .casilla, #svgElementos, #fichas { visibility:hidden !important; }
-.tablero-contenedor { background:linear-gradient(145deg,#f8fbff,#dce8f6) !important;
-  border:1px solid rgba(255,255,255,.7); }
+/* Capa 3D: oculta todas las capas 2D sin eliminarlas del DOM.
+   Se conservan sus medidas para que las rutinas originales sigan funcionando. */
+#tablero {
+  display:block !important;
+  position:relative !important;
+  overflow:hidden !important;
+  background:#101b2b !important;
+  border:0 !important;
+  border-radius:14px !important;
+  isolation:isolate;
+}
+#tablero3DCanvas {
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  display:block !important;
+  border-radius:12px;
+  z-index:50 !important;
+  outline:none;
+}
+#tablero .casilla,
+#tablero .casilla > .numero,
+#tablero #svgElementos,
+#tablero #fichas {
+  visibility:hidden !important;
+  opacity:0 !important;
+  pointer-events:none !important;
+}
+.tablero-contenedor {
+  background:linear-gradient(145deg,#f8fbff,#dce8f6) !important;
+  border:1px solid rgba(255,255,255,.7);
+}
 @media (max-width:760px) {
   #tablero3DCanvas { border-radius:10px; }
 }
@@ -5108,7 +5133,13 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.m
     const w=board.clientWidth,h=board.clientHeight;
     if(!w||!h) return;
     renderer.setSize(w,h,false);
-    camera.aspect=w/h; camera.updateProjectionMatrix();
+    camera.aspect=w/h;
+    // En pantallas anchas se conserva el acercamiento; en paneles estrechos
+    // se abre ligeramente el campo para que no se recorten los laterales.
+    camera.fov = w < h ? 40 : 36;
+    camera.position.set(0, w < h ? 14.2 : 12.8, w < h ? 16.4 : 14.8);
+    camera.lookAt(0, 0.15, 0);
+    camera.updateProjectionMatrix();
   }
   const observer=new ResizeObserver(resize); observer.observe(board);
   window.addEventListener("resize",resize,{passive:true});
