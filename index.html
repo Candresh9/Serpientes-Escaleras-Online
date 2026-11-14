@@ -1844,6 +1844,21 @@ input, select, textarea {
 
 </style>
 
+
+<style>
+/* Capa de presentación 3D: el DOM y la lógica multijugador originales permanecen intactos. */
+#tablero { display:block !important; overflow:visible !important; background:transparent !important;
+  border:0 !important; border-radius:0 !important; isolation:isolate; }
+#tablero3DCanvas { position:absolute; inset:0; width:100%; height:100%; display:block;
+  border-radius:12px; z-index:1; outline:none; }
+#tablero > .casilla, #svgElementos, #fichas { visibility:hidden !important; }
+.tablero-contenedor { background:linear-gradient(145deg,#f8fbff,#dce8f6) !important;
+  border:1px solid rgba(255,255,255,.7); }
+@media (max-width:760px) {
+  #tablero3DCanvas { border-radius:10px; }
+}
+</style>
+
 </head>
 
 
@@ -2852,6 +2867,7 @@ function renderizarFichas(){
     );
 
     // Mantiene sincronizadas las fichas 3D con el estado multijugador.
+    window.estadoJuego3D = estado;
     if (typeof window.actualizarTablero3D === "function") {
         window.actualizarTablero3D(estado);
     }
@@ -3882,7 +3898,10 @@ async function animarMovimientoJugador(
 
         // Ordenar el movimiento 3D con las mismas posiciones que la ficha HTML.
         if (typeof window.animarMovimientoTablero3D === 'function') {
-            window.animarMovimientoTablero3D(id, posicionAnterior, intermedia, posicionFinal);
+            // La capa 3D anima la misma ruta; la lógica y el orden de turnos siguen
+            // controlados por las funciones originales del juego.
+            window.animarMovimientoTablero3D(id, posicionAnterior, intermedia, posicionFinal)
+                .catch(error => console.warn('Animación 3D:', error));
         }
 
         // Primero recorrer todas las casillas normales, una por una.
@@ -4869,6 +4888,242 @@ conectar();
 
 
 
+
+
+<script type="module">
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+(() => {
+  "use strict";
+  const board = document.getElementById("tablero");
+  if (!board) return;
+
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color("#101b2b");
+  const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 100);
+  camera.position.set(0, 15.8, 19.5);
+  camera.lookAt(0, 0, 0);
+
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+  renderer.domElement.id = "tablero3DCanvas";
+  board.prepend(renderer.domElement);
+
+  const ambient = new THREE.HemisphereLight(0xdcecff, 0x344052, 2.0);
+  scene.add(ambient);
+  const key = new THREE.DirectionalLight(0xffffff, 2.8);
+  key.position.set(-8, 16, 10);
+  key.castShadow = true;
+  key.shadow.mapSize.set(2048,2048);
+  key.shadow.camera.left = -12; key.shadow.camera.right = 12;
+  key.shadow.camera.top = 12; key.shadow.camera.bottom = -12;
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0x78bfff, 0.9);
+  fill.position.set(9, 8, -8); scene.add(fill);
+
+  const root = new THREE.Group();
+  scene.add(root);
+  const tileGroup = new THREE.Group(), ladderGroup = new THREE.Group(),
+        snakeGroup = new THREE.Group(), pawnGroup = new THREE.Group();
+  root.add(tileGroup, ladderGroup, snakeGroup, pawnGroup);
+
+  const COLORS = ["#e53935","#1976d2","#43a047","#8e24aa"];
+  const pawnMeshes = new Map();
+  const positions = new Map();
+  const tileMeshes = new Map();
+  const TILE = 1, GAP = 0.055;
+  const mat = (color, roughness=.72, metalness=.02) =>
+    new THREE.MeshStandardMaterial({color, roughness, metalness});
+  const boardMat = mat("#263b54");
+  const base = new THREE.Mesh(new THREE.BoxGeometry(10.65,.48,10.65), boardMat);
+  base.position.y=-.34; base.receiveShadow=true; base.castShadow=true;
+  root.add(base);
+
+  function cell(number) {
+    const idx=number-1, row=Math.floor(idx/10), col=idx%10;
+    const visualCol=(row%2===0)?9-col:col;
+    return {x:visualCol-4.5, z:4.5-row};
+  }
+  function labelTexture(n, color="#18283d") {
+    const c=document.createElement("canvas"); c.width=128; c.height=128;
+    const ctx=c.getContext("2d");
+    ctx.fillStyle="rgba(255,255,255,.92)"; ctx.beginPath();
+    ctx.roundRect(8,8,112,112,17); ctx.fill();
+    ctx.fillStyle=color; ctx.font="bold 62px Arial"; ctx.textAlign="center";
+    ctx.textBaseline="middle"; ctx.fillText(String(n),64,66);
+    const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace;
+    return tex;
+  }
+  for(let n=1;n<=100;n++){
+    const p=cell(n), even=(Math.floor((n-1)/10)+(n%2))%2===0;
+    const tile=new THREE.Mesh(
+      new THREE.BoxGeometry(TILE-GAP,.16,TILE-GAP),
+      mat(even?"#f5f8ff":"#dce9f8")
+    );
+    tile.position.set(p.x,0,p.z); tile.castShadow=true; tile.receiveShadow=true;
+    tile.userData.number=n; tileGroup.add(tile); tileMeshes.set(n,tile);
+    const label=new THREE.Mesh(new THREE.PlaneGeometry(.34,.34),
+      new THREE.MeshBasicMaterial({map:labelTexture(n),transparent:true,depthWrite:false}));
+    label.rotation.x=-Math.PI/2; label.position.set(p.x-.29,.091,p.z-.29);
+    tileGroup.add(label);
+  }
+
+  function addCylinderBetween(group,a,b,radius,material,radial=10) {
+    const A=new THREE.Vector3(a.x,a.y,a.z), B=new THREE.Vector3(b.x,b.y,b.z);
+    const d=new THREE.Vector3().subVectors(B,A);
+    const mesh=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,d.length(),radial),material);
+    mesh.position.copy(A).add(B).multiplyScalar(.5);
+    mesh.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());
+    mesh.castShadow=true; mesh.receiveShadow=true; group.add(mesh); return mesh;
+  }
+  const stairMat=mat("#b87532"), rungMat=mat("#f4c477");
+  const snakeMats=["#25a66a","#20a88d","#6bba45","#3e9dca","#a18bdb","#e0a23e"];
+  const snakeData={};
+  function buildLadders() {
+    for(const [from,to] of Object.entries(window.ESCALERAS_3D || {})) {
+      const a=cell(+from), b=cell(+to);
+      const dx=b.x-a.x, dz=b.z-a.z, len=Math.hypot(dx,dz)||1;
+      const nx=-dz/len*.19, nz=dx/len*.19;
+      const A={x:a.x,y:.28,z:a.z}, B={x:b.x,y:.28,z:b.z};
+      for(const s of [-1,1]) addCylinderBetween(ladderGroup,
+        {x:A.x+nx*s,y:A.y,z:A.z+nz*s},
+        {x:B.x+nx*s,y:B.y,z:B.z+nz*s},.065,stairMat,8);
+      const count=Math.max(4,Math.floor(len*2.5));
+      for(let i=1;i<count;i++){
+        const t=i/count, x=a.x+dx*t, z=a.z+dz*t;
+        addCylinderBetween(ladderGroup,{x:x+nx*1.12,y:.3,z:z+nz*1.12},
+          {x:x-nx*1.12,y:.3,z:z-nz*1.12},.045,rungMat,7);
+      }
+    }
+  }
+  function buildSnakes() {
+    for(const [from,to] of Object.entries(window.SERPIENTES_3D || {})) {
+      const a=cell(+from), b=cell(+to), dx=b.x-a.x, dz=b.z-a.z;
+      const len=Math.hypot(dx,dz)||1, nx=-dz/len, nz=dx/len;
+      const pts=[];
+      const steps=Math.max(22,Math.floor(len*9));
+      for(let i=0;i<=steps;i++){
+        const t=i/steps, wiggle=Math.sin(t*Math.PI*3.2)*Math.min(.42,len*.085);
+        pts.push(new THREE.Vector3(a.x+dx*t+nx*wiggle,.34,a.z+dz*t+nz*wiggle));
+      }
+      const curve=new THREE.CatmullRomCurve3(pts);
+      const color=snakeMats[(+from)%snakeMats.length];
+      const body=new THREE.Mesh(new THREE.TubeGeometry(curve,steps, .115, 9,false),
+        mat(color,.42));
+      body.castShadow=true; body.receiveShadow=true; snakeGroup.add(body);
+      const head=new THREE.Mesh(new THREE.SphereGeometry(.24,18,14),mat(color,.35));
+      head.position.copy(pts[0]); head.scale.set(1.25,.72,1.0); head.castShadow=true; snakeGroup.add(head);
+      const eyeMat=mat("#fff2c7",.3), pupilMat=mat("#14251e",.25);
+      for(const side of [-1,1]){
+        const eye=new THREE.Mesh(new THREE.SphereGeometry(.065,10,8),eyeMat);
+        eye.position.set(head.position.x+.12,.49,head.position.z+side*.105); snakeGroup.add(eye);
+        const pupil=new THREE.Mesh(new THREE.SphereGeometry(.03,8,8),pupilMat);
+        pupil.position.set(eye.position.x+.025,.51,eye.position.z); snakeGroup.add(pupil);
+      }
+      const tail=new THREE.Mesh(new THREE.ConeGeometry(.11,.36,10),mat(color));
+      tail.position.copy(pts[pts.length-1]); tail.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0,1,0),new THREE.Vector3(dx,0,dz).normalize()); snakeGroup.add(tail);
+    }
+  }
+  // Las tablas de reglas se copian desde las constantes originales sin modificarlas.
+  window.ESCALERAS_3D = {4:25,13:46,33:49,42:63,50:69,62:81,74:92};
+  window.SERPIENTES_3D = {27:5,40:3,43:18,54:31,66:45,76:58,89:53,99:41};
+  buildLadders(); buildSnakes();
+
+  function makePawn(color,id) {
+    const group=new THREE.Group();
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.19,.24,.42,24),mat(color,.32,.12));
+    body.position.y=.31; body.castShadow=true; group.add(body);
+    const top=new THREE.Mesh(new THREE.SphereGeometry(.19,20,14),mat(color,.28,.1));
+    top.position.y=.55; top.castShadow=true; group.add(top);
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.2,.035,8,24),mat("#ffffff",.3));
+    ring.rotation.x=Math.PI/2; ring.position.y=.18; group.add(ring);
+    group.userData.playerId=String(id); pawnGroup.add(group); pawnMeshes.set(String(id),group);
+    return group;
+  }
+  function placePawn(id,position,offsetIndex=0) {
+    let pawn=pawnMeshes.get(String(id));
+    if(!pawn) pawn=makePawn(COLORS[(Number(id)-1)%COLORS.length],id);
+    const p=cell(Math.max(1,Math.min(100,Number(position)||1)));
+    const offsets=[[0,0],[-.17,-.17],[.17,.17],[-.17,.17]];
+    const o=offsets[offsetIndex%4];
+    pawn.position.set(p.x+o[0],.14,p.z+o[1]);
+    positions.set(String(id),Number(position)||1);
+  }
+  function update(state) {
+    if(!state) return;
+    const players=state.jugadores||{}, ids=Object.keys(players);
+    ids.forEach((id,i)=>placePawn(id,players[id]?.posicion ?? players[id]?.casilla ?? 1,i));
+    for(const [id,pawn] of [...pawnMeshes]) if(!Object.prototype.hasOwnProperty.call(players,id)){
+      pawnGroup.remove(pawn); pawnMeshes.delete(id); positions.delete(id);
+    }
+    // El resplandor marca la casilla del jugador cuyo turno está activo.
+    for(const [n,tile] of tileMeshes) {
+      const active=ids.some(id=>Number(id)===Number(state.turno) &&
+        Number(players[id]?.posicion ?? players[id]?.casilla ?? 1)===n);
+      tile.material.emissive.set(active?"#b18a22":"#000000");
+      tile.material.emissiveIntensity=active?.22:0;
+    }
+  }
+  function tweenPawn(id,from,to,duration) {
+    const pawn=pawnMeshes.get(String(id)); if(!pawn) return Promise.resolve();
+    const a=cell(from),b=cell(to),start=performance.now();
+    return new Promise(resolve=>{
+      const tick=now=>{
+        const t=Math.min(1,(now-start)/duration),e=t*t*(3-2*t);
+        pawn.position.x=THREE.MathUtils.lerp(a.x,b.x,e);
+        pawn.position.z=THREE.MathUtils.lerp(a.z,b.z,e);
+        pawn.position.y=.14+Math.sin(t*Math.PI)*.22;
+        if(t<1) requestAnimationFrame(tick); else {positions.set(String(id),to);resolve();}
+      }; requestAnimationFrame(tick);
+    });
+  }
+  async function animateMove(id,from,landing,finalPos) {
+    id=String(id); from=Number(from); landing=Number(landing); finalPos=Number(finalPos);
+    if(!pawnMeshes.has(id)) makePawn(COLORS[(Number(id)-1)%COLORS.length],id);
+    if(from===landing) {
+      const pawn=pawnMeshes.get(id); pawn.position.y=.4;
+      await new Promise(r=>setTimeout(r,250)); pawn.position.y=.14;
+    } else {
+      for(let n=from+Math.sign(landing-from); n!==landing+Math.sign(landing-from); n+=Math.sign(landing-from))
+        await tweenPawn(id,n-Math.sign(landing-from),n,190);
+    }
+    if(finalPos!==landing) {
+      const isLadder=Object.prototype.hasOwnProperty.call(window.ESCALERAS_3D,landing);
+      const isSnake=Object.prototype.hasOwnProperty.call(window.SERPIENTES_3D,landing);
+      await tweenPawn(id,landing,finalPos,isLadder?950:(isSnake?1050:400));
+    }
+    const pawn=pawnMeshes.get(id); if(pawn) pawn.position.y=.14;
+  }
+  window.actualizarTablero3D=update;
+  window.animarMovimientoTablero3D=animateMove;
+  window.obtenerPosicionVisual3D=id=>positions.get(String(id)) ?? null;
+
+  function resize() {
+    const w=board.clientWidth,h=board.clientHeight;
+    if(!w||!h) return;
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.updateProjectionMatrix();
+  }
+  const observer=new ResizeObserver(resize); observer.observe(board);
+  window.addEventListener("resize",resize,{passive:true});
+  resize();
+  update(window.estadoJuego3D || null);
+  let frame=0;
+  function render(){requestAnimationFrame(render); frame+=.01;
+    // movimiento sutil de luz, sin alterar posiciones ni reglas
+    key.position.x=-8+Math.sin(frame*.18)*.5;
+    renderer.render(scene,camera);
+  }
+  render();
+  window.addEventListener("beforeunload",()=>{observer.disconnect();renderer.dispose();});
+})();
+</script>
 
 </body>
 
